@@ -111,6 +111,18 @@ describe("buildImperativeHandle — against a real Scene", () => {
     expect(handle.getFiles()).toEqual({});
   });
 
+  it("addFiles stores image bytes the live room did not carry", () => {
+    const scene = new Scene();
+    const handle = buildImperativeHandle(buildDeps(scene));
+    const file = { mimeType: "image/png", dataURL: "data:image/png;base64,QQ==", createdAt: 1 };
+
+    handle.addFiles({ "file-1": file });
+    scene.addElement(createImageElement({ x: 0, y: 0, width: 10, height: 10, fileId: "file-1", naturalWidth: 10, naturalHeight: 10 }));
+
+    expect(scene.getFile("file-1")).toEqual(file);
+    expect(handle.getFiles()).toEqual({ "file-1": file });
+  });
+
   it("resetScene clears every element and prunes orphaned files, batched as one undo step", () => {
     const scene = new Scene();
     scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10 }));

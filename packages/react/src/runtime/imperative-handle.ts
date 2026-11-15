@@ -53,6 +53,11 @@ export interface DevivaDrawHandle {
   getSceneElements(): AnyElement[];
   /** Every stored file (images) still referenced by a live element. */
   getFiles(): Record<string, LiveStoredFile>;
+  /**
+   * Inserts image bytes the live room does not carry. `Scene.addFile` notifies subscribers,
+   * so the canvas repaints and the image decode cache loads the new file.
+   */
+  addFiles(files: Record<string, LiveStoredFile>): void;
   exportToPng(options?: ExportPngOptions): Promise<Blob>;
   exportToSvg(options?: ExportSvgOptions): string;
   /** Clears the canvas back to empty (batched as a single undo step) — the main menu's "Reset canvas" action calls the same path. */
@@ -137,6 +142,9 @@ export function buildImperativeHandle(deps: ImperativeHandleDeps): DevivaDrawHan
     getDocument: () => documentControl?.getDocument() ?? scene.toJSON(),
     getSceneElements: () => getLiveElements(scene),
     getFiles: () => getLiveFiles(scene),
+    addFiles: (files) => {
+      for (const [fileId, file] of Object.entries(files)) scene.addFile(fileId, file);
+    },
 
     exportToPng: (options = {}) =>
       exportToPng({

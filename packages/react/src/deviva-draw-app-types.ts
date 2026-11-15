@@ -30,6 +30,13 @@ export interface DevivaDrawProps {
   shareApiBaseUrl?: string;
   /** A full room URL (`.../room/{id}#key=...`) to auto-join once on mount — how a host application turns a shared room link into a live session without the recipient opening the Collaborate dialog and pasting it by hand. Requires `shareApiBaseUrl`; a malformed or keyless URL surfaces the same inline collab error as a manual join. */
   initialRoomUrl?: string;
+  /**
+   * Follow the only other peer in the room without a click.
+   * `"sole-peer"` follows until the local user pans, then offers a way back.
+   * `"locked"` follows and puts the camera back on any local pan, with no way to stop.
+   * Omit for the manual Follow button.
+   */
+  autoFollow?: "sole-peer" | "locked";
   /** Host-supplied file operations for scene open/save — how a shell with a real filesystem (the desktop app) provides native dialogs, path identity, and save-in-place. Omit for the browser's picker/download behavior, which is unchanged when this prop is absent. See `FileOperationsProvider`. */
   fileOperations?: FileOperationsProvider;
   /** Fired synchronously on every document identity/dirty transition (`{path, name, dirty}`) — the desktop shell's title bar, macOS documentEdited dot, recents, and unsaved-close guard all hang off this. Dirty is content-only: pan/zoom and page switching never set it. */

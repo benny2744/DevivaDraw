@@ -27,7 +27,8 @@ import { shouldSuppressGlobalShortcuts } from "./runtime/should-suppress-global-
 import { useCollabCursorTracking } from "./hooks/use-collab-cursor-tracking";
 import { useCollabSession } from "./hooks/use-collab-session";
 import { useLanHosting } from "./hooks/use-lan-hosting";
-import { useFollowPeerCamera, usePublishLocalViewport } from "./hooks/use-follow-peer-camera";
+import { useFollowPeerCamera, usePublishLocalViewport, viewportToCamera } from "./hooks/use-follow-peer-camera";
+import { soleFollowablePeerId } from "./runtime/sole-followable-peer";
 import { TextEditorOverlay } from "./components/text-editor-overlay";
 import { CanvasHint } from "./components/canvas-hint";
 import { EmptyStateOverlay } from "./components/empty-state-overlay";
@@ -92,7 +93,7 @@ import type { ImageInsertOutcome } from "./browser/image-insert-outcome";
 import type { DevivaDrawProps } from "./deviva-draw-app-types";
 
 export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(function DevivaDrawShell(props, ref) {
-  const { initialData, persistenceKey, onChange, className, style, initialViewOnly, shareApiBaseUrl, initialRoomUrl, fileOperations, onDocumentStateChange, lanHost, confirmDiscardChanges } = props;
+  const { initialData, persistenceKey, onChange, className, style, initialViewOnly, shareApiBaseUrl, initialRoomUrl, autoFollow, fileOperations, onDocumentStateChange, lanHost, confirmDiscardChanges } = props;
   const canvasHostRef = useRef<HTMLDivElement | null>(null);
 
   // The document's page list, seeded once: host-supplied `initialData` wraps into a single page
@@ -494,10 +495,40 @@ export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(fun
   // camera from whoever this client follows. Any local camera gesture breaks the follow (`onBreak`) —
   // that rule lives in the hook, not in the pan/zoom handlers; see `use-follow-peer-camera.ts`.
   const collabFollow = collab.follow;
+  const autoFollowMode = autoFollow ?? null;
+  const [brokeFollow, setBrokeFollow] = useState(false);
   usePublishLocalViewport({ cameraStore, getViewportSize, publish: collab.setLocalViewport, active: collab.status === "connected" });
-  const stopFollowing = useCallback(() => collabFollow(null), [collabFollow]);
+  const snapBackToFollowed = useCallback(() => {
+    const viewport = collab.followedViewport;
+    if (!viewport) return;
+    const camera = viewportToCamera(viewport, getViewportSize());
+    if (camera) cameraStore.setCamera(camera);
+  }, [cameraStore, collab.followedViewport, getViewportSize]);
+  const stopFollowing = useCallback(() => {
+    // Locked viewers (a projector) cannot leave the teacher's camera.
+    if (autoFollowMode === "locked") {
+      snapBackToFollowed();
+      return;
+    }
+    if (autoFollowMode === "sole-peer") setBrokeFollow(true);
+    collabFollow(null);
+  }, [autoFollowMode, collabFollow, snapBackToFollowed]);
   useFollowPeerCamera({ cameraStore, getViewportSize, viewport: collab.followedViewport, onBreak: stopFollowing });
-  const followedPeer = collab.peers.find((peer) => peer.peerId === collab.followedPeerId) ?? null;
+  const peers = collab.peers;
+  const followedPeerId = collab.followedPeerId;
+  const localPageId = collab.localPageId;
+  useEffect(() => {
+    if (autoFollowMode !== "sole-peer" && autoFollowMode !== "locked") return;
+    if (autoFollowMode === "sole-peer" && brokeFollow) return;
+    const target = soleFollowablePeerId(peers, localPageId);
+    if (target && target !== followedPeerId) collabFollow(target);
+  }, [autoFollowMode, brokeFollow, peers, localPageId, followedPeerId, collabFollow]);
+  const followedPeer = peers.find((peer) => peer.peerId === followedPeerId) ?? null;
+  const resumeFollow = useCallback(() => {
+    setBrokeFollow(false);
+    const target = soleFollowablePeerId(collab.peers, collab.localPageId);
+    if (target) collabFollow(target);
+  }, [collab.peers, collab.localPageId, collabFollow]);
 
   const collabRole = collab.role;
   const setCollabViewer = collabViewer.set;
@@ -571,7 +602,30 @@ export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(fun
       {runtime && zenMode.value && !presentationActive.value && <ExitZenPill onExit={() => zenMode.set(false)} />}
       {/* Presenting drives the camera itself, which would break the follow on the first slide anyway —
           so the pill is not rendered there rather than flashing on screen for one frame. */}
-      {runtime && followedPeer && !presentationActive.value && <FollowingPeerPill peerName={followedPeer.name} peerColor={followedPeer.color} onStop={stopFollowing} />}
+      {runtime && followedPeer && !presentationActive.value && autoFollowMode !== "locked" && <FollowingPeerPill peerName={followedPeer.name} peerColor={followedPeer.color} onStop={stopFollowing} />}
+      {runtime && brokeFollow && autoFollowMode === "sole-peer" && !presentationActive.value && (
+        <button
+          type="button"
+          data-testid="back-to-teacher"
+          onClick={resumeFollow}
+          style={{
+            position: "absolute",
+            left: 16,
+            bottom: 16,
+            zIndex: 90,
+            padding: "8px 14px",
+            borderRadius: 999,
+            border: "none",
+            background: "#0056D2",
+            color: "white",
+            fontWeight: 700,
+            fontSize: 13,
+            cursor: "pointer",
+          }}
+        >
+          Back to teacher
+        </button>
+      )}
       {runtime && collabViewer.value && !presentationActive.value && <CollabViewerBadge />}
       {/* Not gated on `panelsHidden`: zen mode hides chrome the user chose to do without, and nobody
           chooses to do without being told their work has stopped saving. Presentation is the one
