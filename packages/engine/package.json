@@ -14,11 +14,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benny2744/deviva-draw.git",
+    "url": "git+https://github.com/benny2744/vf-draw.git",
     "directory": "packages/engine"
   },
-  "homepage": "https://github.com/benny2744/deviva-draw#readme",
-  "bugs": "https://github.com/benny2744/deviva-draw/issues",
+  "homepage": "https://github.com/benny2744/vf-draw#readme",
+  "bugs": "https://github.com/benny2744/vf-draw/issues",
   "engines": {
     "node": ">=22"
   },
