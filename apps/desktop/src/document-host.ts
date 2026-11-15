@@ -16,7 +16,7 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { ask, message } from "@tauri-apps/plugin-dialog";
 import { relaunch } from "@tauri-apps/plugin-process";
 import { check } from "@tauri-apps/plugin-updater";
-import type { DevivaDrawHandle, DocumentState, FileOperationsProvider, SaveDocumentOutcome } from "@deviva-draw/react";
+import type { DevivaDrawHandle, DocumentState, FileOperationsProvider, SaveDocumentOutcome } from "@benny2744/react";
 import { clearWrittenHash, contentHash, decideOnModify, lastWrittenHash } from "./external-change";
 
 interface PickedFile {

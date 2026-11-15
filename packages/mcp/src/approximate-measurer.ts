@@ -6,7 +6,7 @@
  * default to a real `@napi-rs/canvas`-backed `createCanvasTextMeasurer` when that install path is
  * available; this stays the graceful fallback.
  */
-import type { TextMeasurer } from "@deviva-draw/engine";
+import type { TextMeasurer } from "@benny2744/engine";
 
 /**
  * Average advance width as a fraction of font size, measured from the bundled hand-drawn face's own

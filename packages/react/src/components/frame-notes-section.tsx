@@ -16,8 +16,8 @@
  * Typed letters do not leak to the tool shortcuts: the shell's key handler already ignores events
  * whose focused element is an input/textarea, so no local `stopPropagation` is needed here.
  */
-import { MAX_FRAME_NOTES_LENGTH } from "@deviva-draw/engine";
-import type { AnyElement, FrameElement } from "@deviva-draw/engine";
+import { MAX_FRAME_NOTES_LENGTH } from "@benny2744/engine";
+import type { AnyElement, FrameElement } from "@benny2744/engine";
 import { inputStyle, labelStyle } from "./chrome-styles";
 import { useTranslation } from "../i18n/use-translation";
 import type { DevivaRuntime } from "../runtime/runtime-types";

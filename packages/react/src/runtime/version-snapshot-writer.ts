@@ -12,7 +12,7 @@
  * promises to the user, and `autosave-status-store.ts` is the one that means "your work is not being
  * saved". Every failure is logged and reported as "did not land".
  */
-import { isQuotaExceededError } from "@deviva-draw/engine";
+import { isQuotaExceededError } from "@benny2744/engine";
 import { DEFAULT_RETENTION_POLICY, snapshotsToPrune } from "../browser/version-retention";
 import type { RetentionPolicy } from "../browser/version-retention";
 import type { VersionStore } from "../browser/indexeddb-version-store";

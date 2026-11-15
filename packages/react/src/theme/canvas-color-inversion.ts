@@ -7,8 +7,8 @@
  * print/export) passes through untouched. The canvas *background* itself is a separate, always-swapped
  * theme token (`theme-tokens.ts`'s `canvasBackground`) — this module only ever touches element colors.
  */
-import { DEFAULT_BACKGROUND_COLOR_PALETTE, DEFAULT_STROKE_COLOR_PALETTE } from "@deviva-draw/engine";
-import type { AnyElement, Scene } from "@deviva-draw/engine";
+import { DEFAULT_BACKGROUND_COLOR_PALETTE, DEFAULT_STROKE_COLOR_PALETTE } from "@benny2744/engine";
+import type { AnyElement, Scene } from "@benny2744/engine";
 import type { ThemeMode } from "./theme-tokens";
 
 /** Dark-mode counterparts for `DEFAULT_STROKE_COLOR_PALETTE`, same order/length — each entry is a lightened version legible against a dark canvas background. */

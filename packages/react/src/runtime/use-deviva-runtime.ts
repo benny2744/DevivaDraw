@@ -26,10 +26,10 @@ import {
   ImageDecodeCache,
   loadTextFonts,
   Scene,
-} from "@deviva-draw/engine";
-import type { AnyElement, FileStoreLike, MultiPageDocumentV1, RemoteCursorOverlay, SceneDocument, TextEditSession } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import type { AnyElement, FileStoreLike, MultiPageDocumentV1, RemoteCursorOverlay, SceneDocument, TextEditSession } from "@benny2744/engine";
 import type { FileOperationsProvider } from "../browser/file-operations-provider";
-import { referencedFileIds } from "@deviva-draw/engine";
+import { referencedFileIds } from "@benny2744/engine";
 import { openIndexedDbFileStore } from "../browser/indexeddb-file-store";
 import { openIndexedDbVersionStore } from "../browser/indexeddb-version-store";
 import type { VersionStore } from "../browser/indexeddb-version-store";

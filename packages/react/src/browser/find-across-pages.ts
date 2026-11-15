@@ -11,7 +11,7 @@
  * Order is page order, then scene draw order within each page, so stepping through matches walks the
  * document the way the page rail reads top to bottom.
  */
-import { findTextMatches } from "@deviva-draw/engine";
+import { findTextMatches } from "@benny2744/engine";
 import type { PageStore } from "../pages/page-store";
 
 /** One match, carrying enough page identity for the panel to label it and to switch pages before revealing. */

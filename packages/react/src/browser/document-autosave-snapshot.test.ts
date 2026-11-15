@@ -9,8 +9,8 @@
  * or name file ids nothing has accepted yet — a stored version that restores with broken images.
  */
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { createImageElement } from "@deviva-draw/engine";
-import type { FileStoreLike, StoredFile } from "@deviva-draw/engine";
+import { createImageElement } from "@benny2744/engine";
+import type { FileStoreLike, StoredFile } from "@benny2744/engine";
 import { PageStore } from "../pages/page-store";
 import { startBrowserDocumentAutosave } from "./scene-file-operations";
 

@@ -12,9 +12,9 @@ same core.
 ## Layout
 
 ```
-packages/engine         @deviva-draw/engine — framework-agnostic core
-packages/react          @deviva-draw/react — <DevivaDraw/> component, hooks, UI chrome
-packages/collab-client  @deviva-draw/collab-client — WS sync, E2E crypto, presence
+packages/engine         @benny2744/engine — framework-agnostic core
+packages/react          @benny2744/react — <DevivaDraw/> component, hooks, UI chrome
+packages/collab-client  @benny2744/collab-client — WS sync, E2E crypto, presence
 apps/web                Standalone web app — Vite + React SPA
 apps/collab-server      Cloudflare Worker: Durable Objects rooms + R2 share blobs
 apps/desktop            Tauri v2 shell — native files, menus, LAN room hosting
@@ -121,7 +121,7 @@ test suites — the mechanism that keeps two relays from becoming two protocols.
 | engine | `roughjs` | hand-drawn/sketchy shape rendering |
 | engine | `perfect-freehand` | pressure-sensitive freehand stroke outlines |
 | engine | `fractional-indexing` | z-order index generation between elements |
-| react | `@deviva-draw/engine`, `@deviva-draw/collab-client` (workspace) | — |
+| react | `@benny2744/engine`, `@benny2744/collab-client` (workspace) | — |
 
 All third-party runtime libs are small, single-purpose, and MIT/CC0 — consistent
 with the project's locked decision: zero Excalidraw code, small permissive deps

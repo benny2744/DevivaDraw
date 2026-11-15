@@ -4,7 +4,7 @@
  * `use-deviva-runtime.ts`'s debounced `onChange` payload need, factored out once so the two never
  * drift (previously duplicated inline in both places).
  */
-import type { AnyElement, Scene } from "@deviva-draw/engine";
+import type { AnyElement, Scene } from "@benny2744/engine";
 
 export interface LiveStoredFile {
   mimeType: string;

@@ -1,6 +1,6 @@
 /**
  * Converts local pointermove/pointerleave events on `containerRef` into scene-coordinate cursor
- * broadcasts for collaborators — mirrors `@deviva-draw/engine`'s `PointerEventPipeline.toScenePoint`
+ * broadcasts for collaborators — mirrors `@benny2744/engine`'s `PointerEventPipeline.toScenePoint`
  * exactly (`clientX`/`clientY` minus the container's bounding rect, then `screenToScene`) so a remote
  * peer's cursor lands in the same place a local click would. A separate listener pair, not folded into
  * the pointer pipeline itself: this is presence bookkeeping, not a tool gesture, so it must keep firing
@@ -8,8 +8,8 @@
  */
 import { useEffect } from "react";
 import type { RefObject } from "react";
-import { screenToScene } from "@deviva-draw/engine";
-import type { Camera } from "@deviva-draw/engine";
+import { screenToScene } from "@benny2744/engine";
+import type { Camera } from "@benny2744/engine";
 
 export interface UseCollabCursorTrackingOptions {
   containerRef: RefObject<HTMLElement | null>;

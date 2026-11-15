@@ -4,7 +4,7 @@
  * is the ONLY tool that returns full scene JSON (token-economy contract — everything else returns
  * summaries).
  */
-import { computeExportBounds, serializeScene } from "@deviva-draw/engine";
+import { computeExportBounds, serializeScene } from "@benny2744/engine";
 import { z } from "zod";
 import { defineTool, liveElementCount } from "./tool-types";
 

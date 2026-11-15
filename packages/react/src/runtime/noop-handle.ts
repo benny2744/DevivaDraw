@@ -3,7 +3,7 @@
  * calls a ref method before `useEffect` has run) — every method is a harmless no-op/empty read rather
  * than `undefined`, so `ref.current.getSceneElements()` never has to be null-checked by the caller.
  */
-import { Scene } from "@deviva-draw/engine";
+import { Scene } from "@benny2744/engine";
 import type { DevivaDrawHandle } from "./imperative-handle";
 
 export const NOOP_HANDLE: DevivaDrawHandle = {

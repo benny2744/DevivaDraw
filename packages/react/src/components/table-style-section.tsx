@@ -19,8 +19,8 @@ import {
   tableCellsGrid,
   tableColumnWidths,
   tableRowHeights,
-} from "@deviva-draw/engine";
-import type { AnyElement, TableElement, TextFontFamily } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import type { AnyElement, TableElement, TextFontFamily } from "@benny2744/engine";
 import { buttonStyle, labelStyle } from "./chrome-styles";
 import { StyleSection } from "./style-section";
 import { useTranslation } from "../i18n/use-translation";

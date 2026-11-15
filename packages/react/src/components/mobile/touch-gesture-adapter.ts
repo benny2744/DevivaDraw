@@ -1,7 +1,7 @@
 /**
  * DOM wiring for mobile/touch: pinch-zoom + two-finger pan (feeding `touch-gesture-math.ts`'s pure
  * math) and long-press -> context menu (feeding `long-press-detector.ts`'s pure timing/movement
- * predicates). Layered *additively* on top of `@deviva-draw/engine`'s single-pointer
+ * predicates). Layered *additively* on top of `@benny2744/engine`'s single-pointer
  * `PointerEventPipeline` — a single touch flows through the pipeline
  * completely untouched; this adapter only ever activates once a *second* touch appears (pinch/pan) or
  * a *single* touch holds still long enough (long-press). When a second finger lands mid-gesture, this
@@ -17,7 +17,7 @@
  * Verified manually via Chrome DevTools touch emulation and a real touch device
  * (native-pinch-zoom-conflict is a known pitfall class).
  */
-import type { Camera } from "@deviva-draw/engine";
+import type { Camera } from "@benny2744/engine";
 import { hasMovedPastLongPressThreshold, LONG_PRESS_DURATION_MS, shouldFireLongPress } from "./long-press-detector";
 import { isDoubleTap, isTap } from "./double-tap-detector";
 import { computeTouchPanZoomCamera, touchCentroid, touchSpread } from "./touch-gesture-math";

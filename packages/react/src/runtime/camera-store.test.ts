@@ -1,4 +1,4 @@
-import { createCamera } from "@deviva-draw/engine";
+import { createCamera } from "@benny2744/engine";
 import { describe, expect, it, vi } from "vitest";
 import { createCameraStore } from "./camera-store";
 

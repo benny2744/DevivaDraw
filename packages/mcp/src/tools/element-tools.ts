@@ -6,8 +6,8 @@
  * collab invariants can't be bypassed from here. Results are token-economy summaries, never full
  * elements.
  */
-import { deleteContainerAndBoundText, findBoundTextRef, growContainerToFitText, isBindableContainer, unbindTextFromContainer } from "@deviva-draw/engine";
-import type { AnyElement, ElementUpdate, Scene, TextMeasurer } from "@deviva-draw/engine";
+import { deleteContainerAndBoundText, findBoundTextRef, growContainerToFitText, isBindableContainer, unbindTextFromContainer } from "@benny2744/engine";
+import type { AnyElement, ElementUpdate, Scene, TextMeasurer } from "@benny2744/engine";
 import { z } from "zod";
 import { applyLabel, insertElementFromInput, measureStandaloneText, normalizePoints } from "./element-create";
 import { createElementSchema, updateElementSchema } from "./element-schemas";

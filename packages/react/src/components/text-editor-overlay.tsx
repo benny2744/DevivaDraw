@@ -12,7 +12,7 @@
  *
  * Not unit tested: `HTMLTextAreaElement`/focus/`scrollHeight` behavior don't exist in this
  * package's node-based vitest environment (no `jsdom` dependency, same trade-off
- * `@deviva-draw/engine`'s `render/canvas-stage.ts` documents for its own DOM-only surface).
+ * `@benny2744/engine`'s `render/canvas-stage.ts` documents for its own DOM-only surface).
  * Verified manually via `apps/web`'s app shell instead.
  */
 import { useEffect, useRef } from "react";

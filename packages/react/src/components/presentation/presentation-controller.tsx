@@ -13,8 +13,8 @@
  * owns no timers; the math it does own is not duplicated.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { computeRevealRectCamera, easeInOutCubic, interpolateCamera } from "@deviva-draw/engine";
-import type { Camera, FrameElement, SceneRect } from "@deviva-draw/engine";
+import { computeRevealRectCamera, easeInOutCubic, interpolateCamera } from "@benny2744/engine";
+import type { Camera, FrameElement, SceneRect } from "@benny2744/engine";
 import { Z_LAYER } from "../chrome-styles";
 import { orderFramesAsSlides, orderedSceneFrames } from "./frame-slide-order";
 import type { Slide } from "./frame-slide-order";

@@ -4,8 +4,8 @@
  * presence mapping, and the fake-socket e2e proving bidirectional element flow through two real
  * `CollabSession` instances (bridge + simulated browser peer).
  */
-import { createRectangleElement, Scene } from "@deviva-draw/engine";
-import { CollabSession, createPageStoreCollabAdapter, PageStore } from "@deviva-draw/collab-client";
+import { createRectangleElement, Scene } from "@benny2744/engine";
+import { CollabSession, createPageStoreCollabAdapter, PageStore } from "@benny2744/collab-client";
 import { afterEach, describe, expect, it } from "vitest";
 import { SceneSession } from "../scene-session";
 import { ToolError } from "../tools/tool-types";

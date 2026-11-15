@@ -1,15 +1,15 @@
 import { useEffect } from "react";
-import { DevivaDraw } from "@deviva-draw/react";
+import { DevivaDraw } from "@benny2744/react";
 import { SharedSceneViewerRoute } from "./routes/shared-scene-viewer";
 import { SHARE_API_BASE_URL } from "./share-api-config";
 
 /**
  * Application shell for the standalone Deviva Draw app (draw.deviva.app) — a thin wrapper around the
- * composed `<DevivaDraw/>` component from `@deviva-draw/react`, full-screen, with no props overridden
+ * composed `<DevivaDraw/>` component from `@benny2744/react`, full-screen, with no props overridden
  * beyond `shareApiBaseUrl` (theme defaults to the persisted preference then light, locale to the
  * persisted preference then the browser language; scene data defaults to localStorage autosave restore/save, this app's whole persistence
  * story). Every actual feature (canvas, tools, toolbar, panels, menus, shortcuts, mobile/touch,
- * theming, i18n) lives in `@deviva-draw/react` — this app is just the browser tab that hosts it.
+ * theming, i18n) lives in `@benny2744/react` — this app is just the browser tab that hosts it.
  *
  * Routing is a single `pathname` check, not a router dependency (YAGNI: this app has a small, fixed
  * set of "pages"). `/s/{blobId}` share links render the read-only `<SharedSceneViewerRoute/>`;

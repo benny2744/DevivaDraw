@@ -10,7 +10,7 @@
  * would. A right-click on empty canvas opens the canvas menu (paste/select-all/view toggles)
  * instead, leaving any existing selection alone.
  */
-import { expandToGroupMembers, screenToScene, selectionBoundsOf, topmostElementAt } from "@deviva-draw/engine";
+import { expandToGroupMembers, screenToScene, selectionBoundsOf, topmostElementAt } from "@benny2744/engine";
 import { useEffect, useState } from "react";
 import type { RefObject } from "react";
 import { TouchGestureAdapter } from "../components/mobile/touch-gesture-adapter";

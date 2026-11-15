@@ -3,7 +3,7 @@
  * someone) putting the local camera where they are looking.
  *
  * They live in one file because they are inverse functions of the same wire shape — `PresenceViewport`
- * is the scene point at the centre of a screen plus a zoom (see its doc in `@deviva-draw/collab-client`),
+ * is the scene point at the centre of a screen plus a zoom (see its doc in `@benny2744/collab-client`),
  * and getting the two conversions out of sync is exactly the bug that makes follow-mode drift. The
  * conversions are exported as pure functions so they can be unit-tested in a package that does not
  * test hooks (see `runtime/use-live-version.ts`'s module doc for why).
@@ -15,9 +15,9 @@
  * camera without going through `CameraStore.setCamera`.
  */
 import { useEffect, useRef } from "react";
-import { clampZoom } from "@deviva-draw/engine";
-import type { Camera } from "@deviva-draw/engine";
-import type { PresenceViewport } from "@deviva-draw/collab-client";
+import { clampZoom } from "@benny2744/engine";
+import type { Camera } from "@benny2744/engine";
+import type { PresenceViewport } from "@benny2744/collab-client";
 import type { CameraStore } from "../runtime/camera-store";
 
 export interface ViewportSize {

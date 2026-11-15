@@ -12,8 +12,8 @@
  * Inactive pages keep their live `Scene` instances — an engine `Scene` is independent of any mounted
  * runtime, which is also what lets a collab session apply remote edits to a page that isn't on screen.
  */
-import { generatePageId, Scene, serializeMultiPageDocument } from "@deviva-draw/engine";
-import type { Camera, MultiPageDocumentV1, ScenePage } from "@deviva-draw/engine";
+import { generatePageId, Scene, serializeMultiPageDocument } from "@benny2744/engine";
+import type { Camera, MultiPageDocumentV1, ScenePage } from "@benny2744/engine";
 import type { PagesManifest } from "./pages-adapter";
 
 export interface PageListEntry {
@@ -36,7 +36,7 @@ export class PageStore {
   private pages: PageEntry[];
   private activeId: string;
   private readonly listeners = new Set<PageStoreListener>();
-  // Page-list LWW state for collab (see `@deviva-draw/collab-client`'s `pages-adapter.ts`): every
+  // Page-list LWW state for collab (see `@benny2744/collab-client`'s `pages-adapter.ts`): every
   // local page operation bumps the version and re-rolls the nonce; a remote manifest replaces the
   // list only when it wins the same comparison elements use. Deleted page ids are tombstoned so an
   // in-flight remote delta can't resurrect a page a peer just watched disappear.

@@ -11,7 +11,7 @@ These are settled; revisit only with explicit maintainer sign-off:
   libraries are OK (roughjs, perfect-freehand, fractional-indexing).
 - **Scope.** Full whiteboard including live collaboration.
 - **Two deliverables.** A standalone web app, and a React library
-  (`@deviva-draw/react`) embeddable in other apps — including [Deviva](https://deviva.app/),
+  (`@benny2744/react`) embeddable in other apps — including [Deviva](https://deviva.app/),
   whose design canvas it powers.
 - **Collab foundation from day one.** Every element mutation bumps
   `version`/`versionNonce` via `touch()`, so the collab layer can merge by

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createRectangleElement, createTableElement, Scene } from "@deviva-draw/engine";
+import { createRectangleElement, createTableElement, Scene } from "@benny2744/engine";
 import { findTableCellAt } from "./find-table-cell-at-point";
 
 function sceneWithTable(overrides: Partial<Parameters<typeof createTableElement>[0]> = {}) {

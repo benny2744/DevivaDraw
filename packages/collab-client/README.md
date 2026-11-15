@@ -1,8 +1,8 @@
-# @deviva-draw/collab-client
+# @benny2744/collab-client
 
 Realtime sync client for [Deviva Draw](https://github.com/nhtera/DevivaDraw): WebSocket
 transport, end-to-end encryption, presence broadcasting, and last-writer-wins conflict resolution
-over [`@deviva-draw/engine`](https://www.npmjs.com/package/@deviva-draw/engine) element versions.
+over [`@benny2744/engine`](https://www.npmjs.com/package/@benny2744/engine) element versions.
 Pairs with a Durable Objects (or any compatible WebSocket) relay server — see the
 [repository](https://github.com/nhtera/DevivaDraw)'s `apps/collab-server` for the reference
 backend.
@@ -10,14 +10,14 @@ backend.
 ## Install
 
 ```bash
-npm install @deviva-draw/collab-client @deviva-draw/engine
+npm install @benny2744/collab-client @benny2744/engine
 ```
 
 ## Minimal example
 
 ```ts
-import { CollabSession } from "@deviva-draw/collab-client";
-import { Scene } from "@deviva-draw/engine";
+import { CollabSession } from "@benny2744/collab-client";
+import { Scene } from "@benny2744/engine";
 
 const scene = new Scene();
 const session = new CollabSession({ scene, userName: "Alice", userColor: "#f97316" });
@@ -29,7 +29,7 @@ const roomUrl = await session.startSession("https://your-collab-server.example.c
 // await session.joinSession("https://your-collab-server.example.com", roomUrl);
 ```
 
-`@deviva-draw/react`'s `useCollabSession` hook wraps this client with React state management —
+`@benny2744/react`'s `useCollabSession` hook wraps this client with React state management —
 prefer that in a React app; use this package directly for a framework-agnostic integration.
 
 ## License

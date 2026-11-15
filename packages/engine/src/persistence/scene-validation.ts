@@ -33,7 +33,7 @@ export const DOCUMENT_CEILINGS = {
 } as const;
 
 /**
- * Scene-load twin of the UI entry gate in `@deviva-draw/react`'s `components/link-url.ts`: only
+ * Scene-load twin of the UI entry gate in `@benny2744/react`'s `components/link-url.ts`: only
  * absolute `http:`/`https:` URLs survive a load. A `javascript:`/`data:`/`file:` link in a crafted
  * `.devivadraw` file would otherwise flow into the link-open anchor path — with OS file association
  * (double-click opens the file), that is an untrusted-input XSS surface, so it is closed at the one

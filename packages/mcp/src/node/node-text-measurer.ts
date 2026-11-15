@@ -4,8 +4,8 @@
  * `@napi-rs/canvas` is present, else the approximate fallback. Called once by the stdio entry and
  * injected into the `SceneSession` — the shared tool core never imports this module.
  */
-import { createCanvasTextMeasurer } from "@deviva-draw/engine";
-import type { MeasurementContext2D, TextMeasurer } from "@deviva-draw/engine";
+import { createCanvasTextMeasurer } from "@benny2744/engine";
+import type { MeasurementContext2D, TextMeasurer } from "@benny2744/engine";
 import { createApproximateTextMeasurer } from "../approximate-measurer";
 import { loadCanvasRuntime } from "./canvas-runtime";
 import { ensureHandDrawnFontRegistered } from "./hand-drawn-font";

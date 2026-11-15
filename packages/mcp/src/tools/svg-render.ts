@@ -4,8 +4,8 @@
  * SVG without evaluating `node:fs`/`node:os` at module load; `export-tools.ts` layers file writing
  * and inline-size fallbacks on top for the stdio transport.
  */
-import { createRoughGenerator, EmptyExportSelectionError, exportToSvg, findBoundTextRef, isBindableContainer } from "@deviva-draw/engine";
-import type { AnyElement, Scene } from "@deviva-draw/engine";
+import { createRoughGenerator, EmptyExportSelectionError, exportToSvg, findBoundTextRef, isBindableContainer } from "@benny2744/engine";
+import type { AnyElement, Scene } from "@benny2744/engine";
 import { ToolError } from "./tool-types";
 import type { ToolSession } from "./tool-types";
 

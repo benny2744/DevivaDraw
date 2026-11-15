@@ -13,7 +13,7 @@ import { isPlausibleManifest } from "./pages-adapter";
 import { isPlausibleLayersManifest } from "./layers-adapter";
 import { mergeRemoteComments, mergeRemoteCommentMessage, mergeRemoteCommentThread } from "./comments-adapter";
 import type { CollabPagesAdapter } from "./pages-adapter";
-import type { Scene } from "@deviva-draw/engine";
+import type { Scene } from "@benny2744/engine";
 import type { PresenceStore } from "./presence-state";
 
 export interface InboundMessageDeps {

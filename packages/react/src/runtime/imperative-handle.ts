@@ -3,10 +3,10 @@
  * the read/export/control surface layered on top of the composed app shell's live `Scene`/history/
  * camera. Kept as a pure builder function (not baked into the component) over injected dependencies,
  * the same seam `browser/scene-file-operations.ts` uses for its own export functions, so this stays
- * unit-testable against a real `@deviva-draw/engine` `Scene` with fake render/measure dependencies
+ * unit-testable against a real `@benny2744/engine` `Scene` with fake render/measure dependencies
  * instead of needing a real `<canvas>`.
  */
-import { DEFAULT_EXPORT_PADDING, exportToPng, exportToSvg, Scene } from "@deviva-draw/engine";
+import { DEFAULT_EXPORT_PADDING, exportToPng, exportToSvg, Scene } from "@benny2744/engine";
 import type {
   AnyElement,
   CreateExportRenderTarget,
@@ -18,7 +18,7 @@ import type {
   SceneDocument,
   SelectionState,
   TextMeasurer,
-} from "@deviva-draw/engine";
+} from "@benny2744/engine";
 import type { SaveDocumentOutcome } from "../actions/action-types";
 import { resetScene } from "./reset-scene";
 import { getLiveElements, getLiveFiles } from "./scene-live-snapshot";
@@ -121,7 +121,7 @@ export interface ImperativeHandleDeps {
   history: HistoryStack<AnyElement[]>;
   panZoomTool: PanZoomTool;
   createExportRenderTarget: CreateExportRenderTarget;
-  /** Headless rough.js generator factory (`rough.generator()`) — typed as `unknown` here so this module has no hard rough.js type dependency; `exportToSvg` (from `@deviva-draw/engine`) is what actually constrains its real shape. */
+  /** Headless rough.js generator factory (`rough.generator()`) — typed as `unknown` here so this module has no hard rough.js type dependency; `exportToSvg` (from `@benny2744/engine`) is what actually constrains its real shape. */
   createRoughSvgGenerator(): unknown;
   textMeasurer: TextMeasurer;
   imageDecodeCache: ImageDecodeCache<HTMLImageElement>;

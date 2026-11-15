@@ -6,7 +6,7 @@
  * `use-image-file-picker.ts`'s capture-phase listener.
  */
 import { useEffect, useState } from "react";
-import type { Camera } from "@deviva-draw/engine";
+import type { Camera } from "@benny2744/engine";
 import type { PendingImagePlacement } from "../hooks/use-image-file-picker";
 
 const GHOST_OPACITY = 0.55;

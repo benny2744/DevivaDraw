@@ -10,8 +10,8 @@
  * inserts through `insertImageFile` — both offset to the viewport center, in one history batch, and
  * selected so they can be moved/tweaked immediately.
  */
-import { computeElementsBounds, insertElements, insertImageFile, screenToScene, tryMermaidToElements } from "@deviva-draw/engine";
-import type { MermaidErrorCode } from "@deviva-draw/engine";
+import { computeElementsBounds, insertElements, insertImageFile, screenToScene, tryMermaidToElements } from "@benny2744/engine";
+import type { MermaidErrorCode } from "@benny2744/engine";
 import { useEffect, useMemo, useState } from "react";
 import { buttonStyle, dialogOverlayStyle, dialogStyle, disabledButtonStyle, inputStyle, labelStyle } from "./chrome-styles";
 import { Icon } from "./icon";

@@ -1,10 +1,10 @@
 /**
  * Align/distribute/flip/group/ungroup/lock actions — align/distribute/flip compute pure `{id, changes}` pairs
- * via `@deviva-draw/engine`'s `selection/align-distribute.ts` and apply them as one batched history
+ * via `@benny2744/engine`'s `selection/align-distribute.ts` and apply them as one batched history
  * step, matching every other multi-element mutation in this codebase.
  */
-import { computeAlignChanges, computeDistributeChanges, computeFlipChanges, groupSelection, lockSelection, unlockSelection, ungroupSelection } from "@deviva-draw/engine";
-import type { AlignEdge, DistributeAxis, FlipAxis } from "@deviva-draw/engine";
+import { computeAlignChanges, computeDistributeChanges, computeFlipChanges, groupSelection, lockSelection, unlockSelection, ungroupSelection } from "@benny2744/engine";
+import type { AlignEdge, DistributeAxis, FlipAxis } from "@benny2744/engine";
 import type { Action, ActionRuntime } from "./action-types";
 
 function selectedAlignableElements(runtime: ActionRuntime) {

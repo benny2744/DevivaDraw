@@ -12,7 +12,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@deviva-draw/engine": "workspace:*",
+    "@benny2744/engine": "workspace:*",
     "@deviva-draw/mcp": "workspace:*",
     "zod": "^4.4.3"
   },

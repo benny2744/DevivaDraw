@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Scene } from "@deviva-draw/engine";
-import { createRectangleElement } from "@deviva-draw/engine";
+import { Scene } from "@benny2744/engine";
+import { createRectangleElement } from "@benny2744/engine";
 import type { FileOperationsProvider } from "../browser/file-operations-provider";
 import { buildPersistenceOperations } from "./build-persistence-operations";
 import type { BuildPersistenceOperationsDeps, PagesPersistenceAdapter } from "./build-persistence-operations";

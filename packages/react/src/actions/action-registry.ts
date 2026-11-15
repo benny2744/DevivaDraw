@@ -14,7 +14,7 @@ export class ActionRegistry {
    * Registers `action`. A duplicate `id` is a programmer bug (two action builders picked the same
    * id) — warns via `console.warn` and keeps the first registration, the same "surface every conflict
    * in one pass, never throw" policy `ShortcutRegistry.register` already establishes for the sibling
-   * conflict-detection case in `@deviva-draw/engine`.
+   * conflict-detection case in `@benny2744/engine`.
    */
   register(action: Action): void {
     const existing = this.actions.get(action.id);

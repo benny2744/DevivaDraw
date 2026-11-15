@@ -5,7 +5,7 @@
  * `null` session (the shell has none until the runtime finishes mounting).
  */
 import { useEffect, useReducer } from "react";
-import type { TextEditSession } from "@deviva-draw/engine";
+import type { TextEditSession } from "@benny2744/engine";
 
 export function useEditSessionStatus(session: TextEditSession | null): "idle" | "editing" {
   const [, dispatch] = useReducer((count: number) => count + 1, 0);

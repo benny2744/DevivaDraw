@@ -10,7 +10,7 @@
  * plain document is a thing that can be tested exhaustively; the same walk inlined in a scheduler
  * that also owns timers and a database is not.
  */
-import type { MultiPageDocumentV1 } from "@deviva-draw/engine";
+import type { MultiPageDocumentV1 } from "@benny2744/engine";
 
 export interface DocumentSummary {
   /** Every image this document references, in first-seen order. */

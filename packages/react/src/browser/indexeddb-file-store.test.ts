@@ -6,7 +6,7 @@
 import "fake-indexeddb/auto";
 import { describe, expect, it } from "vitest";
 import { openIndexedDbFileStore } from "./indexeddb-file-store";
-import type { FileStoreLike, StoredFile } from "@deviva-draw/engine";
+import type { FileStoreLike, StoredFile } from "@benny2744/engine";
 
 function file(dataURL: string): StoredFile {
   return { mimeType: "image/png", dataURL, createdAt: 1 };

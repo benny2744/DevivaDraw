@@ -1,5 +1,5 @@
 /**
- * `useCollabSession` — thin React wiring exposing `@deviva-draw/collab-client`'s `CollabSession` to the
+ * `useCollabSession` — thin React wiring exposing `@benny2744/collab-client`'s `CollabSession` to the
  * chrome layer. Collaboration is opt-in at this hook's boundary: called with `scene: null` (no runtime
  * mounted yet, e.g. before `useDevivaRuntime` finishes its mount effect) it constructs nothing and
  * touches no network; a host that never renders UI driven by this hook's return value (no collab
@@ -8,15 +8,15 @@
  *
  * Not unit tested for the same reason every other hook in this package documents (no
  * `@testing-library/react` dependency — see `runtime/use-live-version.ts`'s module doc): the
- * `CollabSession` this hook wraps is already thoroughly unit tested in `@deviva-draw/collab-client`,
+ * `CollabSession` this hook wraps is already thoroughly unit tested in `@benny2744/collab-client`,
  * including two-simulated-clients convergence over an in-memory relay; this file has no decision logic
  * left to test beyond React lifecycle wiring (construct-on-scene-ready, subscribe-to-presence,
  * dispose-on-unmount).
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import { adoptRoomPages, CollabSession, createPageStoreCollabAdapter } from "@deviva-draw/collab-client";
-import type { CollabConnectionStatus, CollabPagesAdapter, CollabRole, GiveUpReason, MintedRoom, PresenceViewport, RemotePeerPresence } from "@deviva-draw/collab-client";
-import type { Scene } from "@deviva-draw/engine";
+import { adoptRoomPages, CollabSession, createPageStoreCollabAdapter } from "@benny2744/collab-client";
+import type { CollabConnectionStatus, CollabPagesAdapter, CollabRole, GiveUpReason, MintedRoom, PresenceViewport, RemotePeerPresence } from "@benny2744/collab-client";
+import type { Scene } from "@benny2744/engine";
 import { randomGuestColor, randomGuestName } from "./random-collab-identity";
 import type { PageStore } from "../pages/page-store";
 
@@ -25,7 +25,7 @@ export interface UseCollabSessionOptions {
   /**
    * Multi-page host: the session anchors to this stable store instead of the (per-page) `scene`, so a
    * page switch never tears a live session down; element sync spans every page and the page list
-   * itself syncs (see `@deviva-draw/collab-client`'s `pages-adapter.ts`). The local user's active
+   * itself syncs (see `@benny2744/collab-client`'s `pages-adapter.ts`). The local user's active
    * page also rides with presence, keeping their cursor off other pages' canvases.
    */
   pageStore?: PageStore | null;
@@ -147,7 +147,7 @@ export function useCollabSession(options: UseCollabSessionOptions): UseCollabSes
   useEffect(() => {
     if (!sessionAnchor) return;
     const identity = identityRef.current!;
-    // The canonical PageStore↔collab wiring lives beside `PageStore` in `@deviva-draw/collab-client`
+    // The canonical PageStore↔collab wiring lives beside `PageStore` in `@benny2744/collab-client`
     // (`page-store-adapter.ts`) — shared verbatim with the headless MCP live-session bridge.
     const pages: CollabPagesAdapter | undefined = pageStore ? createPageStoreCollabAdapter(pageStore) : undefined;
     const session = new CollabSession({

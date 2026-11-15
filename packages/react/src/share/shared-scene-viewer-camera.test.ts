@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deserializeMultiPageDocument, Scene, serializeMultiPageDocument } from "@deviva-draw/engine";
+import { deserializeMultiPageDocument, Scene, serializeMultiPageDocument } from "@benny2744/engine";
 
 /**
  * The share-viewer load path re-serializes the validated pages before the shell deserializes them

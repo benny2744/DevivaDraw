@@ -3,7 +3,7 @@
  * Skipped wholesale when the optional dependency is absent, which is itself a supported install
  * state (`screenshot-tools.test.ts` covers the degraded path explicitly).
  */
-import { HAND_DRAWN_FONT_FAMILY, ImageDecodeCache, Scene, createImageElement } from "@deviva-draw/engine";
+import { HAND_DRAWN_FONT_FAMILY, ImageDecodeCache, Scene, createImageElement } from "@benny2744/engine";
 import { describe, expect, it } from "vitest";
 import { createApproximateTextMeasurer } from "../approximate-measurer";
 import { loadCanvasRuntime } from "./canvas-runtime";

@@ -135,7 +135,7 @@ mount - this is how the standalone app handles `/room/{id}#key=…` URLs:
 component:
 
 ```tsx
-import { SharedSceneViewer } from "@deviva-draw/react";
+import { SharedSceneViewer } from "@benny2744/react";
 ```
 
 ## Lower-level hooks
@@ -148,7 +148,7 @@ Hosts building custom collaboration UI can use the exported hooks directly:
 - `CollabDialog` - the ready-made join/share dialog the shell uses.
 
 The wire protocol itself lives in
-[`@deviva-draw/collab-client`](https://www.npmjs.com/package/@deviva-draw/collab-client);
+[`@benny2744/collab-client`](https://www.npmjs.com/package/@benny2744/collab-client);
 the React package wraps it, and you only reach for it directly when building a
 non-React client (the MCP server's live-session peer does exactly that).
 

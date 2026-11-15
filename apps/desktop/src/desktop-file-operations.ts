@@ -5,7 +5,7 @@
  */
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
-import type { FileOperationsProvider, OpenedFile } from "@deviva-draw/react";
+import type { FileOperationsProvider, OpenedFile } from "@benny2744/react";
 import { recordWrittenContent } from "./external-change";
 
 interface WatchEventPayload {

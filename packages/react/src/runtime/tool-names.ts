@@ -1,6 +1,6 @@
 /**
  * Tool-name string constants shared across the runtime wiring, the action registry, and the toolbar —
- * `@deviva-draw/react` owns the one canonical set every consumer imports instead of each hand-typing
+ * `@benny2744/react` owns the one canonical set every consumer imports instead of each hand-typing
  * the same literal strings.
  */
 export const SELECT_TOOL_NAME = "select";

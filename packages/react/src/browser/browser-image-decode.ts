@@ -14,8 +14,8 @@
  * Kept as its own tiny module so it stays independently readable and swappable — the engine-side
  * unit tests instead inject synchronous fakes for these exact seams.
  */
-import { createBrowserImageDecoder } from "@deviva-draw/engine";
-import type { DecodeNaturalSizeFn, DownscaleImageFn } from "@deviva-draw/engine";
+import { createBrowserImageDecoder } from "@benny2744/engine";
+import type { DecodeNaturalSizeFn, DownscaleImageFn } from "@benny2744/engine";
 
 const decodeImage = createBrowserImageDecoder();
 

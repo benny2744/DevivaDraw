@@ -1,13 +1,13 @@
 /**
- * The network leg between `@deviva-draw/engine`'s pure crypto (`encryptSceneDocument`/
+ * The network leg between `@benny2744/engine`'s pure crypto (`encryptSceneDocument`/
  * `decryptSceneCiphertext`) and the collab-server's dumb ciphertext store — every actual encryption/
  * compression/JSON decision lives in the engine; this module only knows how to PUT/GET bytes over
  * `fetch`. Despite living under `browser/` alongside the other DOM-only adapters, this file uses only
  * `fetch`/`crypto` (both available in Node 22+ too, not DOM-specific), so it stays unit-testable with a
  * stubbed global `fetch` instead of needing a real browser.
  */
-import { buildShareUrl, bytesToBase64Url, decryptSceneCiphertext, encryptSceneDocument, MULTI_PAGE_DOCUMENT_TYPE } from "@deviva-draw/engine";
-import type { DecryptSceneErrorReason, MultiPageDocumentV1, SceneDocumentV1 } from "@deviva-draw/engine";
+import { buildShareUrl, bytesToBase64Url, decryptSceneCiphertext, encryptSceneDocument, MULTI_PAGE_DOCUMENT_TYPE } from "@benny2744/engine";
+import type { DecryptSceneErrorReason, MultiPageDocumentV1, SceneDocumentV1 } from "@benny2744/engine";
 import type { ShareLinkResult } from "../actions/action-types";
 
 function blobUrl(apiBaseUrl: string, blobId: string): string {
@@ -59,7 +59,7 @@ export async function createShareLink(options: CreateShareLinkOptions): Promise<
     },
     // `BodyInit` requires an `ArrayBuffer`-backed view; `encryptSceneDocument`'s `ciphertext` is
     // always exactly that (it comes from `SubtleCrypto.encrypt`'s output), but `Uint8Array`'s type is
-    // generic over the wider `ArrayBufferLike` — see `@deviva-draw/engine`'s `gzip-codec.ts` for the
+    // generic over the wider `ArrayBufferLike` — see `@benny2744/engine`'s `gzip-codec.ts` for the
     // same cast pattern.
     body: ciphertext as Uint8Array<ArrayBuffer>,
   });

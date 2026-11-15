@@ -1,5 +1,5 @@
 /**
- * Pure formatter turning a normalized combo string (`@deviva-draw/engine`'s `normalizeCombo` output,
+ * Pure formatter turning a normalized combo string (`@benny2744/engine`'s `normalizeCombo` output,
  * e.g. `"meta+shift+z"`) into a human-readable display string for tooltips/the shortcuts dialog —
  * platform-aware (⌘/⌥/⇧ on Mac, `Ctrl`/`Alt`/`Shift` elsewhere), with `isMac` passed in rather than
  * read from `navigator` directly so this stays a pure, fully unit-testable function.

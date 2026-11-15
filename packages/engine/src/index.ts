@@ -1,5 +1,5 @@
 /**
- * @deviva-draw/engine — framework-agnostic whiteboard core.
+ * @benny2744/engine — framework-agnostic whiteboard core.
  *
  * Populated across the implementation phases: element model, scene store,
  * history, renderer, geometry, input/tools state machine, bindings,
@@ -549,7 +549,7 @@ export { buildShareUrl } from "./share-link/build-share-url";
 export type { ParsedShareUrl, ParseShareUrlErrorReason, ParseShareUrlResult } from "./share-link/parse-share-url";
 export { parseShareUrl } from "./share-link/parse-share-url";
 
-// Low-level primitives re-exported for `@deviva-draw/collab-client`'s per-message encryption, which
+// Low-level primitives re-exported for `@benny2744/collab-client`'s per-message encryption, which
 // reuses the same base64url/gzip building blocks as the share-link flow above instead of duplicating
 // them (a fresh key-per-message would defeat AES-GCM's whole point for a long-lived room key, so
 // collab-client calls `crypto.subtle` directly with these rather than reusing `encryptSceneDocument`,

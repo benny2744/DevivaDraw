@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createArrowElement } from "@deviva-draw/engine";
-import type { ArrowElement } from "@deviva-draw/engine";
+import { createArrowElement } from "@benny2744/engine";
+import type { ArrowElement } from "@benny2744/engine";
 import { findArrowEndpointAt } from "./find-arrow-endpoint-at-point";
 
 /** A horizontal arrow from (0,0) to (100,0). */

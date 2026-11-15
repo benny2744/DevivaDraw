@@ -13,8 +13,8 @@
  * document swapped. A malformed record must leave the open board exactly as it was, rather than
  * emptying it and then discovering there is nothing to put in its place.
  */
-import { deserializeMultiPageDocument } from "@deviva-draw/engine";
-import type { FileStoreLike, ScenePage } from "@deviva-draw/engine";
+import { deserializeMultiPageDocument } from "@benny2744/engine";
+import type { FileStoreLike, ScenePage } from "@benny2744/engine";
 import { restoreSceneFiles } from "../runtime/restore-document-files";
 import type { VersionStore } from "./indexeddb-version-store";
 import type { PageStore } from "../pages/page-store";

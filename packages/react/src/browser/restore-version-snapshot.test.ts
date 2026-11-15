@@ -7,9 +7,9 @@
  * emptied first and repaired never.
  */
 import { describe, expect, it, vi } from "vitest";
-import { createImageElement, Scene, serializeMultiPageDocument } from "@deviva-draw/engine";
+import { createImageElement, Scene, serializeMultiPageDocument } from "@benny2744/engine";
 import { PageStore } from "../pages/page-store";
-import type { FileStoreLike, MultiPageDocumentV1, StoredFile } from "@deviva-draw/engine";
+import type { FileStoreLike, MultiPageDocumentV1, StoredFile } from "@benny2744/engine";
 import { restoreVersionSnapshot } from "./restore-version-snapshot";
 import type { RestoreVersionDeps } from "./restore-version-snapshot";
 import type { VersionStore } from "./indexeddb-version-store";

@@ -7,7 +7,7 @@
  * The predicate reuses the renderer's own culling (`filterVisibleElements`), so "on screen" means
  * exactly what the draw pass means by it — no second, drifting definition of visibility.
  */
-import { filterVisibleElements } from "@deviva-draw/engine";
+import { filterVisibleElements } from "@benny2744/engine";
 import { useEffect, useState } from "react";
 import { buttonStyle, panelStyle } from "./chrome-styles";
 import { Icon } from "./icon";

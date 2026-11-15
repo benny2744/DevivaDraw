@@ -1,5 +1,5 @@
 /**
- * Per-message AES-GCM encryption for the live collab channel. Generalizes `@deviva-draw/engine`'s
+ * Per-message AES-GCM encryption for the live collab channel. Generalizes `@benny2744/engine`'s
  * share-link crypto (a fresh key *per share*) to a single room key reused across every message for the
  * lifetime of a session, with a fresh random IV on every individual call — AES-GCM's one hard rule is
  * that an IV must never repeat under the same key (a repeat leaks the XOR of both plaintexts and can
@@ -7,10 +7,10 @@
  * from a counter or timestamp. The collab-server relay never holds this key; it only ever sees
  * `{type, iv, ciphertext}` and cannot decrypt any of it (see `apps/collab-server`'s room modules).
  */
-import { base64UrlToBytes, bytesToBase64Url, gzipCompress, gzipDecompress } from "@deviva-draw/engine";
+import { base64UrlToBytes, bytesToBase64Url, gzipCompress, gzipDecompress } from "@benny2744/engine";
 
 const AES_KEY_LENGTH_BITS = 256;
-/** NIST SP 800-38D's recommended AES-GCM IV length — see `@deviva-draw/engine`'s `encrypt-scene.ts` for why this exact length is not made configurable. */
+/** NIST SP 800-38D's recommended AES-GCM IV length — see `@benny2744/engine`'s `encrypt-scene.ts` for why this exact length is not made configurable. */
 const GCM_IV_LENGTH_BYTES = 12;
 
 /** The wire shape a room message travels in — `iv`/`ciphertext` are absent only for a bare `snapshot-request` signal, which carries no payload. */
@@ -44,7 +44,7 @@ export async function encryptEnvelope(key: CryptoKey, type: string, payload: unk
   const json = new TextEncoder().encode(JSON.stringify(payload));
   const plaintext = compress ? await gzipCompress(json) : json;
   const iv = crypto.getRandomValues(new Uint8Array(GCM_IV_LENGTH_BYTES));
-  // See `@deviva-draw/engine`'s `gzip-codec.ts` for why this cast is always safe here: both branches
+  // See `@benny2744/engine`'s `gzip-codec.ts` for why this cast is always safe here: both branches
   // above produce a fresh, exactly-`ArrayBuffer`-backed `Uint8Array`.
   const ciphertextBuffer = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, plaintext as Uint8Array<ArrayBuffer>);
   return { type, iv: bytesToBase64Url(iv), ciphertext: bytesToBase64Url(new Uint8Array(ciphertextBuffer)) };

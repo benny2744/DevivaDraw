@@ -13,7 +13,7 @@
  * later receives nothing to replay.
  */
 import { useEffect, useRef, useState } from "react";
-import type { RemotePeerPresence } from "@deviva-draw/collab-client";
+import type { RemotePeerPresence } from "@benny2744/collab-client";
 
 /** How long a reaction floats before it is dropped. Long enough to read, short enough not to cover the board. */
 export const REACTION_LIFETIME_MS = 2600;

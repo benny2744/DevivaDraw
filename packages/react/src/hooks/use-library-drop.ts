@@ -11,8 +11,8 @@
  * out a diagram without moving every piece afterwards.
  */
 import { useEffect } from "react";
-import { screenToScene } from "@deviva-draw/engine";
-import type { Camera } from "@deviva-draw/engine";
+import { screenToScene } from "@benny2744/engine";
+import type { Camera } from "@benny2744/engine";
 import type { RefObject } from "react";
 import { currentLibraryDragItem, endLibraryDrag, isLibraryDrag } from "../browser/library-drag";
 import { insertLibraryElementsAt } from "../browser/insert-library-item";

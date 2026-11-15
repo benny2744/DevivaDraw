@@ -47,7 +47,7 @@ export type ElementUpdate = Partial<Omit<AnyElement, "id" | "type" | "version" |
  *
  * @example
  * ```ts
- * import { Scene, createRectangleElement } from "@deviva-draw/engine";
+ * import { Scene, createRectangleElement } from "@benny2744/engine";
  *
  * const scene = new Scene();
  * const box = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 160, height: 80 }));

@@ -24,8 +24,8 @@ import {
   TEXT_FONT_FAMILY_CSS,
   DEFAULT_TEXT_FONT_SIZE,
   DEFAULT_TEXT_LINE_HEIGHT,
-} from "@deviva-draw/engine";
-import type { AnyElement, ElementCreationInput, FreedrawPoint, RelativePoint, Scene, TextMeasurer } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import type { AnyElement, ElementCreationInput, FreedrawPoint, RelativePoint, Scene, TextMeasurer } from "@benny2744/engine";
 import type { CreateElementInput } from "./element-schemas";
 
 /** Default footprint for a box shape created without explicit size — large enough to hold a short label. */

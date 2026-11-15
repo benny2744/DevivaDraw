@@ -4,8 +4,8 @@
  * key fragment), and the tool-level e2e — `create_elements` reaching the simulated browser peer
  * and a user edit becoming visible to `search_scene_content`.
  */
-import { createRectangleElement, Scene } from "@deviva-draw/engine";
-import { CollabSession } from "@deviva-draw/collab-client";
+import { createRectangleElement, Scene } from "@benny2744/engine";
+import { CollabSession } from "@benny2744/collab-client";
 import { afterEach, describe, expect, it } from "vitest";
 import { FakeCollabRelay, waitUntil } from "../live/fake-collab-relay";
 import { LiveSessionBridge } from "../live/live-session-bridge";

@@ -19,7 +19,7 @@
  * board ever snapshotted. Both stores are written and deleted inside one transaction, so a summary
  * without its document is not a state that can be observed.
  */
-import type { MultiPageDocumentV1 } from "@deviva-draw/engine";
+import type { MultiPageDocumentV1 } from "@benny2744/engine";
 import type { VersionSnapshot, VersionSummary } from "./version-snapshot-types";
 
 const DATABASE_NAME = "devivadraw-versions";

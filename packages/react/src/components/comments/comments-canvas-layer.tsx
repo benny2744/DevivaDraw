@@ -20,8 +20,8 @@
  * Pins are chrome, never document content: nothing here reaches any export path, because exports
  * serialize the scene's elements and a comment is not an element.
  */
-import { resolveCommentAnchor, sceneToScreen } from "@deviva-draw/engine";
-import type { CommentThread, Scene } from "@deviva-draw/engine";
+import { resolveCommentAnchor, sceneToScreen } from "@benny2744/engine";
+import type { CommentThread, Scene } from "@benny2744/engine";
 import { useEffect, useReducer } from "react";
 import { Icon } from "../icon";
 import { CommentThreadPopover } from "./comment-thread-popover";

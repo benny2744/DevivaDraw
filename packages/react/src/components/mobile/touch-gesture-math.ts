@@ -2,11 +2,11 @@
  * Pure two-finger pinch-zoom/pan math — no DOM, fully unit-testable. `touch-gesture-adapter.ts`
  * (untested, DOM-only per this package's established trade-off) is the thin listener wiring that
  * feeds live touch coordinates through these functions each `pointermove`. Additive to, not a
- * replacement of, `@deviva-draw/engine`'s single-pointer `PointerEventPipeline` gesture model (this
+ * replacement of, `@benny2744/engine`'s single-pointer `PointerEventPipeline` gesture model (this
  * phase's Key Insight): the adapter only ever activates once a *second* touch appears.
  */
-import { clampZoom, zoomCameraAtScreenPoint } from "@deviva-draw/engine";
-import type { Camera, Point } from "@deviva-draw/engine";
+import { clampZoom, zoomCameraAtScreenPoint } from "@benny2744/engine";
+import type { Camera, Point } from "@benny2744/engine";
 
 /** Midpoint of every tracked touch — the anchor pinch-zoom keeps fixed on screen and two-finger pan follows. */
 export function touchCentroid(points: readonly Point[]): Point {

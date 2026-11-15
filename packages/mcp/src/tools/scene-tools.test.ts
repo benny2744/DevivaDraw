@@ -1,5 +1,5 @@
-import { SCENE_DOCUMENT_TYPE } from "@deviva-draw/engine";
-import type { SceneDocumentV1 } from "@deviva-draw/engine";
+import { SCENE_DOCUMENT_TYPE } from "@benny2744/engine";
+import type { SceneDocumentV1 } from "@benny2744/engine";
 import { describe, expect, it } from "vitest";
 import { SceneSession } from "../scene-session";
 import { createElementsTool } from "./element-tools";

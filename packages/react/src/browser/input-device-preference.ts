@@ -11,7 +11,7 @@
  * `useSyncExternalStore`.
  */
 import { useSyncExternalStore } from "react";
-import type { WheelBehaviorMode } from "@deviva-draw/engine";
+import type { WheelBehaviorMode } from "@benny2744/engine";
 import type { StorageLike } from "../theme/theme-storage";
 
 /** Unhyphenated app prefix + `:v1` version suffix, matching the theme/locale/library key convention. */

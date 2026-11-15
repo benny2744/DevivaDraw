@@ -69,7 +69,7 @@ const index = [
   '',
   '## Reference',
   '',
-  `- [API reference](${site}/api/react/readme/): generated from TypeScript source for @deviva-draw/react and @deviva-draw/engine`,
+  `- [API reference](${site}/api/react/readme/): generated from TypeScript source for @benny2744/react and @benny2744/engine`,
   `- [Live app](https://draw.deviva.app): the SDK running as a full product`,
   '',
 ].join('\n');

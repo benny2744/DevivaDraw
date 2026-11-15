@@ -8,8 +8,8 @@
  * resized it". An outcome type can, which is why the seam changed shape rather than just gaining a
  * consumer.
  */
-import { ImageFileTooLargeError, ImagePixelLimitError } from "@deviva-draw/engine";
-import type { ImageResizedInfo } from "@deviva-draw/engine";
+import { ImageFileTooLargeError, ImagePixelLimitError } from "@benny2744/engine";
+import type { ImageResizedInfo } from "@benny2744/engine";
 
 export type ImageInsertOutcome =
   | { kind: "resized"; resized: ImageResizedInfo }

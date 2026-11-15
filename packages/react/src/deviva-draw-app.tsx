@@ -22,7 +22,7 @@ export type { DevivaDrawProps, DevivaDrawStoredFile } from "./deviva-draw-app-ty
  *
  * @example
  * ```tsx
- * import { DevivaDraw } from "@deviva-draw/react";
+ * import { DevivaDraw } from "@benny2744/react";
  *
  * export default function App() {
  *   return <DevivaDraw style={{ position: "fixed", inset: 0 }} />;

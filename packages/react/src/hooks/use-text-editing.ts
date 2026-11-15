@@ -1,14 +1,14 @@
 /**
  * Derives the overlay geometry/styling + change handlers for whichever `TextElement` a
  * `TextEditSession` currently has open — the bridge between the engine's DOM-free editing state
- * machine (`@deviva-draw/engine`'s `text/text-edit-session.ts`) and the real `<textarea>`
+ * machine (`@benny2744/engine`'s `text/text-edit-session.ts`) and the real `<textarea>`
  * `components/text-editor-overlay.tsx` renders. Kept as a hook (not baked into the component)
  * so a host app can build its own overlay UI against the same derived state if it ever needs to.
  */
 import { useEffect, useReducer } from "react";
 import type { CSSProperties, KeyboardEvent } from "react";
-import type { Camera, Scene, TextAlign, TextEditSession, TextElement } from "@deviva-draw/engine";
-import { panCameraByScreenDelta, sceneToScreen, TEXT_FONT_FAMILY_CSS } from "@deviva-draw/engine";
+import type { Camera, Scene, TextAlign, TextEditSession, TextElement } from "@benny2744/engine";
+import { panCameraByScreenDelta, sceneToScreen, TEXT_FONT_FAMILY_CSS } from "@benny2744/engine";
 import { computeKeyboardPanDelta } from "../browser/visual-viewport-inset";
 
 export interface UseTextEditingOptions {

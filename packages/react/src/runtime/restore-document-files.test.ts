@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { createImageElement, Scene } from "@deviva-draw/engine";
-import type { FileStoreLike, StoredFile } from "@deviva-draw/engine";
+import { createImageElement, Scene } from "@benny2744/engine";
+import type { FileStoreLike, StoredFile } from "@benny2744/engine";
 import { collectOrphanedFiles, expectStoredFiles, restoreDocumentFiles } from "./restore-document-files";
 
 function file(dataURL: string): StoredFile {

@@ -11,7 +11,7 @@
  * stays untouched); a page operation triggers a prompt snapshot, so renames don't wait for the
  * periodic timer. Element *content* stays per-element LWW, routed by the `pageId` each delta carries.
  */
-import type { LayersManifest, Scene } from "@deviva-draw/engine";
+import type { LayersManifest, Scene } from "@benny2744/engine";
 
 export interface PagesManifestEntry {
   id: string;

@@ -20,7 +20,7 @@
  * `autosave-status-store.ts` exists to say "your work is not being saved". Losing version history is
  * not that, so every failure here is caught, warned about, and reported as `null` to the caller.
  */
-import type { MultiPageDocumentV1 } from "@deviva-draw/engine";
+import type { MultiPageDocumentV1 } from "@benny2744/engine";
 import { summarizeDocument } from "../browser/version-snapshot-summary";
 import { createVersionSnapshotWriter } from "./version-snapshot-writer";
 import type { RetentionPolicy } from "../browser/version-retention";

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createCommentMessage, createCommentThread, Scene } from "@deviva-draw/engine";
+import { createCommentMessage, createCommentThread, Scene } from "@benny2744/engine";
 import { handleInboundMessage } from "./inbound-message-handler";
 import { flushCommentDeltas, sendFullSnapshot } from "./outbound-sync";
 import { generateRoomKey, importRoomKey, encryptEnvelope } from "./message-codec";

@@ -7,7 +7,7 @@
  * View-only safety is not this component's job either: the shell unmounts it in the surfaces where
  * commenting is not allowed, so no per-control guard can be forgotten here.
  */
-import { resolveCommentAnchor } from "@deviva-draw/engine";
+import { resolveCommentAnchor } from "@benny2744/engine";
 import { useEffect, useReducer, useState } from "react";
 import { buttonStyle, chromeFontFamily, inputStyle, labelStyle, panelStyle } from "../chrome-styles";
 import { Icon } from "../icon";

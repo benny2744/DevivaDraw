@@ -14,7 +14,7 @@
  * which only ever grouped via frame elements (a concept Deviva Draw doesn't have yet), never via
  * Cmd+G groups either.
  */
-import type { AnyElement } from "@deviva-draw/engine";
+import type { AnyElement } from "@benny2744/engine";
 
 /** A scene element reduced to what makes it a diagram component — mirrors a generic drawing-tool shape record. */
 export interface CanvasShapeInput {

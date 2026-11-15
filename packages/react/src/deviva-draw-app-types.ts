@@ -1,5 +1,5 @@
 /** Public `<DevivaDraw/>` prop surface — split into its own file so both `deviva-draw-app.tsx` (the provider wrapper) and `deviva-draw-shell.tsx` (the composed chrome, which needs the same shape minus `theme`/`locale`, already consumed by the providers) can reference it without a circular value import. */
-import type { AnyElement, MultiPageDocumentV1, SceneDocument } from "@deviva-draw/engine";
+import type { AnyElement, MultiPageDocumentV1, SceneDocument } from "@benny2744/engine";
 import type { CSSProperties } from "react";
 import type { FileOperationsProvider } from "./browser/file-operations-provider";
 import type { LanHostController } from "./browser/lan-host-controller";

@@ -5,8 +5,8 @@
  * the zero-knowledge stance. `StatelessSession` satisfies the tool core's `ToolSession` interface
  * with file methods that throw an actionable pointer at the local `npx @deviva-draw/mcp` server.
  */
-import { deserializeScene, Scene, serializeScene } from "@deviva-draw/engine";
-import type { SceneDocumentV1, TextMeasurer } from "@deviva-draw/engine";
+import { deserializeScene, Scene, serializeScene } from "@benny2744/engine";
+import type { SceneDocumentV1, TextMeasurer } from "@benny2744/engine";
 import { createApproximateTextMeasurer, ToolError } from "@deviva-draw/mcp/core";
 import type { OpenSceneResult, ToolSession } from "@deviva-draw/mcp/core";
 

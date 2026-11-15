@@ -20,7 +20,7 @@ import type { ThemePreference } from "../theme/theme-tokens";
 import { useInputDevicePreference } from "../browser/input-device-preference";
 import type { InputDevicePreference } from "../browser/input-device-preference";
 import { useEditorPreferences } from "../browser/editor-preferences";
-import type { SelectOnMode } from "@deviva-draw/engine";
+import type { SelectOnMode } from "@benny2744/engine";
 import type { DevivaRuntime } from "../runtime/runtime-types";
 
 export interface MainMenuProps {

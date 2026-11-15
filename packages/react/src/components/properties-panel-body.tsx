@@ -10,8 +10,8 @@
  * only the control content (no positioning, no testid'd container) and never returns null — the caller
  * checks `isPropertiesPanelHidden` and supplies the container.
  */
-import { DEFAULT_BACKGROUND_COLOR_PALETTE, DEFAULT_STROKE_COLOR_PALETTE, ROUNDNESS_LEVELS, SLOPPINESS_LEVELS, STROKE_WIDTH_LEVELS } from "@deviva-draw/engine";
-import type { AnyElement, FillStyle, RoundnessValue, ShapeStyle, StrokeStyle, TextElement } from "@deviva-draw/engine";
+import { DEFAULT_BACKGROUND_COLOR_PALETTE, DEFAULT_STROKE_COLOR_PALETTE, ROUNDNESS_LEVELS, SLOPPINESS_LEVELS, STROKE_WIDTH_LEVELS } from "@benny2744/engine";
+import type { AnyElement, FillStyle, RoundnessValue, ShapeStyle, StrokeStyle, TextElement } from "@benny2744/engine";
 import { useReducer } from "react";
 import { ColorPicker } from "./color-picker";
 import { FrameNotesSection } from "./frame-notes-section";

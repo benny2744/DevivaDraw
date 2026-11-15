@@ -10,8 +10,8 @@
  * The page previewed is the one that was active when the snapshot was taken — the board the user was
  * actually looking at, which is the one they will recognise.
  */
-import { deserializeMultiPageDocument, referencedFileIds } from "@deviva-draw/engine";
-import type { FileStoreLike, StoredFile } from "@deviva-draw/engine";
+import { deserializeMultiPageDocument, referencedFileIds } from "@benny2744/engine";
+import type { FileStoreLike, StoredFile } from "@benny2744/engine";
 import { renderElementsToThumbnail } from "./scene-file-operations";
 import type { VersionSnapshot } from "./version-snapshot-types";
 

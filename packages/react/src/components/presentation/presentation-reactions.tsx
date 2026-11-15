@@ -11,9 +11,9 @@
  * rises from the bottom edge instead of being dropped — the reaction still carries who sent it, which
  * is most of its meaning.
  */
-import { sceneToScreen } from "@deviva-draw/engine";
-import type { Camera } from "@deviva-draw/engine";
-import type { RemotePeerPresence } from "@deviva-draw/collab-client";
+import { sceneToScreen } from "@benny2744/engine";
+import type { Camera } from "@benny2744/engine";
+import type { RemotePeerPresence } from "@benny2744/collab-client";
 import { buttonStyle, panelStyle, Z_LAYER } from "../chrome-styles";
 import { REACTION_LIFETIME_MS } from "../../hooks/use-peer-reactions";
 import type { FloatingReaction } from "../../hooks/use-peer-reactions";

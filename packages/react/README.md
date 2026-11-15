@@ -1,4 +1,4 @@
-# @deviva-draw/react
+# @benny2744/react
 
 React bindings for [Deviva Draw](../../README.md): the `<DevivaDraw/>` component (canvas, tools, UI
 chrome, theming, i18n, persistence, export, sharing, live collaboration), plus the lower-level
@@ -7,10 +7,10 @@ hooks/building blocks a host that wants its own chrome can use directly.
 ## Install
 
 ```bash
-npm install @deviva-draw/react @deviva-draw/engine react react-dom
+npm install @benny2744/react @benny2744/engine react react-dom
 ```
 
-`@deviva-draw/collab-client` is pulled in automatically as a dependency (used by the live
+`@benny2744/collab-client` is pulled in automatically as a dependency (used by the live
 collaboration hooks) — no separate install needed unless you want to use it directly.
 
 ## Local development against a sibling checkout
@@ -18,14 +18,14 @@ collaboration hooks) — no separate install needed unless you want to use it di
 Inside this monorepo, packages depend on each other via `workspace:*`. Consuming from a **separate**
 repository (e.g. a Next.js app that isn't part of this pnpm workspace) that has a sibling checkout of
 this repo on disk can point pnpm's `link:` protocol at every Deviva Draw package actually reachable
-from `@deviva-draw/react`'s import graph:
+from `@benny2744/react`'s import graph:
 
 ```json
 {
   "dependencies": {
-    "@deviva-draw/react": "link:../relative/path/to/deviva-draw/packages/react",
-    "@deviva-draw/engine": "link:../relative/path/to/deviva-draw/packages/engine",
-    "@deviva-draw/collab-client": "link:../relative/path/to/deviva-draw/packages/collab-client"
+    "@benny2744/react": "link:../relative/path/to/deviva-draw/packages/react",
+    "@benny2744/engine": "link:../relative/path/to/deviva-draw/packages/engine",
+    "@benny2744/collab-client": "link:../relative/path/to/deviva-draw/packages/collab-client"
   }
 }
 ```
@@ -34,7 +34,7 @@ from `@deviva-draw/react`'s import graph:
 `package.json` dependencies (including its `workspace:*` references to sibling Deviva Draw packages)
 against the *consuming* repo's workspace, which fails — those packages aren't members of it. `link:`
 just symlinks the target directory as-is and skips that resolution step, relying on Deviva Draw's own
-`pnpm install` (run once, in *this* repo) having already wired `packages/react/node_modules/@deviva-draw/engine`
+`pnpm install` (run once, in *this* repo) having already wired `packages/react/node_modules/@benny2744/engine`
 etc. correctly. Re-run `pnpm install` here whenever this repo's own dependency tree changes.
 
 This is a **local sibling-checkout workflow for development**, not the production consumption
@@ -44,7 +44,7 @@ the npm-published package instead (see Install above), which resolves to a pre-b
 ## Basic usage
 
 ```tsx
-import { DevivaDraw } from "@deviva-draw/react";
+import { DevivaDraw } from "@benny2744/react";
 
 function App() {
   return (
@@ -67,8 +67,8 @@ this package needing to import that pipeline's own types:
 
 ```tsx
 import { useCallback } from "react";
-import { DevivaDraw, toCanvasShapeInput } from "@deviva-draw/react";
-import type { AnyElement } from "@deviva-draw/engine";
+import { DevivaDraw, toCanvasShapeInput } from "@benny2744/react";
+import type { AnyElement } from "@benny2744/engine";
 
 function DesignCanvas({ onDiagram }: { onDiagram: (shapes: unknown, bindings: unknown) => void }) {
   const handleChange = useCallback((elements: AnyElement[]) => {
@@ -99,7 +99,7 @@ not compiled JS) via `next.config`:
 ```ts
 // next.config.ts
 const nextConfig: NextConfig = {
-  transpilePackages: ["@deviva-draw/react", "@deviva-draw/engine", "@deviva-draw/collab-client"],
+  transpilePackages: ["@benny2744/react", "@benny2744/engine", "@benny2744/collab-client"],
 };
 ```
 
@@ -108,7 +108,7 @@ const nextConfig: NextConfig = {
 "use client";
 import dynamic from "next/dynamic";
 
-const DevivaDraw = dynamic(() => import("@deviva-draw/react").then((m) => m.DevivaDraw), { ssr: false });
+const DevivaDraw = dynamic(() => import("@benny2744/react").then((m) => m.DevivaDraw), { ssr: false });
 
 export default function DesignCanvas() {
   return <DevivaDraw theme="dark" persistenceKey="design-canvas" />;
@@ -120,7 +120,7 @@ export default function DesignCanvas() {
 No special configuration needed — Vite transpiles workspace TypeScript source by default:
 
 ```tsx
-import { DevivaDraw } from "@deviva-draw/react";
+import { DevivaDraw } from "@benny2744/react";
 
 export default function App() {
   return <DevivaDraw theme="dark" />;
@@ -131,8 +131,8 @@ export default function App() {
 
 ```tsx
 import { useRef } from "react";
-import { DevivaDraw } from "@deviva-draw/react";
-import type { DevivaDrawHandle } from "@deviva-draw/react";
+import { DevivaDraw } from "@benny2744/react";
+import type { DevivaDrawHandle } from "@benny2744/react";
 
 function App() {
   const ref = useRef<DevivaDrawHandle>(null);

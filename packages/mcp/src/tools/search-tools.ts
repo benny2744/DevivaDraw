@@ -4,7 +4,7 @@
  * text, shape/note labels, table cells) and joins each hit back to the element that visually carries
  * it (a label match reports its container, which is the id an agent wants to move/style/delete).
  */
-import { findTextMatches } from "@deviva-draw/engine";
+import { findTextMatches } from "@benny2744/engine";
 import { z } from "zod";
 import { defineTool, summarizeElement } from "./tool-types";
 import type { ElementSummary } from "./tool-types";

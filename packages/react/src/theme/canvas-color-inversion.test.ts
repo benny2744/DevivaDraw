@@ -1,4 +1,4 @@
-import { createRectangleElement, DEFAULT_BACKGROUND_COLOR_PALETTE, DEFAULT_STROKE_COLOR_PALETTE, Scene } from "@deviva-draw/engine";
+import { createRectangleElement, DEFAULT_BACKGROUND_COLOR_PALETTE, DEFAULT_STROKE_COLOR_PALETTE, Scene } from "@benny2744/engine";
 import { describe, expect, it } from "vitest";
 import { adaptBackgroundColorForTheme, adaptStrokeColorForTheme, applyThemeToSceneElements } from "./canvas-color-inversion";
 

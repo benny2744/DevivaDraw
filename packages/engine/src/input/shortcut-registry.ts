@@ -3,7 +3,7 @@
  * immediately if a combo is already bound to a different action). `registerCoreShortcuts` covers this
  * package's own tool-switch/pan-zoom bindings; `registerToolShortcuts`/`registerHistoryShortcuts`/
  * `registerCommandPaletteShortcut` add the remaining letter/tool/undo-redo/palette bindings the UI
- * chrome layer (`@deviva-draw/react`) wires up — `registerFullShortcutMap` composes all of them into
+ * chrome layer (`@benny2744/react`) wires up — `registerFullShortcutMap` composes all of them into
  * the one registry instance a host app's pointer pipeline resolves every keydown against. Note: some
  * "shortcuts" mentioned by the product spec (Delete, Escape, arrow-key nudge, Ctrl/Cmd+A/C/V/D/G/L,
  * `[`/`]`) are deliberately *not* registered here — they're handled inside the select tool's own

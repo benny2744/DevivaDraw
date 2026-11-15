@@ -5,7 +5,7 @@
  * per distinct failure, and keep painting.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Scene } from "@deviva-draw/engine";
+import { Scene } from "@benny2744/engine";
 import { startRenderLoop } from "./start-render-loop";
 import type { RenderLoopDeps } from "./start-render-loop";
 

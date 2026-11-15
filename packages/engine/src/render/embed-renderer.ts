@@ -1,7 +1,7 @@
 /**
  * Canvas placeholder for an `EmbedElement`: a rounded card with a border and the embedded URL's host,
  * drawn on the static layer. The *live* content is a sandboxed `<iframe>` the host app overlays in
- * screen space (see `@deviva-draw/react`'s embed overlay); this placeholder is what shows underneath
+ * screen space (see `@benny2744/react`'s embed overlay); this placeholder is what shows underneath
  * it, and — crucially — what appears in PNG/SVG exports (which can't rasterize a live cross-origin
  * iframe). Rotation/opacity are wrapped exactly like the other renderers.
  */

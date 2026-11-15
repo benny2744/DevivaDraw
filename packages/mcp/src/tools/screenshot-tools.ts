@@ -9,8 +9,8 @@
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-import { exportToPng, ImageDecodeCache } from "@deviva-draw/engine";
-import type { AnyElement, ExportScale } from "@deviva-draw/engine";
+import { exportToPng, ImageDecodeCache } from "@benny2744/engine";
+import type { AnyElement, ExportScale } from "@benny2744/engine";
 import { z } from "zod";
 import { loadCanvasRuntime } from "../node/canvas-runtime";
 import type { CanvasRuntime, NodeCanvasImage } from "../node/canvas-runtime";

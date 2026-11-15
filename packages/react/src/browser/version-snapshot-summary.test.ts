@@ -4,8 +4,8 @@
  * failed to name, and the failure only appears later as a broken image in a restored board.
  */
 import { describe, expect, it } from "vitest";
-import { createImageElement, MULTI_PAGE_DOCUMENT_TYPE, Scene, serializeMultiPageDocument } from "@deviva-draw/engine";
-import type { AnyElement, MultiPageDocumentV1, SceneDocumentV1 } from "@deviva-draw/engine";
+import { createImageElement, MULTI_PAGE_DOCUMENT_TYPE, Scene, serializeMultiPageDocument } from "@benny2744/engine";
+import type { AnyElement, MultiPageDocumentV1, SceneDocumentV1 } from "@benny2744/engine";
 import { summarizeDocument } from "./version-snapshot-summary";
 
 function imageOn(scene: Scene, fileId: string): AnyElement {

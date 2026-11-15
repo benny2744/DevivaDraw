@@ -10,8 +10,8 @@ import {
   PointerEventPipeline,
   registerFullShortcutMap,
   ShortcutRegistry,
-} from "@deviva-draw/engine";
-import type { Camera, Scene } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import type { Camera, Scene } from "@benny2744/engine";
 import { buildActionRegistry } from "../actions/build-action-registry";
 import { getInputDevicePreference } from "../browser/input-device-preference";
 import type { PersistenceOperations, UiToggleState } from "../actions/action-types";

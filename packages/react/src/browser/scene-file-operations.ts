@@ -1,5 +1,5 @@
 /**
- * Wires `@deviva-draw/engine`'s persistence/export functions to the browser (localStorage autosave,
+ * Wires `@benny2744/engine`'s persistence/export functions to the browser (localStorage autosave,
  * save/open `.devivadraw` *and* Excalidraw `.excalidraw` files, PNG/SVG export downloads, copy-as-image) — the concrete
  * `PersistenceOperations` implementation `runtime/build-runtime.ts` hands to every file/export
  * `Action`. Kept as plain functions over an explicit `scene`/`getScene` parameter (not a class) so
@@ -23,8 +23,8 @@ import {
   serializeScene,
   startAutosave,
   writeAutosaveDocument,
-} from "@deviva-draw/engine";
-import { DOCUMENT_CEILINGS } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import { DOCUMENT_CEILINGS } from "@benny2744/engine";
 import type {
   AnyElement,
   AutosaveController,
@@ -38,7 +38,7 @@ import type {
   SceneDocument,
   ScenePage,
   StoredFile,
-} from "@deviva-draw/engine";
+} from "@benny2744/engine";
 import { createAutosaveFileOffload } from "./autosave-file-offload";
 import type { AutosaveFileOffload } from "./autosave-file-offload";
 import type { AutosaveStatusStore } from "../runtime/autosave-status-store";

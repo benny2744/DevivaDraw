@@ -23,7 +23,7 @@
  */
 import { buttonStyle, chromeFontFamily, panelStyle } from "./chrome-styles";
 import { Icon } from "./icon";
-import type { GiveUpReason } from "@deviva-draw/collab-client";
+import type { GiveUpReason } from "@benny2744/collab-client";
 import type { TranslationKey } from "../i18n/catalog-en";
 import { useTranslation } from "../i18n/use-translation";
 

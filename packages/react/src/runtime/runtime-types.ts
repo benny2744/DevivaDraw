@@ -1,5 +1,5 @@
 /** The fully-wired runtime `use-deviva-runtime.ts` builds once per mounted canvas — `ActionRuntime` plus the plumbing (pipeline, action registry, marquee/snap-guide readers) only the hook itself and `deviva-draw-app.tsx` need directly. */
-import type { LaserTrailPoint, PointerEventPipeline, Point, SceneRect, SnapGuide } from "@deviva-draw/engine";
+import type { LaserTrailPoint, PointerEventPipeline, Point, SceneRect, SnapGuide } from "@benny2744/engine";
 import type { ActionRegistry } from "../actions/action-registry";
 import type { ActionRuntime } from "../actions/action-types";
 

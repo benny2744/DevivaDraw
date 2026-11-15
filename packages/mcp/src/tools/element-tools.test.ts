@@ -1,5 +1,5 @@
-import { getLabel } from "@deviva-draw/engine";
-import type { ArrowElement, TextElement } from "@deviva-draw/engine";
+import { getLabel } from "@benny2744/engine";
+import type { ArrowElement, TextElement } from "@benny2744/engine";
 import { describe, expect, it } from "vitest";
 import { SceneSession } from "../scene-session";
 import { createElementsTool, deleteElementsTool, listElementsTool, updateElementsTool } from "./element-tools";

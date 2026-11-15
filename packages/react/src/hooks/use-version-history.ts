@@ -12,7 +12,7 @@
  * tested where it lives, and end to end in `apps/web/e2e/version-history.spec.ts`.
  */
 import { useCallback, useEffect, useState } from "react";
-import type { FileStoreLike } from "@deviva-draw/engine";
+import type { FileStoreLike } from "@benny2744/engine";
 import { restoreVersionSnapshot } from "../browser/restore-version-snapshot";
 import type { RestoreVersionOutcome } from "../browser/restore-version-snapshot";
 import { renderVersionThumbnail } from "../browser/version-snapshot-preview";

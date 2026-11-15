@@ -5,7 +5,7 @@
  * clears the override (`setBackground(null)`) so the canvas follows the theme again; any other color
  * pins that background regardless of theme (matching Excalidraw's theme-independent view background).
  */
-import type { Scene } from "@deviva-draw/engine";
+import type { Scene } from "@benny2744/engine";
 import { ColorPicker } from "./color-picker";
 import { useCanvasBackground } from "../runtime/use-live-version";
 import { useTranslation } from "../i18n/use-translation";

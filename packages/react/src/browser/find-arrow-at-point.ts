@@ -4,8 +4,8 @@
  * trade-off `find-bindable-container-at-point.ts` makes for shapes, adapted for a multi-point path
  * instead of a filled bbox (an arrow has no interior to hit).
  */
-import type { ArrowElement, Point, Scene } from "@deviva-draw/engine";
-import { absolutePoints, arrowPathPoints } from "@deviva-draw/engine";
+import type { ArrowElement, Point, Scene } from "@benny2744/engine";
+import { absolutePoints, arrowPathPoints } from "@benny2744/engine";
 
 /** Scene-unit distance from any segment of the path within which a click counts as "on the arrow". */
 const HIT_DISTANCE_SCENE_UNITS = 8;

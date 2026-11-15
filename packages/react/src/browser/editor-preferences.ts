@@ -12,7 +12,7 @@
  * config already follow.
  */
 import { useSyncExternalStore } from "react";
-import type { SelectOnMode } from "@deviva-draw/engine";
+import type { SelectOnMode } from "@benny2744/engine";
 import type { StorageLike } from "../theme/theme-storage";
 
 /** Unhyphenated app prefix + `:v1` version suffix, matching the theme/locale/library/input-device key convention. */

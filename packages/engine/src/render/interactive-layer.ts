@@ -60,7 +60,7 @@ export interface InteractiveLayerContext {
   arc?(x: number, y: number, radius: number, startAngle: number, endAngle: number): void;
 }
 
-/** A collaborator's live cursor, already resolved to scene coordinates — the host (`packages/react`'s render loop) owns turning `@deviva-draw/collab-client` presence data into this shape each frame. */
+/** A collaborator's live cursor, already resolved to scene coordinates — the host (`packages/react`'s render loop) owns turning `@benny2744/collab-client` presence data into this shape each frame. */
 export interface RemoteCursorOverlay {
   id: string;
   name: string;

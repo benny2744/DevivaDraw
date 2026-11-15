@@ -4,7 +4,7 @@
  * line), at the same bounds and style. A no-op when the selection isn't exactly one freehand stroke,
  * or when nothing confident matches (the stroke is kept). One history batch.
  */
-import { recognizeFreedrawShape } from "@deviva-draw/engine";
+import { recognizeFreedrawShape } from "@benny2744/engine";
 import type { Action, ActionRuntime } from "./action-types";
 
 function singleSelectedFreedraw(runtime: ActionRuntime) {

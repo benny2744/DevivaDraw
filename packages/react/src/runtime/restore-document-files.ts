@@ -7,8 +7,8 @@
  * swap (a file opened, a share link loaded, a page switched) — see `collectOrphanedFiles`. Notably
  * NOT after "Reset canvas", which is one undo away from restoring every element it cleared.
  */
-import { referencedFileIds } from "@deviva-draw/engine";
-import type { FileStoreLike, Scene } from "@deviva-draw/engine";
+import { referencedFileIds } from "@benny2744/engine";
+import type { FileStoreLike, Scene } from "@benny2744/engine";
 
 /** What a restore did, for logging and for tests that need to see the decisions rather than the side effects. */
 export interface RestoreDocumentFilesResult {

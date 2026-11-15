@@ -3,7 +3,7 @@
  * data URI the engine re-exports) with `@napi-rs/canvas`'s `GlobalFonts`, once per process. The
  * Phase 2 spike confirmed skia accepts the woff2 directly, so no converted-ttf asset is vendored.
  */
-import { HAND_DRAWN_FONT_DATA_URL, HAND_DRAWN_FONT_FAMILY } from "@deviva-draw/engine";
+import { HAND_DRAWN_FONT_DATA_URL, HAND_DRAWN_FONT_FAMILY } from "@benny2744/engine";
 import type { CanvasRuntime } from "./canvas-runtime";
 
 let registered = false;

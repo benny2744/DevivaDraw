@@ -5,7 +5,7 @@
  * is built around (not just mutate the current one), so both go through `onSceneReplaced`, the same
  * "rebuild the runtime" path `use-deviva-runtime.ts`'s `sceneVersion` bump drives.
  */
-import type { AnyElement, HistoryStack, MultiPageDocumentV1, Scene, SelectionState } from "@deviva-draw/engine";
+import type { AnyElement, HistoryStack, MultiPageDocumentV1, Scene, SelectionState } from "@benny2744/engine";
 import type { PersistenceOperations, SaveDocumentOutcome } from "../actions/action-types";
 import {
   exportSceneToPngFile,

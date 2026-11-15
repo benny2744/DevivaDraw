@@ -1,8 +1,12 @@
 # Deviva Draw
 
-[![@deviva-draw/engine](https://img.shields.io/npm/v/@deviva-draw/engine?label=%40deviva-draw%2Fengine&color=cb3837&logo=npm)](https://www.npmjs.com/package/@deviva-draw/engine)
-[![@deviva-draw/react](https://img.shields.io/npm/v/@deviva-draw/react?label=%40deviva-draw%2Freact&color=cb3837&logo=npm)](https://www.npmjs.com/package/@deviva-draw/react)
-[![@deviva-draw/collab-client](https://img.shields.io/npm/v/@deviva-draw/collab-client?label=%40deviva-draw%2Fcollab-client&color=cb3837&logo=npm)](https://www.npmjs.com/package/@deviva-draw/collab-client)
+This is a fork of [nhtera/DevivaDraw](https://github.com/nhtera/DevivaDraw), kept so ModChat can carry changes that are not upstream yet. The MIT license and the original copyright stay in place. `main` tracks upstream. `modchat` is the branch ModChat installs, published as `@benny2744/engine`, `@benny2744/react`, and `@benny2744/collab-client`. `@deviva-draw/mcp` and the apps are not published from this fork.
+
+After merging `upstream/main` into `modchat`, run `node scripts/apply-fork-names.mjs`, then the typecheck, lint, and test gate. Bump the `-modchat.N` versions, publish the three packages, and point ModChat at the new versions.
+
+[![@benny2744/engine](https://img.shields.io/npm/v/@benny2744/engine?label=%40benny2744%2Fengine&color=cb3837&logo=npm)](https://www.npmjs.com/package/@benny2744/engine)
+[![@benny2744/react](https://img.shields.io/npm/v/@benny2744/react?label=%40benny2744%2Freact&color=cb3837&logo=npm)](https://www.npmjs.com/package/@benny2744/react)
+[![@benny2744/collab-client](https://img.shields.io/npm/v/@benny2744/collab-client?label=%40benny2744%2Fcollab-client&color=cb3837&logo=npm)](https://www.npmjs.com/package/@benny2744/collab-client)
 [![@deviva-draw/mcp](https://img.shields.io/npm/v/@deviva-draw/mcp?label=%40deviva-draw%2Fmcp&color=cb3837&logo=npm)](https://www.npmjs.com/package/@deviva-draw/mcp)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -77,9 +81,9 @@ Published to npm under the `@deviva-draw` scope:
 
 | Package | What it is |
 |---|---|
-| [`@deviva-draw/engine`](packages/engine) | Framework-agnostic core: element model, scene store, history, renderer, geometry, input/tools. No DOM/React required at the type level. |
-| [`@deviva-draw/react`](packages/react) | React bindings: the `<DevivaDraw/>` component, hooks, UI chrome, and a scene-read API for embedding. |
-| [`@deviva-draw/collab-client`](packages/collab-client) | Real-time sync client: WebSocket transport, E2E crypto, presence. |
+| [`@benny2744/engine`](packages/engine) | Framework-agnostic core: element model, scene store, history, renderer, geometry, input/tools. No DOM/React required at the type level. |
+| [`@benny2744/react`](packages/react) | React bindings: the `<DevivaDraw/>` component, hooks, UI chrome, and a scene-read API for embedding. |
+| [`@benny2744/collab-client`](packages/collab-client) | Real-time sync client: WebSocket transport, E2E crypto, presence. |
 | [`@deviva-draw/mcp`](packages/mcp) | MCP server: AI agents create, edit, and export scenes headlessly (`npx @deviva-draw/mcp`). |
 
 Apps in this repo (not published):
@@ -92,11 +96,11 @@ Apps in this repo (not published):
 ## Embedding the React component
 
 ```bash
-npm install @deviva-draw/react @deviva-draw/engine react react-dom
+npm install @benny2744/react @benny2744/engine react react-dom
 ```
 
 ```tsx
-import { DevivaDraw } from "@deviva-draw/react";
+import { DevivaDraw } from "@benny2744/react";
 
 export function App() {
   return <DevivaDraw style={{ position: "fixed", inset: 0 }} />;

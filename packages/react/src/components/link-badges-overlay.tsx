@@ -8,8 +8,8 @@
  * Rendered as a SIBLING of the canvas host, not inside it — the engine's pointer pipeline listens on
  * the host, so a badge click here can never also start a marquee or change the selection underneath.
  */
-import { rotatedCorners, sceneToScreen } from "@deviva-draw/engine";
-import type { AnyElement, Scene } from "@deviva-draw/engine";
+import { rotatedCorners, sceneToScreen } from "@benny2744/engine";
+import type { AnyElement, Scene } from "@benny2744/engine";
 import { useEffect, useReducer } from "react";
 import { Icon } from "./icon";
 import { useSceneVersion } from "../runtime/use-live-version";

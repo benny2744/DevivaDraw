@@ -1,21 +1,21 @@
-# @deviva-draw/engine
+# @benny2744/engine
 
 Framework-agnostic whiteboard core for [Deviva Draw](https://github.com/nhtera/DevivaDraw): the
 element model, scene store, history (undo/redo), renderer, geometry, and input/tools state
 machine. No DOM/React dependency required at the type level — bring your own `<canvas>` and
-pointer events, or use [`@deviva-draw/react`](https://www.npmjs.com/package/@deviva-draw/react)
+pointer events, or use [`@benny2744/react`](https://www.npmjs.com/package/@benny2744/react)
 for a ready-made `<DevivaDraw/>` component.
 
 ## Install
 
 ```bash
-npm install @deviva-draw/engine
+npm install @benny2744/engine
 ```
 
 ## Minimal example
 
 ```ts
-import { Scene, createRectangleElement } from "@deviva-draw/engine";
+import { Scene, createRectangleElement } from "@benny2744/engine";
 
 const scene = new Scene();
 scene.addElement(

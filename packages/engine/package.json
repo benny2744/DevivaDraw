@@ -1,6 +1,6 @@
 {
-  "name": "@deviva-draw/engine",
-  "version": "0.12.0",
+  "name": "@benny2744/engine",
+  "version": "0.12.0-modchat.1",
   "description": "Framework-agnostic whiteboard core: element model, scene store, history, renderer, geometry, tools",
   "type": "module",
   "license": "MIT",
@@ -14,11 +14,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nhtera/DevivaDraw.git",
+    "url": "git+https://github.com/benny2744/DevivaDraw.git",
     "directory": "packages/engine"
   },
-  "homepage": "https://github.com/nhtera/DevivaDraw#readme",
-  "bugs": "https://github.com/nhtera/DevivaDraw/issues",
+  "homepage": "https://github.com/benny2744/DevivaDraw#readme",
+  "bugs": "https://github.com/benny2744/DevivaDraw/issues",
   "engines": {
     "node": ">=22"
   },

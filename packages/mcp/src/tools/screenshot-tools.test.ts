@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createImageElement, deserializeScene, readEmbeddedSceneData } from "@deviva-draw/engine";
+import { createImageElement, deserializeScene, readEmbeddedSceneData } from "@benny2744/engine";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { loadCanvasRuntime } from "../node/canvas-runtime";
 import { createNodeTextMeasurer } from "../node/node-text-measurer";

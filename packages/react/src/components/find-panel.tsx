@@ -20,7 +20,7 @@
  * Embedders that mount without a page store still work: the panel falls back to searching the one
  * live scene, and nothing switches pages.
  */
-import { computeElementsBounds, findTextMatches } from "@deviva-draw/engine";
+import { computeElementsBounds, findTextMatches } from "@benny2744/engine";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Z_LAYER, buttonStyle, inputStyle, panelStyle } from "./chrome-styles";
 import { Icon } from "./icon";

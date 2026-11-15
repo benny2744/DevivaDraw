@@ -11,8 +11,8 @@
  */
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import { deserializeMultiPageDocument, parseShareUrl, serializeMultiPageDocument } from "@deviva-draw/engine";
-import type { MultiPageDocumentV1 } from "@deviva-draw/engine";
+import { deserializeMultiPageDocument, parseShareUrl, serializeMultiPageDocument } from "@benny2744/engine";
+import type { MultiPageDocumentV1 } from "@benny2744/engine";
 import { chromeFontFamily } from "../components/chrome-styles";
 import { fetchAndDecryptSharedScene } from "../browser/share-link-client";
 import type { FetchSharedSceneErrorReason } from "../browser/share-link-client";

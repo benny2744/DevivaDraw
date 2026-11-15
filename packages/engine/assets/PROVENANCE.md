@@ -2,7 +2,7 @@
 
 `PatrickHand-Regular.ttf` is the source the shipped `src/text/hand-drawn-font-data.ts` subset is
 generated from. It is committed so the artifact is reproducible: anyone can re-run
-`pnpm --filter @deviva-draw/engine font:build` and get byte-identical output without hunting for the
+`pnpm --filter @benny2744/engine font:build` and get byte-identical output without hunting for the
 upstream file.
 
 | Field | Value |

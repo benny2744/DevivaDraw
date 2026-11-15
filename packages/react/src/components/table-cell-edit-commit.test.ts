@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createTableElement, MAX_TABLE_CELL_CHARS } from "@deviva-draw/engine";
-import type { TableElement } from "@deviva-draw/engine";
+import { createTableElement, MAX_TABLE_CELL_CHARS } from "@benny2744/engine";
+import type { TableElement } from "@benny2744/engine";
 import { buildCellCommit, tabDestination } from "./table-cell-edit-commit";
 
 function table(cells?: string[][]): TableElement {

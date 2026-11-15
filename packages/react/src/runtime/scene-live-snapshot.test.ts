@@ -1,4 +1,4 @@
-import { createImageElement, createRectangleElement, Scene } from "@deviva-draw/engine";
+import { createImageElement, createRectangleElement, Scene } from "@benny2744/engine";
 import { describe, expect, it } from "vitest";
 import { getLiveElements, getLiveFiles } from "./scene-live-snapshot";
 

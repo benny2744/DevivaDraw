@@ -15,8 +15,8 @@
  * slides in a different order than Present shows them, which is a bug this codebase has already had
  * once.
  */
-import { exportFramesToPptx, frameContainedElementIds, readPngPixelSize } from "@deviva-draw/engine";
-import type { AnyElement, ExportScale, FrameElement, Scene } from "@deviva-draw/engine";
+import { exportFramesToPptx, frameContainedElementIds, readPngPixelSize } from "@benny2744/engine";
+import type { AnyElement, ExportScale, FrameElement, Scene } from "@benny2744/engine";
 import { orderedSceneFrames } from "../components/presentation/frame-slide-order";
 import { triggerDownload } from "./persistence-adapters";
 import { renderSceneToPngBlob } from "./scene-file-operations";

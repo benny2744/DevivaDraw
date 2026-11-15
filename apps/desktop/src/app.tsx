@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
-import { DevivaDraw } from "@deviva-draw/react";
-import type { DevivaDrawHandle } from "@deviva-draw/react";
+import { DevivaDraw } from "@benny2744/react";
+import type { DevivaDrawHandle } from "@benny2744/react";
 import { createDesktopFileOperations } from "./desktop-file-operations";
 import { DocumentHost } from "./document-host";
 import { lanHost } from "./lan-host";

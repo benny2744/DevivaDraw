@@ -2,7 +2,7 @@
  * `CollabSession` — the client-side orchestrator wiring `connection-manager.ts` (transport),
  * `message-codec.ts` (E2E crypto), `inbound-message-handler.ts`/`lww-merge.ts` (conflict resolution),
  * `presence-broadcaster.ts` (outbound presence), and `presence-state.ts` (inbound presence) to a live
- * `@deviva-draw/engine` `Scene`. Collaboration is opt-in at this class's boundary: a `Scene` never
+ * `@benny2744/engine` `Scene`. Collaboration is opt-in at this class's boundary: a `Scene` never
  * touched by a connected `CollabSession` behaves exactly as it always has.
  *
  * Outbound element sync is diffed by version, not flagged by origin: `syncedVersions` records the last
@@ -27,7 +27,7 @@ import { PresenceBroadcaster } from "./presence-broadcaster";
 import { PresenceStore } from "./presence-state";
 import type { PresenceViewport } from "./presence-state";
 import { buildRoomUrl, buildRoomWebSocketUrl, parseRoomUrl, roleClaimedByToken } from "./room-url";
-import type { Scene } from "@deviva-draw/engine";
+import type { Scene } from "@benny2744/engine";
 
 export type CollabConnectionStatus = "disconnected" | "connecting" | "connected";
 

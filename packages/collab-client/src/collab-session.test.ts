@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { createRectangleElement, Scene } from "@deviva-draw/engine";
+import { createRectangleElement, Scene } from "@benny2744/engine";
 import { adoptRoomPages } from "./adopt-room-pages";
 import { CollabSession } from "./collab-session";
 import { PageStore } from "./page-store";

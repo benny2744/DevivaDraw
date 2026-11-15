@@ -1,6 +1,6 @@
 {
-  "name": "@deviva-draw/collab-client",
-  "version": "0.8.4",
+  "name": "@benny2744/collab-client",
+  "version": "0.8.4-modchat.1",
   "description": "Realtime sync client for Deviva Draw: WebSocket transport, E2E crypto, presence, conflict resolution",
   "type": "module",
   "license": "MIT",
@@ -14,11 +14,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nhtera/DevivaDraw.git",
+    "url": "git+https://github.com/benny2744/DevivaDraw.git",
     "directory": "packages/collab-client"
   },
-  "homepage": "https://github.com/nhtera/DevivaDraw#readme",
-  "bugs": "https://github.com/nhtera/DevivaDraw/issues",
+  "homepage": "https://github.com/benny2744/DevivaDraw#readme",
+  "bugs": "https://github.com/benny2744/DevivaDraw/issues",
   "engines": {
     "node": ">=22"
   },
@@ -51,7 +51,7 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@deviva-draw/engine": "workspace:*"
+    "@benny2744/engine": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

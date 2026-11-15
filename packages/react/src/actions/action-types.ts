@@ -17,7 +17,7 @@ import type {
   ShapeStyleState,
   TextEditSession,
   ToolStateMachine,
-} from "@deviva-draw/engine";
+} from "@benny2744/engine";
 import type { TranslationKey } from "../i18n/catalog-en";
 import type { ThemeMode } from "../theme/theme-tokens";
 
@@ -124,7 +124,7 @@ export interface PersistenceOperations {
   /**
    * Encrypts the live scene client-side and uploads only ciphertext to the collab-server, resolving
    * the shareable URL (or rejecting on failure) — see `browser/share-link-client.ts` and
-   * `@deviva-draw/engine`'s `share-link/` module for the actual crypto. Unlike every other operation
+   * `@benny2744/engine`'s `share-link/` module for the actual crypto. Unlike every other operation
    * here, this one surfaces its result (the URL, or an error) to the caller instead of swallowing
    * failures via a logged `console.error`: `actions/share-actions.ts` needs the URL to populate
    * `ShareDialogState`, and a silent failure would leave the share dialog stuck on "generating"

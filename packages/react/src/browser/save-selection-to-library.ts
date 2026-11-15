@@ -8,8 +8,8 @@
  * carries the whole of what the user sees selected — a container's bound label, a group's members —
  * rather than the bare ids the selection happens to hold.
  */
-import { expandForDuplication } from "@deviva-draw/engine";
-import type { AnyElement, Scene } from "@deviva-draw/engine";
+import { expandForDuplication } from "@benny2744/engine";
+import type { AnyElement, Scene } from "@benny2744/engine";
 import { notifyLibraryChanged } from "./library-change-event";
 import { deriveLibraryItemName } from "./library-item-name";
 import { addLibraryItem, librarySourceOf, loadLibrary } from "./library-storage";

@@ -2,7 +2,7 @@
  * The dumb, content-agnostic ciphertext store behind share links: `PUT /blobs/{id}` writes bytes,
  * `GET /blobs/{id}` reads them back. Neither route parses or inspects what it stores — the payload is
  * always AES-GCM ciphertext the client encrypted with a key that never reaches this Worker (see
- * `@deviva-draw/engine`'s `share-link/` module), so there is nothing here to "understand" even in
+ * `@benny2744/engine`'s `share-link/` module), so there is nothing here to "understand" even in
  * principle. Blob ids are client-generated UUIDs, never sequential/short ids, so knowing (or guessing)
  * one is required to fetch it — this module only validates the shape of whatever id the client already
  * chose; it never mints or tracks ids itself.
@@ -19,7 +19,7 @@ import type { RateLimiter } from "./rate-limit";
 
 /**
  * Conservative cap mirroring the client's own `MAX_SHARE_PAYLOAD_BYTES`
- * (`@deviva-draw/engine`'s `share-link/encrypt-scene.ts`) — enforced again here since a client-side
+ * (`@benny2744/engine`'s `share-link/encrypt-scene.ts`) — enforced again here since a client-side
  * check alone is trivially bypassed by anyone calling this endpoint directly.
  */
 export const MAX_BLOB_BYTES = 15 * 1024 * 1024;
@@ -185,7 +185,7 @@ export async function handlePutBlob(request: Request, blobId: string, deps: Blob
   if (!bodyResult.ok) return new Response("payload too large", { status: 413 });
   if (bodyResult.bytes.byteLength === 0) return new Response("empty payload", { status: 400 });
 
-  // See `@deviva-draw/engine`'s `gzip-codec.ts` for why `Uint8Array`'s `.buffer` needs this cast:
+  // See `@benny2744/engine`'s `gzip-codec.ts` for why `Uint8Array`'s `.buffer` needs this cast:
   // `bytes` was allocated fresh above (`new Uint8Array(total)`), so it's always exactly
   // `ArrayBuffer`-backed even though the type is generic over the wider `ArrayBufferLike`.
   //

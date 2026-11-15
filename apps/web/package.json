@@ -14,8 +14,8 @@
     "deploy": "vite build && wrangler deploy"
   },
   "dependencies": {
-    "@deviva-draw/engine": "workspace:*",
-    "@deviva-draw/react": "workspace:*",
+    "@benny2744/engine": "workspace:*",
+    "@benny2744/react": "workspace:*",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

@@ -16,7 +16,7 @@
  *    document would make opening the history panel proportional to the size of every board ever
  *    snapshotted.
  */
-import type { MultiPageDocumentV1 } from "@deviva-draw/engine";
+import type { MultiPageDocumentV1 } from "@benny2744/engine";
 
 /**
  * Why a snapshot exists, which is also what retention is allowed to do with it:

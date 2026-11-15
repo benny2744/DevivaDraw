@@ -3,9 +3,9 @@
  * layer (selection outline/handles/marquee/snap guides) every frame. Split out of
  * `use-deviva-runtime.ts` purely to keep that hook under the house line-count limit — not unit
  * tested, same DOM-only (`requestAnimationFrame`/`CanvasStage`) trade-off `canvas-stage.ts` itself
- * documents in `@deviva-draw/engine`.
+ * documents in `@benny2744/engine`.
  */
-import type { AnyElement, CanvasStage, ElementColorAdapter, LaserTrailPoint, Point, RemoteCursorOverlay, Scene, SelectionState } from "@deviva-draw/engine";
+import type { AnyElement, CanvasStage, ElementColorAdapter, LaserTrailPoint, Point, RemoteCursorOverlay, Scene, SelectionState } from "@benny2744/engine";
 import type { CameraStore } from "./camera-store";
 
 export interface RenderLoopDeps {

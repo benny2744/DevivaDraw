@@ -2,7 +2,7 @@
  * Transport-level tests: drive the Worker's `fetch` with real `Request`s (web APIs only — no
  * Workers runtime needed), covering the stateless contract, protocol errors, and abuse caps.
  */
-import { deserializeScene, readEmbeddedSceneDataFromSvg } from "@deviva-draw/engine";
+import { deserializeScene, readEmbeddedSceneDataFromSvg } from "@benny2744/engine";
 import { describe, expect, it } from "vitest";
 import worker from "./index";
 

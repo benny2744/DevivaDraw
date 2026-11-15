@@ -17,8 +17,8 @@
  * drag-to-move path. The iframe is sandboxed with no top-navigation, so framed content can't navigate
  * the host away.
  */
-import { hitTestElement, resolveEmbed, sceneToScreen, screenToScene } from "@deviva-draw/engine";
-import type { EmbedElement } from "@deviva-draw/engine";
+import { hitTestElement, resolveEmbed, sceneToScreen, screenToScene } from "@benny2744/engine";
+import type { EmbedElement } from "@benny2744/engine";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { chromeFontFamily } from "./chrome-styles";
 import { SELECT_TOOL_NAME } from "../runtime/tool-names";

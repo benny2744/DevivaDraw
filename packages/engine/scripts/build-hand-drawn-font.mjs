@@ -3,7 +3,7 @@
  * hand-drawn text face — by subsetting the committed source font in `assets/` to the unicode ranges
  * below.
  *
- * Run by hand (`pnpm --filter @deviva-draw/engine font:build`), never by the build: the output is
+ * Run by hand (`pnpm --filter @benny2744/engine font:build`), never by the build: the output is
  * committed, so an ordinary build and an ordinary CI run need no font toolchain at all. Re-running it
  * on an unchanged source must produce a byte-identical file — that is what makes the committed
  * artifact reviewable.

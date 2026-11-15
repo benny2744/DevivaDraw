@@ -1,7 +1,7 @@
 # @deviva-draw/desktop
 
 Deviva Draw as a desktop app — a [Tauri v2](https://v2.tauri.app) shell around the exact same
-`@deviva-draw/react` editor the web app hosts. Fully offline; localStorage autosave persists per-app
+`@benny2744/react` editor the web app hosts. Fully offline; localStorage autosave persists per-app
 across relaunches. Real `.devivadraw` file semantics (open/save-in-place, file association, recents)
 land in later phases of `plans/260816-1921-offline-desktop-app/`.
 

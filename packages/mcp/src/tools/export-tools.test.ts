@@ -1,7 +1,7 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { deserializeScene, readEmbeddedSceneDataFromSvg } from "@deviva-draw/engine";
+import { deserializeScene, readEmbeddedSceneDataFromSvg } from "@benny2744/engine";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { SceneSession } from "../scene-session";
 import { createElementsTool } from "./element-tools";

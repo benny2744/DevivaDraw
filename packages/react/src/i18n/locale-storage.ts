@@ -1,6 +1,6 @@
 /**
  * Locale persistence — the same "inject a `StorageLike`, never touch `window` directly" pattern
- * `@deviva-draw/engine`'s `persistence/local-storage-autosave.ts` uses, so this stays unit-testable
+ * `@benny2744/engine`'s `persistence/local-storage-autosave.ts` uses, so this stays unit-testable
  * with an in-memory fake. Persisted under its own key, deliberately separate from the engine's
  * scene-autosave key (`AUTOSAVE_STORAGE_KEY`) and from `theme-storage.ts`'s key — a locale/theme
  * preference is UI-chrome state, not scene data, and the two preferences are independent toggles a

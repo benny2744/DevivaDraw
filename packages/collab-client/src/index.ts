@@ -1,5 +1,5 @@
 /**
- * @deviva-draw/collab-client — realtime sync client for the Deviva Draw
+ * @benny2744/collab-client — realtime sync client for the Deviva Draw
  * engine: WebSocket transport, end-to-end encryption, presence, and
  * last-writer-wins conflict resolution over element versions.
  */

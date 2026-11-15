@@ -5,7 +5,7 @@
  * `runtime/restore-document-files.ts`), which is right as far as it goes — but the document is not
  * the only thing that can hold a claim on an image. Anything listed here is spared.
  */
-import { AUTOSAVE_RECOVERY_KEY_SUFFIX, AUTOSAVE_STORAGE_KEY } from "@deviva-draw/engine";
+import { AUTOSAVE_RECOVERY_KEY_SUFFIX, AUTOSAVE_STORAGE_KEY } from "@benny2744/engine";
 import { libraryFileIds } from "./library-storage";
 
 /**

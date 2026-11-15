@@ -9,8 +9,8 @@
  * failures reference the room id at most. The key lives only inside `CollabSession`'s in-memory
  * `CryptoKey` for the lifetime of the connection.
  */
-import { adoptRoomPages, CollabSession, createPageStoreCollabAdapter, parseRoomUrl } from "@deviva-draw/collab-client";
-import type { CollabConnectionStatus, PageListEntry, PageStore, WebSocketLike } from "@deviva-draw/collab-client";
+import { adoptRoomPages, CollabSession, createPageStoreCollabAdapter, parseRoomUrl } from "@benny2744/collab-client";
+import type { CollabConnectionStatus, PageListEntry, PageStore, WebSocketLike } from "@benny2744/collab-client";
 import { ToolError } from "../tools/tool-types";
 
 /**

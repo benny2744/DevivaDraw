@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { encryptSceneDocument, CURRENT_SCHEMA_VERSION, SCENE_DOCUMENT_TYPE } from "@deviva-draw/engine";
-import type { SceneDocumentV1 } from "@deviva-draw/engine";
+import { encryptSceneDocument, CURRENT_SCHEMA_VERSION, SCENE_DOCUMENT_TYPE } from "@benny2744/engine";
+import type { SceneDocumentV1 } from "@benny2744/engine";
 import { createShareLink, fetchAndDecryptSharedScene, revokeShareLink } from "./share-link-client";
 
 function fixtureDocument(): SceneDocumentV1 {

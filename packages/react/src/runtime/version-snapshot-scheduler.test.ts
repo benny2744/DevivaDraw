@@ -5,8 +5,8 @@
  * the session's next window.
  */
 import { describe, expect, it, vi } from "vitest";
-import { MULTI_PAGE_DOCUMENT_TYPE } from "@deviva-draw/engine";
-import type { MultiPageDocumentV1 } from "@deviva-draw/engine";
+import { MULTI_PAGE_DOCUMENT_TYPE } from "@benny2744/engine";
+import type { MultiPageDocumentV1 } from "@benny2744/engine";
 import { AUTO_SNAPSHOT_INTERVAL_MS, startVersionSnapshotScheduler } from "./version-snapshot-scheduler";
 import type { VersionStore } from "../browser/indexeddb-version-store";
 import type { VersionSnapshot } from "../browser/version-snapshot-types";

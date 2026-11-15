@@ -17,8 +17,8 @@
  * The record still travels as an opaque `{type, iv, ciphertext}` envelope: the relay never sees any
  * of this, and `comment-delta` is one more type string in its whitelist, nothing more.
  */
-import type { CommentMessage, CommentThread, Scene } from "@deviva-draw/engine";
-import { lwwRecordWins, validateCommentMessage, validateCommentThread } from "@deviva-draw/engine";
+import type { CommentMessage, CommentThread, Scene } from "@benny2744/engine";
+import { lwwRecordWins, validateCommentMessage, validateCommentThread } from "@benny2744/engine";
 
 /** A decrypted payload rebuilt into a safe `CommentThread`, or `undefined` when it is not one. */
 export function parseRemoteCommentThread(value: unknown): CommentThread | undefined {

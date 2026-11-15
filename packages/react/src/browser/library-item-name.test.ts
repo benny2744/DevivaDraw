@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { AnyElement } from "@deviva-draw/engine";
+import type { AnyElement } from "@benny2744/engine";
 import { deriveLibraryItemName, libraryItemMatches, libraryItemTexts } from "./library-item-name";
 import type { LibraryItem } from "./library-storage";
 

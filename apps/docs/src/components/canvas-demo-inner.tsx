@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { DevivaDraw, type DevivaDrawHandle, type ThemeMode } from '@deviva-draw/react';
-import type { SceneDocument } from '@deviva-draw/engine';
+import { DevivaDraw, type DevivaDrawHandle, type ThemeMode } from '@benny2744/react';
+import type { SceneDocument } from '@benny2744/engine';
 import type { DemoSceneName } from './canvas-demo-scenes';
 import quickStart from '../demos/scenes/quick-start.json';
 import shapesTour from '../demos/scenes/shapes-tour.json';

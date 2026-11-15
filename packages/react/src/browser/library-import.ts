@@ -10,8 +10,8 @@
  * Format detection is by *content*, not file extension: a renamed file still imports correctly, and a
  * file that is neither shape reports `"unrecognized"` rather than silently producing an empty library.
  */
-import { importExcalidrawLibrary } from "@deviva-draw/engine";
-import type { AnyElement } from "@deviva-draw/engine";
+import { importExcalidrawLibrary } from "@benny2744/engine";
+import type { AnyElement } from "@benny2744/engine";
 import { deriveLibraryItemName } from "./library-item-name";
 import type { LibraryItem } from "./library-storage";
 

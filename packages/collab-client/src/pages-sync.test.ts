@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { createRectangleElement, Scene } from "@deviva-draw/engine";
+import { createRectangleElement, Scene } from "@benny2744/engine";
 import { encryptEnvelope, decryptEnvelope, generateRoomKey, importRoomKey } from "./message-codec";
 import { handleInboundMessage } from "./inbound-message-handler";
 import { flushElementDeltas, sendDocumentSnapshot } from "./outbound-sync";

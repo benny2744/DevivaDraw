@@ -1,11 +1,11 @@
 /**
- * @deviva-draw/react — React bindings for the Deviva Draw engine.
+ * @benny2744/react — React bindings for the Deviva Draw engine.
  *
  * Public entry point: the composed `<DevivaDraw/>` component + its imperative handle (the embedding
  * contract deviva.app and `apps/web` both consume), plus the lower-level hooks/building blocks a host
  * that wants to build its own chrome around the engine can use directly.
  */
-export { ENGINE_VERSION } from "@deviva-draw/engine";
+export { ENGINE_VERSION } from "@benny2744/engine";
 
 // --- Composed app shell (primary public API) ---
 

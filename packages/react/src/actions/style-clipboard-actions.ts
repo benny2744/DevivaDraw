@@ -6,8 +6,8 @@
  * survives until the next copy. Paste rewrites every selected element's style in one history batch —
  * the same "one batch per discrete user action" rule every other multi-element mutation follows.
  */
-import { pickShapeStyle } from "@deviva-draw/engine";
-import type { ShapeStyle } from "@deviva-draw/engine";
+import { pickShapeStyle } from "@benny2744/engine";
+import type { ShapeStyle } from "@benny2744/engine";
 import type { Action, ActionRuntime } from "./action-types";
 
 function firstSelected(runtime: ActionRuntime) {

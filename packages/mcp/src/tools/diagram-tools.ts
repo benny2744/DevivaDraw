@@ -5,8 +5,8 @@
  * AST directly from semantic nodes+edges, so agents that already know their graph skip mermaid
  * syntax (and its escaping pitfalls) entirely.
  */
-import { flowchartToElements, tryMermaidToElements } from "@deviva-draw/engine";
-import type { AnyElement, Flowchart, MermaidErrorCode, Scene } from "@deviva-draw/engine";
+import { flowchartToElements, tryMermaidToElements } from "@benny2744/engine";
+import type { AnyElement, Flowchart, MermaidErrorCode, Scene } from "@benny2744/engine";
 import { z } from "zod";
 import { defineTool, summarizeElement, ToolError } from "./tool-types";
 import type { ElementSummary, ToolResult } from "./tool-types";

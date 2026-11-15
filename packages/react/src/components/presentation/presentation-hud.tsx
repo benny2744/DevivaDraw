@@ -6,7 +6,7 @@
  * — the two things with real logic in them. This component owns no state: every control reports to the
  * controller, which is where the keyboard reaches the same actions.
  */
-import { REACTION_EMOJIS } from "@deviva-draw/collab-client";
+import { REACTION_EMOJIS } from "@benny2744/collab-client";
 import { buttonStyle, panelStyle } from "../chrome-styles";
 import { Icon } from "../icon";
 import { ReactionBar } from "./presentation-reactions";

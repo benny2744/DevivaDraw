@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { Scene } from "@deviva-draw/engine";
+import { Scene } from "@benny2744/engine";
 import { PageStore } from "./page-store";
 
 describe("PageStore", () => {

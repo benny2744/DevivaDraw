@@ -17,8 +17,8 @@ import {
   SelectionState,
   ShapeStyleState,
   ShortcutRegistry,
-} from "@deviva-draw/engine";
-import type { AnyElement } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import type { AnyElement } from "@benny2744/engine";
 import { describe, expect, it, vi } from "vitest";
 import { buildActionRegistry } from "./build-action-registry";
 import type { ActionRuntime } from "./action-types";

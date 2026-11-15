@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { RemotePeerPresence } from "@deviva-draw/collab-client";
+import type { RemotePeerPresence } from "@benny2744/collab-client";
 import { canFollow } from "./use-collab-session";
 
 /**

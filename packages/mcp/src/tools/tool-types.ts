@@ -5,8 +5,8 @@
  * exactly once per capability. Handlers throw `ToolError` for agent-facing failures (bad input,
  * unknown id, out-of-root path) — transports render those as MCP tool errors, never crashes.
  */
-import type { AnyElement, Scene, TextMeasurer } from "@deviva-draw/engine";
-import { getLabel } from "@deviva-draw/engine";
+import type { AnyElement, Scene, TextMeasurer } from "@benny2744/engine";
+import { getLabel } from "@benny2744/engine";
 import { z } from "zod";
 
 /** Agent-facing failure: the message is the complete, actionable explanation shown to the model. */

@@ -2,13 +2,13 @@
  * Minimal axis-aligned hit test for "which bindable container is under this scene-space point" —
  * used by double-click-to-edit-bound-text wiring. Deliberately narrow, not a general selection/hit-
  * test utility: rotation is ignored (unlike a real selection hit-test, which would need to account
- * for it — the same trade-off `@deviva-draw/engine`'s `render/viewport-culling.ts` makes for the
+ * for it — the same trade-off `@benny2744/engine`'s `render/viewport-culling.ts` makes for the
  * same "safe over-inclusion, never under-inclusion" reason) and only bindable containers are
- * considered, not every element type. `@deviva-draw/engine`'s own selection hit-testing supersedes
+ * considered, not every element type. `@benny2744/engine`'s own selection hit-testing supersedes
  * this for anything beyond double-click-to-edit.
  */
-import type { AnyElement, Point, Scene } from "@deviva-draw/engine";
-import { isBindableContainer } from "@deviva-draw/engine";
+import type { AnyElement, Point, Scene } from "@benny2744/engine";
+import { isBindableContainer } from "@benny2744/engine";
 
 /** Returns the topmost (highest z-order) non-deleted bindable container whose axis-aligned bbox contains `point`, or `null` if none does. */
 export function findBindableContainerAt(scene: Scene, point: Point): AnyElement | null {

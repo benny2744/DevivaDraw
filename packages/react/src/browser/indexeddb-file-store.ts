@@ -7,7 +7,7 @@
  * Written directly against the raw IndexedDB API rather than pulling in a wrapper: the port is four
  * batched methods, and this is what those four cost.
  */
-import type { FileStoreLike, StoredFile } from "@deviva-draw/engine";
+import type { FileStoreLike, StoredFile } from "@benny2744/engine";
 
 const DATABASE_NAME = "devivadraw-files";
 const OBJECT_STORE = "files";

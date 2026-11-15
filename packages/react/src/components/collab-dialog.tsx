@@ -3,7 +3,7 @@
  * "hook owns state, dialog only reads/dispatches" pattern `share-dialog.tsx` uses for the share-link
  * flow). Offers two entry points from a fresh (disconnected, no room) state: start a brand-new session
  * (mints a room + shows its link, same copy-to-clipboard UX as `share-dialog.tsx`) or join one via a
- * pasted room URL (`@deviva-draw/collab-client`'s `room-url.ts` scheme — the decryption key travels in
+ * pasted room URL (`@benny2744/collab-client`'s `room-url.ts` scheme — the decryption key travels in
  * the URL fragment, this dialog never sees or transmits it separately).
  */
 import { useState } from "react";

@@ -5,7 +5,7 @@
  * presence, LWW merge) with zero network; the real relay's behavior is covered by
  * `apps/collab-server`'s own tests and Phase 2's wrangler-dev integration test.
  */
-import type { WebSocketLike } from "@deviva-draw/collab-client";
+import type { WebSocketLike } from "@benny2744/collab-client";
 
 export class FakeCollabRelay {
   private readonly members: Array<{ peerId: string; socket: FakeSocket }> = [];

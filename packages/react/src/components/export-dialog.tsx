@@ -11,7 +11,7 @@
  * this is just the control surface.
  */
 import { useState } from "react";
-import { frameContainedElementIds } from "@deviva-draw/engine";
+import { frameContainedElementIds } from "@benny2744/engine";
 import { orderedSceneFrames } from "./presentation/frame-slide-order";
 import { buttonStyle, dialogOverlayStyle, dialogStyle, disabledButtonStyle, labelStyle, outlineButtonStyle, sectionDividerStyle } from "./chrome-styles";
 import { Icon } from "./icon";

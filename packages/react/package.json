@@ -1,6 +1,6 @@
 {
-  "name": "@deviva-draw/react",
-  "version": "0.14.0",
+  "name": "@benny2744/react",
+  "version": "0.14.0-modchat.1",
   "description": "React bindings for the Deviva Draw engine: <DevivaDraw/> component, hooks, UI chrome, scene-read API",
   "type": "module",
   "license": "MIT",
@@ -15,11 +15,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nhtera/DevivaDraw.git",
+    "url": "git+https://github.com/benny2744/DevivaDraw.git",
     "directory": "packages/react"
   },
-  "homepage": "https://github.com/nhtera/DevivaDraw#readme",
-  "bugs": "https://github.com/nhtera/DevivaDraw/issues",
+  "homepage": "https://github.com/benny2744/DevivaDraw#readme",
+  "bugs": "https://github.com/benny2744/DevivaDraw/issues",
   "engines": {
     "node": ">=22"
   },
@@ -52,8 +52,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@deviva-draw/collab-client": "workspace:*",
-    "@deviva-draw/engine": "workspace:*",
+    "@benny2744/collab-client": "workspace:*",
+    "@benny2744/engine": "workspace:*",
     "jspdf": "^4.2.1",
     "mermaid": "^11.16.1",
     "qrcode-generator": "^2.0.4"

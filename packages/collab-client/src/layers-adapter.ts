@@ -10,10 +10,10 @@
  * ignore the unknown key. The LWW win rule and the wholesale-adoption semantics live in the engine
  * (`Scene.applyRemoteLayersManifest`); this module only answers "is this shaped like a manifest?".
  */
-import type { LayersManifest } from "@deviva-draw/engine";
-import { MAX_LAYERS } from "@deviva-draw/engine";
+import type { LayersManifest } from "@benny2744/engine";
+import { MAX_LAYERS } from "@benny2744/engine";
 
-export type { LayersManifest } from "@deviva-draw/engine";
+export type { LayersManifest } from "@benny2744/engine";
 
 export function isPlausibleLayersManifest(value: unknown): value is LayersManifest {
   if (typeof value !== "object" || value === null) return false;

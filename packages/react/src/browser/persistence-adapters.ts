@@ -2,11 +2,11 @@
  * Thin, DOM-only adapters the composed `<DevivaDraw/>` app shell wires the engine's persistence/
  * export functions through — download/open file plumbing, and a real `<canvas>`-backed
  * `ExportRenderTarget` for PNG export. Deliberately dumb: every actual decision (what to serialize,
- * how to validate, how to render) lives in `@deviva-draw/engine`; this file only knows how to talk
+ * how to validate, how to render) lives in `@benny2744/engine`; this file only knows how to talk
  * to the browser.
  */
-import { createBrowserRoughCanvas, createRoughGenerator } from "@deviva-draw/engine";
-import type { CreateExportRenderTarget, RoughSvgGenerator } from "@deviva-draw/engine";
+import { createBrowserRoughCanvas, createRoughGenerator } from "@benny2744/engine";
+import type { CreateExportRenderTarget, RoughSvgGenerator } from "@benny2744/engine";
 
 /** Triggers a browser download of `content` (a string or `Blob`) named `filename` — the universal fallback path every browser supports, used directly when the File System Access API isn't available. */
 export function triggerDownload(filename: string, content: string | Blob, mimeType: string): void {
@@ -114,9 +114,9 @@ export const createBrowserExportRenderTarget: CreateExportRenderTarget = (pixelW
 };
 
 /**
- * Headless rough.js generator for SVG export — see `@deviva-draw/engine`'s `exportToSvg` doc.
+ * Headless rough.js generator for SVG export — see `@benny2744/engine`'s `exportToSvg` doc.
  * Explicit return type: without it, declaration emit can't name the inferred rough.js generator
- * type portably (it lives in `@deviva-draw/engine`'s own `roughjs` dependency, not this package's),
+ * type portably (it lives in `@benny2744/engine`'s own `roughjs` dependency, not this package's),
  * so pnpm's strict node_modules layout makes the type unreachable from a published `.d.ts` here.
  */
 export function createRoughSvgGenerator(): RoughSvgGenerator {

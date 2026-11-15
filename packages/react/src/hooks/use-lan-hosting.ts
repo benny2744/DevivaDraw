@@ -11,7 +11,7 @@
  * to reach from a button.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { MintedRoom } from "@deviva-draw/collab-client";
+import type { MintedRoom } from "@benny2744/collab-client";
 import { lanHostErrorReason, lanRelayBaseUrl } from "../browser/lan-host-controller";
 import type { LanHostAddress, LanHostController, LanHostErrorReason, LanHostRoom } from "../browser/lan-host-controller";
 

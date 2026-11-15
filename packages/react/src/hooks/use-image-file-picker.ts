@@ -17,8 +17,8 @@
  * placement interaction is covered end-to-end in `tools-parity.spec.ts`.
  */
 import { useCallback, useEffect, useState } from "react";
-import { bytesToDataURL, fitInitialSize, insertImageFile, screenToScene } from "@deviva-draw/engine";
-import type { AnyElement, Camera, DecodeNaturalSizeFn, DownscaleImageFn, HistoryStack, Scene, SelectionState } from "@deviva-draw/engine";
+import { bytesToDataURL, fitInitialSize, insertImageFile, screenToScene } from "@benny2744/engine";
+import type { AnyElement, Camera, DecodeNaturalSizeFn, DownscaleImageFn, HistoryStack, Scene, SelectionState } from "@benny2744/engine";
 import type { RefObject } from "react";
 import { reportInsertFailure } from "../browser/image-insert-outcome";
 import type { ImageInsertOutcome } from "../browser/image-insert-outcome";

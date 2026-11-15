@@ -7,8 +7,8 @@ import {
   createImageElement,
   createRectangleElement,
   createTextElement,
-} from "@deviva-draw/engine";
-import type { AnyElement, ArrowElement } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import type { AnyElement, ArrowElement } from "@benny2744/engine";
 import { toCanvasShapeInput } from "./to-canvas-shape-input";
 
 /** Rebuilds a factory-created element with an explicit, readable id for fixtures/assertions. */

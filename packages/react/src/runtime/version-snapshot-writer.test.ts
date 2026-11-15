@@ -6,7 +6,7 @@
  * whether the app then does something sensible or spends the session retrying against a full disk.
  */
 import { describe, expect, it, vi } from "vitest";
-import { MULTI_PAGE_DOCUMENT_TYPE } from "@deviva-draw/engine";
+import { MULTI_PAGE_DOCUMENT_TYPE } from "@benny2744/engine";
 import { createVersionSnapshotWriter } from "./version-snapshot-writer";
 import type { RetentionPolicy } from "../browser/version-retention";
 import type { VersionStore } from "../browser/indexeddb-version-store";

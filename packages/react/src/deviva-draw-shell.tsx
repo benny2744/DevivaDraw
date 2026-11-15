@@ -6,7 +6,7 @@
  *
  * Two nested divs, not one: `rootRef` (sized/styled by the host, holds every chrome
  * button/panel/menu as a plain sibling) and `canvasHostRef` (an absolutely-positioned `inset: 0`
- * child, the *only* element `@deviva-draw/engine`'s `PointerEventPipeline`/`CanvasStage` ever touch).
+ * child, the *only* element `@benny2744/engine`'s `PointerEventPipeline`/`CanvasStage` ever touch).
  * They must stay separate — `PointerEventPipeline` calls `setPointerCapture` on its target element on
  * every `pointerdown` inside it (see that module's doc); a chrome `<button>` nested *inside* that same
  * captured element never receives its synthetic `click` event once capture redirects it, silently
@@ -14,8 +14,8 @@
  * `canvasHostRef` descendants avoids this entirely rather than special-casing it per component.
  */
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
-import { createCamera, deserializeMultiPageDocument } from "@deviva-draw/engine";
-import type { RemoteCursorOverlay } from "@deviva-draw/engine";
+import { createCamera, deserializeMultiPageDocument } from "@benny2744/engine";
+import type { RemoteCursorOverlay } from "@benny2744/engine";
 import { restoreBrowserAutosaveDocument } from "./browser/scene-file-operations";
 import { useKeyboardInsetPx } from "./browser/visual-viewport-inset";
 import { PageStore } from "./pages/page-store";

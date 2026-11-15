@@ -14,8 +14,8 @@
  * its way to being prevented. Those failures are transient by construction, so the caller is told to
  * wait them out and try again rather than to warn the user.
  */
-import { collectSceneFiles, isQuotaExceededError } from "@deviva-draw/engine";
-import type { FileStoreLike, Scene } from "@deviva-draw/engine";
+import { collectSceneFiles, isQuotaExceededError } from "@benny2744/engine";
+import type { FileStoreLike, Scene } from "@benny2744/engine";
 import type { AutosaveStatusStore } from "../runtime/autosave-status-store";
 
 /** How often the offload re-checks that the database still holds what it thinks it does — see `verifyStillStored`. Long, because the only thing that invalidates its memory is another tab. */

@@ -5,8 +5,8 @@
  * ticks queue duplicate writes, or claiming to be busy when there was nothing to do.
  */
 import { describe, expect, it, vi } from "vitest";
-import { createImageElement, Scene } from "@deviva-draw/engine";
-import type { FileStoreLike, StoredFile } from "@deviva-draw/engine";
+import { createImageElement, Scene } from "@benny2744/engine";
+import type { FileStoreLike, StoredFile } from "@benny2744/engine";
 import { createAutosaveFileOffload } from "./autosave-file-offload";
 import type { AutosaveFileOffloadOptions } from "./autosave-file-offload";
 import { createAutosaveStatusStore } from "../runtime/autosave-status-store";

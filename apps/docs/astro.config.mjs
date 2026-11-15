@@ -39,13 +39,13 @@ export default defineConfig({
           entryPoints: ['../../packages/react/src/index.ts'],
           tsconfig: '../../packages/react/tsconfig.json',
           output: 'api/react',
-          sidebar: { label: '@deviva-draw/react' },
+          sidebar: { label: '@benny2744/react' },
         }),
         engineTypeDoc({
           entryPoints: ['../../packages/engine/src/index.ts'],
           tsconfig: '../../packages/engine/tsconfig.json',
           output: 'api/engine',
-          sidebar: { label: '@deviva-draw/engine' },
+          sidebar: { label: '@benny2744/engine' },
         }),
       ],
       social: [

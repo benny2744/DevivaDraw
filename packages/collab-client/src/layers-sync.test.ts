@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { Scene } from "@deviva-draw/engine";
-import type { LayersManifest } from "@deviva-draw/engine";
+import { Scene } from "@benny2744/engine";
+import type { LayersManifest } from "@benny2744/engine";
 import { handleInboundMessage } from "./inbound-message-handler";
 import { isPlausibleLayersManifest } from "./layers-adapter";
 import { sendDocumentSnapshot } from "./outbound-sync";

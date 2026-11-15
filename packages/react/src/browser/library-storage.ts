@@ -5,7 +5,7 @@
  * just data, and re-inserting it goes through the engine's `insertElements` (fresh ids). Import/export
  * uses a `.devivalib` JSON file, mirroring Excalidraw's `.excalidrawlib` interchange idea.
  */
-import type { AnyElement } from "@deviva-draw/engine";
+import type { AnyElement } from "@benny2744/engine";
 
 export const LIBRARY_STORAGE_KEY = "devivadraw:library:v1";
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { createRectangleElement, Scene } from "@deviva-draw/engine";
-import type { AnyElement } from "@deviva-draw/engine";
+import { createRectangleElement, Scene } from "@benny2744/engine";
+import type { AnyElement } from "@benny2744/engine";
 import { isPlausibleRemoteElement, mergeRemoteElement, remoteElementWins } from "./lww-merge";
 
 function rect(overrides: Partial<AnyElement> = {}): AnyElement {
@@ -160,7 +160,7 @@ describe("mergeRemoteElement", () => {
 
 describe("mergeRemoteElement — table elements", () => {
   it("a remote table passes LWW merge verbatim, grid arrays intact", async () => {
-    const { createTableElement, Scene: EngineScene } = await import("@deviva-draw/engine");
+    const { createTableElement, Scene: EngineScene } = await import("@benny2744/engine");
     const source = new EngineScene();
     const table = source.addElement(
       createTableElement({ x: 0, y: 0, columnWidths: [100, 60], rowHeights: [40, 30], cells: [["a", "b"], ["c", "d"]] }),

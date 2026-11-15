@@ -3,8 +3,8 @@
  * stats-panel toggles (gated behind the same `ActionRegistry`/appState pattern
  * as everything else — kept intentionally tiny, no dedicated UI beyond a main-menu toggle each).
  */
-import { selectionBoundsOf } from "@deviva-draw/engine";
-import type { SelectOnMode } from "@deviva-draw/engine";
+import { selectionBoundsOf } from "@benny2744/engine";
+import type { SelectOnMode } from "@benny2744/engine";
 import { getEditorPreferences, setEditorPreferences } from "../browser/editor-preferences";
 import { writeStoredGrid } from "../preferences/grid-storage";
 import { writeStoredObjectSnap } from "../preferences/object-snap-storage";

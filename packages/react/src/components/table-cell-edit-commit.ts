@@ -14,8 +14,8 @@ import {
   tableCellText,
   tableColumnWidths,
   tableRowHeights,
-} from "@deviva-draw/engine";
-import type { TableElement, TextMeasurer } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import type { TableElement, TextMeasurer } from "@benny2744/engine";
 
 export interface CellCommitPlan {
   /** First write: the new grid (and, when appending, the grown row arrays + summed height). */

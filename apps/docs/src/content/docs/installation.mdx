@@ -4,27 +4,27 @@ description: The Deviva Draw package matrix - which package to install for which
 ---
 
 Deviva Draw ships as four npm packages plus a desktop app. Most apps only need
-`@deviva-draw/react`.
+`@benny2744/react`.
 
 | Package | What it is | Install when you want |
 |---|---|---|
-| [`@deviva-draw/react`](https://www.npmjs.com/package/@deviva-draw/react) | The complete whiteboard as a React component (`<DevivaDraw />`), plus hooks and building blocks for custom chrome. | A whiteboard in a React app. **Start here.** |
-| [`@deviva-draw/engine`](https://www.npmjs.com/package/@deviva-draw/engine) | Framework-agnostic, zero-dependency core: element model, scene, history, rendering, geometry. | Headless scene processing, a custom renderer, or non-React bindings. |
-| [`@deviva-draw/collab-client`](https://www.npmjs.com/package/@deviva-draw/collab-client) | Client for E2E-encrypted live collaboration and share links. | Direct protocol access. The React package already uses it under the hood - you rarely install this yourself. |
+| [`@benny2744/react`](https://www.npmjs.com/package/@benny2744/react) | The complete whiteboard as a React component (`<DevivaDraw />`), plus hooks and building blocks for custom chrome. | A whiteboard in a React app. **Start here.** |
+| [`@benny2744/engine`](https://www.npmjs.com/package/@benny2744/engine) | Framework-agnostic, zero-dependency core: element model, scene, history, rendering, geometry. | Headless scene processing, a custom renderer, or non-React bindings. |
+| [`@benny2744/collab-client`](https://www.npmjs.com/package/@benny2744/collab-client) | Client for E2E-encrypted live collaboration and share links. | Direct protocol access. The React package already uses it under the hood - you rarely install this yourself. |
 | [`@deviva-draw/mcp`](https://www.npmjs.com/package/@deviva-draw/mcp) | Model Context Protocol server - AI agents draw, edit, and export scenes. | AI-agent workflows. Run with `npx`, no app integration required. See [MCP for AI Agents](/guides/mcp/). |
 
 ## Requirements
 
-- **`@deviva-draw/react`**: React 19 (`react` and `react-dom` are peer dependencies).
-- **`@deviva-draw/engine`**: any ES2022 runtime - browser, Node.js 18+, or edge. Zero runtime dependencies.
+- **`@benny2744/react`**: React 19 (`react` and `react-dom` are peer dependencies).
+- **`@benny2744/engine`**: any ES2022 runtime - browser, Node.js 18+, or edge. Zero runtime dependencies.
 - **Node.js 18+** for tooling; the packages ship as ESM with TypeScript types included.
 
 ```bash
 # the usual case
-npm install @deviva-draw/react
+npm install @benny2744/react
 
 # headless / framework-agnostic
-npm install @deviva-draw/engine
+npm install @benny2744/engine
 
 # AI-agent MCP server (no install - run directly)
 npx -y @deviva-draw/mcp

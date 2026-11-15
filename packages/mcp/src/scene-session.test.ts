@@ -1,7 +1,7 @@
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { createRectangleElement, MULTI_PAGE_DOCUMENT_TYPE, SCENE_DOCUMENT_TYPE } from "@deviva-draw/engine";
+import { createRectangleElement, MULTI_PAGE_DOCUMENT_TYPE, SCENE_DOCUMENT_TYPE } from "@benny2744/engine";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { SceneSession } from "./scene-session";
 import { ToolError } from "./tools/tool-types";

@@ -19,8 +19,8 @@
  * Commit/Tab logic is pure and lives in `table-cell-edit-commit.ts` (unit-tested there); this
  * component owns only the session state, positioning, and the history-batch lifecycle.
  */
-import { MAX_TABLE_CELL_CHARS, createCanvasTextMeasurer, panCameraByScreenDelta, sceneToScreen, TABLE_CELL_PADDING, tableCellRect, tableCellText, TEXT_FONT_FAMILY_CSS, DEFAULT_TEXT_LINE_HEIGHT } from "@deviva-draw/engine";
-import type { TableElement } from "@deviva-draw/engine";
+import { MAX_TABLE_CELL_CHARS, createCanvasTextMeasurer, panCameraByScreenDelta, sceneToScreen, TABLE_CELL_PADDING, tableCellRect, tableCellText, TEXT_FONT_FAMILY_CSS, DEFAULT_TEXT_LINE_HEIGHT } from "@benny2744/engine";
+import type { TableElement } from "@benny2744/engine";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { KeyboardEvent as ReactKeyboardEvent } from "react";
 import { buildCellCommit, buildCommitRefit, tabDestination } from "./table-cell-edit-commit";

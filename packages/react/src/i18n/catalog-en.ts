@@ -4,7 +4,7 @@
  * forgotten there is a compile error, not just a runtime gap (the runtime completeness test in
  * `catalog-completeness.test.ts` is a second, independent safety net catching the same class of bug
  * for any future catalog that isn't authored as a literal `Record` against this type). Every UI
- * chrome string in `@deviva-draw/react`'s components must be pulled through `t()` against this
+ * chrome string in `@benny2744/react`'s components must be pulled through `t()` against this
  * catalog — the engine itself stays string-free (no i18n dependency).
  */
 export const catalogEn = {

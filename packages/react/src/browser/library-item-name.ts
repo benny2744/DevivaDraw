@@ -17,7 +17,7 @@
  * annotation that lost the title contest, and one whose title was truncated is findable by its full
  * wording.
  */
-import type { AnyElement } from "@deviva-draw/engine";
+import type { AnyElement } from "@benny2744/engine";
 import type { LibraryItem } from "./library-storage";
 
 /** Beyond this a name stops being a tooltip and starts being a paragraph — see the lorem-ipsum blocks real libraries ship. */

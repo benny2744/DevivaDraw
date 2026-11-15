@@ -4,7 +4,7 @@
  * originally lacked (a locked shape's label editor opened in production).
  */
 import { describe, expect, it } from "vitest";
-import { createArrowElement, createNoteElement, createTextElement, Scene } from "@deviva-draw/engine";
+import { createArrowElement, createNoteElement, createTextElement, Scene } from "@benny2744/engine";
 import { findArrowAt } from "./find-arrow-at-point";
 import { findBindableContainerAt } from "./find-bindable-container-at-point";
 import { findStandaloneTextAt } from "./find-standalone-text-at-point";

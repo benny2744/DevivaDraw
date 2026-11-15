@@ -10,10 +10,10 @@
  * (not a dependency of this package — see `package.json`), the same DOM-testing-infra trade-off
  * every other hook in this package documents. The subscribe/unsubscribe primitives it wraps
  * (`Scene.subscribe`, `SelectionState.subscribe`, `ToolStateMachine.subscribe`) are already fully
- * unit tested in `@deviva-draw/engine`.
+ * unit tested in `@benny2744/engine`.
  */
 import { useEffect, useReducer } from "react";
-import type { Scene, SelectionState, ToolStateMachine } from "@deviva-draw/engine";
+import type { Scene, SelectionState, ToolStateMachine } from "@benny2744/engine";
 import type { CameraStore } from "./camera-store";
 import type { PageStore } from "../pages/page-store";
 

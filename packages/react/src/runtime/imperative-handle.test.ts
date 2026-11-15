@@ -9,8 +9,8 @@ import {
   PanZoomTool,
   Scene,
   SelectionState,
-} from "@deviva-draw/engine";
-import type { AnyElement, RenderSceneContext2D, RoughCanvasDrawer } from "@deviva-draw/engine";
+} from "@benny2744/engine";
+import type { AnyElement, RenderSceneContext2D, RoughCanvasDrawer } from "@benny2744/engine";
 import { describe, expect, it, vi } from "vitest";
 import { buildImperativeHandle } from "./imperative-handle";
 
@@ -21,7 +21,7 @@ function u32be(value: number): number[] {
 function asciiBytes(text: string): number[] {
   return [...text].map((char) => char.charCodeAt(0));
 }
-/** Minimal well-formed PNG fixture, matching `@deviva-draw/engine`'s own `png-chunk-writer.test.ts` fixture shape — needed because `exportToPng` embeds a scene-data `tEXt` chunk into whatever bytes the injected `toBlob()` returns. */
+/** Minimal well-formed PNG fixture, matching `@benny2744/engine`'s own `png-chunk-writer.test.ts` fixture shape — needed because `exportToPng` embeds a scene-data `tEXt` chunk into whatever bytes the injected `toBlob()` returns. */
 function fixturePngBytes(): Uint8Array {
   const ihdrData = [...u32be(1), ...u32be(1), 8, 6, 0, 0, 0];
   const ihdrChunk = [...u32be(ihdrData.length), ...asciiBytes("IHDR"), ...ihdrData, ...u32be(0)];
@@ -79,10 +79,10 @@ function buildDeps(scene: Scene) {
       ctx: fakeRenderSceneContext(),
       roughCanvas: fakeRoughCanvas(),
       // Test fixture bytes are always freshly `new Uint8Array(...)`-backed (never a SharedArrayBuffer
-      // view) — same narrowing `@deviva-draw/engine`'s `export-to-png.ts` documents for the identical gap.
+      // view) — same narrowing `@benny2744/engine`'s `export-to-png.ts` documents for the identical gap.
       toBlob: async () => new Blob([fixturePngBytes() as Uint8Array<ArrayBuffer>], { type: "image/png" }),
     }),
-    // Real (headless) rough.js generator, same as `@deviva-draw/engine`'s own `export-to-svg.test.ts` —
+    // Real (headless) rough.js generator, same as `@benny2744/engine`'s own `export-to-svg.test.ts` —
     // no `<canvas>`/DOM needed for SVG-mode path generation.
     createRoughSvgGenerator: () => createRoughGenerator(),
     textMeasurer: createFixedWidthTextMeasurer(8),

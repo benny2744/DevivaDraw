@@ -10,8 +10,8 @@
  */
 import "fake-indexeddb/auto";
 import { describe, expect, it } from "vitest";
-import { MULTI_PAGE_DOCUMENT_TYPE } from "@deviva-draw/engine";
-import type { MultiPageDocumentV1 } from "@deviva-draw/engine";
+import { MULTI_PAGE_DOCUMENT_TYPE } from "@benny2744/engine";
+import type { MultiPageDocumentV1 } from "@benny2744/engine";
 import { openIndexedDbVersionStore } from "./indexeddb-version-store";
 import type { VersionStore } from "./indexeddb-version-store";
 import type { VersionSnapshot } from "./version-snapshot-types";

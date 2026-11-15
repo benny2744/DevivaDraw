@@ -12,8 +12,8 @@
  * by double-click, so the tips claim only a tight radius and everything else falls through to the
  * label editor.
  */
-import type { ArrowElement, Point } from "@deviva-draw/engine";
-import { absolutePoints, arrowPathPoints } from "@deviva-draw/engine";
+import type { ArrowElement, Point } from "@benny2744/engine";
+import { absolutePoints, arrowPathPoints } from "@benny2744/engine";
 
 /** How near (screen px) a click must land to a tip to count as hitting it rather than the arrow's body. */
 export const ARROW_ENDPOINT_HIT_PX = 12;

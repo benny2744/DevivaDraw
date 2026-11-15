@@ -61,8 +61,8 @@
     "test": "vitest run --passWithNoTests"
   },
   "dependencies": {
-    "@deviva-draw/collab-client": "workspace:*",
-    "@deviva-draw/engine": "workspace:*",
+    "@benny2744/collab-client": "workspace:*",
+    "@benny2744/engine": "workspace:*",
     "@modelcontextprotocol/sdk": "~1.30.0",
     "zod": "^4.4.3"
   },

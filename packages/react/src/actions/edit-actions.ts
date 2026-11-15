@@ -1,13 +1,13 @@
 /**
  * Undo/redo + selection-editing actions (copy/paste/duplicate/delete/select-all) — the toolbar/
  * top-bar/context-menu/command-palette entry points for the exact same engine primitives
- * `@deviva-draw/engine`'s `selection/selection-tool-keyboard.ts` already wires to keyboard shortcuts.
+ * `@benny2744/engine`'s `selection/selection-tool-keyboard.ts` already wires to keyboard shortcuts.
  * Deliberately re-implemented as direct engine calls here (not by simulating a keydown event) since
  * an action triggered by a mouse click has no keyboard event to synthesize — both paths converge on
  * the same underlying `Scene`/`SelectionState`/`InternalClipboard` mutations either way.
  */
-import { deleteSelection, duplicateElements, FONT_SIZE_LEVELS } from "@deviva-draw/engine";
-import type { AnyElement } from "@deviva-draw/engine";
+import { deleteSelection, duplicateElements, FONT_SIZE_LEVELS } from "@benny2744/engine";
+import type { AnyElement } from "@benny2744/engine";
 import type { Action, ActionRuntime } from "./action-types";
 
 function hasSelection(runtime: ActionRuntime): boolean {

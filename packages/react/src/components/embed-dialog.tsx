@@ -4,7 +4,7 @@
  * enable the button — arbitrary sites are refused (see engine `resolveEmbed`). The element renders as
  * a placeholder card on the canvas plus a sandboxed iframe overlay (see `embed-overlay.tsx`).
  */
-import { createEmbedElement, DEFAULT_EMBED_HEIGHT, DEFAULT_EMBED_WIDTH, isEmbeddable, screenToScene } from "@deviva-draw/engine";
+import { createEmbedElement, DEFAULT_EMBED_HEIGHT, DEFAULT_EMBED_WIDTH, isEmbeddable, screenToScene } from "@benny2744/engine";
 import { useState } from "react";
 import { buttonStyle, dialogOverlayStyle, dialogStyle, inputStyle, labelStyle } from "./chrome-styles";
 import { Icon } from "./icon";

@@ -22,9 +22,9 @@
  */
 import { useEffect } from "react";
 import type { RefObject } from "react";
-import { insertImageFile, readEmbeddedSceneData, readEmbeddedSceneDataFromSvg, screenToScene } from "@deviva-draw/engine";
-import type { Camera, Scene } from "@deviva-draw/engine";
-import type { DecodeNaturalSizeFn, DownscaleImageFn } from "@deviva-draw/engine";
+import { insertImageFile, readEmbeddedSceneData, readEmbeddedSceneDataFromSvg, screenToScene } from "@benny2744/engine";
+import type { Camera, Scene } from "@benny2744/engine";
+import type { DecodeNaturalSizeFn, DownscaleImageFn } from "@benny2744/engine";
 import { reportInsertFailure } from "../browser/image-insert-outcome";
 import type { ImageInsertOutcome } from "../browser/image-insert-outcome";
 import { findFirstImageItem, looksLikeSvgMarkup, shouldConsumePaste, svgMarkupToBytes, SVG_MIME_TYPE } from "./clipboard-image-detection";

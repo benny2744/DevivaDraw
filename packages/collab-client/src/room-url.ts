@@ -1,6 +1,6 @@
 /**
  * Room URL scheme: `{origin}/room/{roomId}#key={base64Key}` — the same fragment-key trust boundary
- * `@deviva-draw/engine`'s `share-link/build-share-url.ts` uses for static share links, extended to a
+ * `@benny2744/engine`'s `share-link/build-share-url.ts` uses for static share links, extended to a
  * live room: the key lives only in the URL fragment, which browsers never send to any server, so
  * `apps/collab-server` never has a way to obtain it. `buildRoomWebSocketUrl` is the separate,
  * server-facing half — it derives the collab-server's WebSocket endpoint from its own HTTP(S) base URL

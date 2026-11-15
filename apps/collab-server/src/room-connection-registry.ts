@@ -53,7 +53,7 @@ const VIEWER_ALLOWED_TYPES = new Set(["comment-delta", "presence", "snapshot-req
 /**
  * Hard cap on a single inbound WebSocket frame — a basic abuse/memory guard mirroring
  * `blob-routes.ts`'s `MAX_BLOB_BYTES`, sized generously above any legitimate encrypted-scene-snapshot
- * payload (`@deviva-draw/engine`'s `MAX_SHARE_PAYLOAD_BYTES` is 15MB for a *whole scene* share link, but
+ * payload (`@benny2744/engine`'s `MAX_SHARE_PAYLOAD_BYTES` is 15MB for a *whole scene* share link, but
  * that's compressed-then-base64'd for HTTP; a `snapshot` message here is JSON-wrapped ciphertext over a
  * long-lived socket, not a one-shot upload, so 1MB per frame is intentionally tighter — a legitimate
  * client's periodic snapshot for a session that large would need multiple smaller updates anyway).
@@ -159,7 +159,7 @@ export class RoomConnectionRegistry {
     }
 
     // Broadcast-except-sender: the relay never echoes a sender's own message back (see
-    // `@deviva-draw/collab-client`'s `collab-session.ts` doc for why the client-side echo guard is a
+    // `@benny2744/collab-client`'s `collab-session.ts` doc for why the client-side echo guard is a
     // secondary defense, not the only one — this is the primary one).
     const stamped = JSON.stringify({ ...parsed, peerId });
     if (parsed.type === "snapshot") {

@@ -10,9 +10,9 @@
  */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve, sep } from "node:path";
-import { PageStore } from "@deviva-draw/collab-client";
-import { deserializeMultiPageDocumentLenient, MULTI_PAGE_DOCUMENT_TYPE, Scene, serializeScene } from "@deviva-draw/engine";
-import type { TextMeasurer } from "@deviva-draw/engine";
+import { PageStore } from "@benny2744/collab-client";
+import { deserializeMultiPageDocumentLenient, MULTI_PAGE_DOCUMENT_TYPE, Scene, serializeScene } from "@benny2744/engine";
+import type { TextMeasurer } from "@benny2744/engine";
 import { createApproximateTextMeasurer } from "./approximate-measurer";
 import { liveElementCount, ToolError } from "./tools/tool-types";
 import type { OpenSceneResult, ToolSession } from "./tools/tool-types";

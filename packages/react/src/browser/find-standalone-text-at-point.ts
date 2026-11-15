@@ -8,7 +8,7 @@
  * Bound text (`containerId !== null`) is excluded on purpose — that is edited through its container's
  * own double-click path (`startBoundTextEdit`), never as a standalone element.
  */
-import type { AnyElement, Point, Scene } from "@deviva-draw/engine";
+import type { AnyElement, Point, Scene } from "@benny2744/engine";
 
 /** Returns the topmost (highest z-order) non-deleted standalone text element whose axis-aligned bbox contains `point`, or `null` if none does. */
 export function findStandaloneTextAt(scene: Scene, point: Point): AnyElement | null {

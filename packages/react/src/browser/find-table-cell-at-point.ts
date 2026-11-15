@@ -5,8 +5,8 @@
  * via `effectiveLocked`) and hidden tables never offer editing — the lock check the older finders
  * originally shipped without.
  */
-import type { Point, Scene, TableElement } from "@deviva-draw/engine";
-import { elementCenter, rotatePointAroundCenter, tableCellAtPoint } from "@deviva-draw/engine";
+import type { Point, Scene, TableElement } from "@benny2744/engine";
+import { elementCenter, rotatePointAroundCenter, tableCellAtPoint } from "@benny2744/engine";
 
 export interface TableCellHit {
   table: TableElement;

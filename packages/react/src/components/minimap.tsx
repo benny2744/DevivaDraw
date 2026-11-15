@@ -9,8 +9,8 @@
  * either theme). A uniform grey would collapse a busy scene into one indistinguishable slab, which
  * defeats the only thing a minimap is for: recognising *where* in your drawing you are.
  */
-import { computeElementsBounds } from "@deviva-draw/engine";
-import type { AnyElement, Camera } from "@deviva-draw/engine";
+import { computeElementsBounds } from "@benny2744/engine";
+import type { AnyElement, Camera } from "@benny2744/engine";
 import { useEffect, useMemo, useRef } from "react";
 import { panelStyle } from "./chrome-styles";
 import { adaptBackgroundColorForTheme, adaptStrokeColorForTheme } from "../theme/canvas-color-inversion";

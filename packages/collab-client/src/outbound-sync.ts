@@ -8,7 +8,7 @@
 import { encryptEnvelope } from "./message-codec";
 import type { CollabPagesAdapter } from "./pages-adapter";
 import type { PresencePayload } from "./presence-state";
-import type { Scene } from "@deviva-draw/engine";
+import type { Scene } from "@benny2744/engine";
 
 export interface OutboundSyncDeps {
   scene: Scene;

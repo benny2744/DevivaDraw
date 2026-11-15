@@ -159,8 +159,8 @@ around January 2027 — so a long-lived publish token would be a dead end. OIDC
 also makes npm attach a provenance attestation automatically, linking each
 tarball to the workflow run and commit that produced it.
 
-For each of `@deviva-draw/engine`, `@deviva-draw/collab-client`, and
-`@deviva-draw/react`, on npmjs.com → the package → **Settings → Trusted
+For each of `@benny2744/engine`, `@benny2744/collab-client`, and
+`@benny2744/react`, on npmjs.com → the package → **Settings → Trusted
 Publisher**:
 
 - Publisher: **GitHub Actions**
@@ -202,7 +202,7 @@ single package's version.
 - **Hand-drawn font.** The engine bundles Patrick Hand (SIL OFL 1.1), subset to
   Latin + Vietnamese and inlined as a base64 `woff2` data URI, so there is no
   external font request and nothing to configure at deploy time. The artifact is
-  committed; regenerate it with `pnpm --filter @deviva-draw/engine font:build`
+  committed; regenerate it with `pnpm --filter @benny2744/engine font:build`
   after changing the ranges in `scripts/build-hand-drawn-font.mjs`, and commit
   the result. `text/font-loading.ts` still takes `sources`, so a host can
   register additional faces without call-site changes.

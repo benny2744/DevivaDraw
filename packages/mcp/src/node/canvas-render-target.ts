@@ -9,8 +9,8 @@
  * rough.js never touches canvas APIs beyond `getContext` — only the engine's TYPES pin them to the
  * DOM names.
  */
-import { createBrowserRoughCanvas } from "@deviva-draw/engine";
-import type { CreateExportRenderTarget, ExportRenderTarget } from "@deviva-draw/engine";
+import { createBrowserRoughCanvas } from "@benny2744/engine";
+import type { CreateExportRenderTarget, ExportRenderTarget } from "@benny2744/engine";
 import type { CanvasRuntime } from "./canvas-runtime";
 
 export function createNodeExportRenderTarget(runtime: CanvasRuntime): CreateExportRenderTarget {

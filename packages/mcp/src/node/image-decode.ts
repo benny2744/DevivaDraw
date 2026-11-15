@@ -5,8 +5,8 @@
  * and returns `undefined`), a one-shot export must pre-warm the cache to completion before
  * rendering — `prewarmImageDecodeCache` below is that step.
  */
-import { ImageDecodeCache } from "@deviva-draw/engine";
-import type { AnyElement, ImageDecodeFn, Scene } from "@deviva-draw/engine";
+import { ImageDecodeCache } from "@benny2744/engine";
+import type { AnyElement, ImageDecodeFn, Scene } from "@benny2744/engine";
 import type { CanvasRuntime, NodeCanvasImage } from "./canvas-runtime";
 
 export function createNodeImageDecoder(runtime: CanvasRuntime): ImageDecodeFn<NodeCanvasImage> {

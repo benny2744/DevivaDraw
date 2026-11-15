@@ -4,8 +4,8 @@
  * shape" style set), so these write via `Scene.updateElement` for every matching selected element in
  * one batched history step instead of through `styleState.applyToSelection`.
  */
-import { DEFAULT_STROKE_COLOR_PALETTE, FONT_SIZE_LEVELS, findBoundTextRef } from "@deviva-draw/engine";
-import type { AnyElement, ArrowElement, Arrowhead, ArrowType, TextAlign, TextElement, TextFontFamily } from "@deviva-draw/engine";
+import { DEFAULT_STROKE_COLOR_PALETTE, FONT_SIZE_LEVELS, findBoundTextRef } from "@benny2744/engine";
+import type { AnyElement, ArrowElement, Arrowhead, ArrowType, TextAlign, TextElement, TextFontFamily } from "@benny2744/engine";
 import { ColorPicker } from "./color-picker";
 import { buttonStyle, labelStyle } from "./chrome-styles";
 import { OpacityRow, StyleSection } from "./style-section";

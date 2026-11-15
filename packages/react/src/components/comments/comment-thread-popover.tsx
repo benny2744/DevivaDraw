@@ -8,8 +8,8 @@
  * button the store would refuse anyway keeps the UI honest, and the store check keeps a non-UI host
  * (or a hand-crafted call) from bypassing it.
  */
-import { createCommentMessage } from "@deviva-draw/engine";
-import type { CommentThread, Scene } from "@deviva-draw/engine";
+import { createCommentMessage } from "@benny2744/engine";
+import type { CommentThread, Scene } from "@benny2744/engine";
 import { useState } from "react";
 import { Icon } from "../icon";
 import { buttonStyle, chromeFontFamily, panelStyle } from "../chrome-styles";

@@ -5,8 +5,8 @@
  * generator + text measurer, so no runtime/shell plumbing is needed. Elements are drawn on a white
  * "paper" background so the diagram is legible in both light and dark dialog themes.
  */
-import { createCanvasTextMeasurer, exportToSvg, Scene } from "@deviva-draw/engine";
-import type { AnyElement } from "@deviva-draw/engine";
+import { createCanvasTextMeasurer, exportToSvg, Scene } from "@benny2744/engine";
+import type { AnyElement } from "@benny2744/engine";
 import type { CSSProperties } from "react";
 import { useMemo } from "react";
 import { createRoughSvgGenerator } from "../browser/persistence-adapters";

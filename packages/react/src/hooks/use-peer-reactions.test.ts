@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { RemotePeerPresence } from "@deviva-draw/collab-client";
+import type { RemotePeerPresence } from "@benny2744/collab-client";
 import { collectNewReactions, keepLiveReactions, pruneSeen, raisedHands, REACTION_LIFETIME_MS } from "./use-peer-reactions";
 
 function peer(overrides: Partial<RemotePeerPresence> & { peerId: string }): RemotePeerPresence {

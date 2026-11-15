@@ -12,7 +12,7 @@ import { canvasHintKey } from "./canvas-hint-key";
 import { useTranslation } from "../i18n/use-translation";
 import { useSelectionVersion, useToolVersion } from "../runtime/use-live-version";
 import { useEditSessionStatus } from "../runtime/use-edit-session-status";
-import type { TextEditSession } from "@deviva-draw/engine";
+import type { TextEditSession } from "@benny2744/engine";
 import type { DevivaRuntime } from "../runtime/runtime-types";
 
 export interface CanvasHintProps {

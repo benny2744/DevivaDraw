@@ -11,8 +11,8 @@
  * atomic decision, and fractional-index comparison is itself total-order-consistent regardless of
  * application order.
  */
-import type { AnyElement, Scene } from "@deviva-draw/engine";
-import { lwwRecordWins } from "@deviva-draw/engine";
+import type { AnyElement, Scene } from "@benny2744/engine";
+import { lwwRecordWins } from "@benny2744/engine";
 
 /**
  * Structural validation for an inbound remote element — the decrypted payload is still untrusted at
