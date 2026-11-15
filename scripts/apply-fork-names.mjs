@@ -40,7 +40,7 @@ for (const path of walk(ROOT)) {
   const original = text;
   for (const [from, to] of REPLACEMENTS) text = text.replaceAll(from, to);
   if (VERSIONED.has(relativePath)) {
-    text = text.replaceAll("https://github.com/nhtera/DevivaDraw", "https://github.com/benny2744/DevivaDraw");
+    text = text.replaceAll("https://github.com/nhtera/DevivaDraw", "https://github.com/benny2744/deviva-draw");
     text = text.replace(/"version": "([^"]+)"/, (_match, version) => {
       const next = version.includes("-modchat.") ? version : `${version}-modchat.1`;
       return `"version": "${next}"`;

@@ -15,11 +15,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/benny2744/DevivaDraw.git",
+    "url": "git+https://github.com/benny2744/deviva-draw.git",
     "directory": "packages/react"
   },
-  "homepage": "https://github.com/benny2744/DevivaDraw#readme",
-  "bugs": "https://github.com/benny2744/DevivaDraw/issues",
+  "homepage": "https://github.com/benny2744/deviva-draw#readme",
+  "bugs": "https://github.com/benny2744/deviva-draw/issues",
   "engines": {
     "node": ">=22"
   },
