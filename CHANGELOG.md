@@ -4,6 +4,15 @@ All notable changes to Deviva Draw are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and the project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- **An admin layer lock reaches other peers on the next sync, not up to 30 seconds later.** Any
+  layer-list change (lock, audience, rename, reorder) now publishes a snapshot on the same flush
+  as an element edit. A peer whose own layer version is newer still adopts the admin's lock and
+  audience. A new stroke on a locked layer is tombstoned for every peer, including the author.
+
 ## [0.14.0] — 2026-08-23
 
 ### Added

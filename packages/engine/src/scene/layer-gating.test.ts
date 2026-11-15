@@ -62,6 +62,39 @@ describe("layer gating — predicates", () => {
     expect(scene.selectableElements().map((e) => e.id)).toEqual([onAdminLayer.id]);
   });
 
+  it("applyAdminLayerPolicy copies lock and audience without adopting a losing manifest", () => {
+    const scene = new Scene();
+    const layer = scene.getLayers()[0]!;
+    scene.renameLayer(layer.id, "Student name");
+    scene.setLayerVisible(layer.id, false);
+    const versionBefore = scene.getLayersManifest().version;
+
+    const applied = scene.applyAdminLayerPolicy({
+      version: 1,
+      versionNonce: 1,
+      layers: [{ id: layer.id, name: "Teacher name", visible: true, locked: false, adminLocked: true, audience: "admins" }],
+    });
+
+    expect(applied).toBe(true);
+    expect(scene.getLayersManifest().version).toBe(versionBefore);
+    const updated = scene.getLayer(layer.id)!;
+    expect(updated.adminLocked).toBe(true);
+    expect(updated.audience).toBe("admins");
+    expect(updated.name).toBe("Student name");
+    expect(updated.visible).toBe(false);
+
+    expect(
+      scene.applyAdminLayerPolicy({
+        version: 1,
+        versionNonce: 1,
+        layers: [{ id: layer.id, name: "Teacher name", visible: true, locked: false }],
+      })
+    ).toBe(true);
+    expect(scene.getLayer(layer.id)?.adminLocked).toBeUndefined();
+    expect(scene.getLayer(layer.id)?.audience).toBeUndefined();
+    expect(scene.getLayersManifest().version).toBe(versionBefore);
+  });
+
   it("setLayerAudience marks a layer admins-only and omits audience when reset", () => {
     const scene = new Scene();
     const layer = scene.addLayer("Teacher Key");

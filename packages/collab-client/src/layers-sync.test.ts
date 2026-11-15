@@ -30,7 +30,7 @@ function makeAdapter(initial: { id: string; name: string }[]): CollabPagesAdapte
       const layers = scenes.get(pageId)?.getLayersManifest() ?? null;
       return layers !== null && layers.version > 0 ? layers : null;
     },
-    applyRemoteLayersManifest: (pageId, layersManifest) => void scenes.get(pageId)?.applyRemoteLayersManifest(layersManifest),
+    applyRemoteLayersManifest: (pageId, layersManifest) => scenes.get(pageId)?.applyRemoteLayersManifest(layersManifest) ?? false,
     subscribe: () => () => {},
     scene: (pageId) => scenes.get(pageId)!,
   };
@@ -113,6 +113,43 @@ describe("layers over the snapshot wire", () => {
     const oldClient = { ...new Scene().addElement({ ...basicRect(), id: "r3" }), version: 5, versionNonce: 1 };
     expect(mergeRemoteElement(scene, oldClient)).toBe(true);
     expect(scene.getElement("r3")?.layerId).toBeUndefined();
+  });
+
+  it("an admin snapshot that loses last-writer-wins still applies the layer lock and audience", async () => {
+    const receiver = makeAdapter([{ id: "p1", name: "Page 1" }]);
+    const scene = receiver.scene("p1");
+    const layer = scene.getLayers()[0]!;
+    scene.renameLayer(layer.id, "Student name");
+    for (let i = 0; i < 4; i++) scene.setLayerVisible(layer.id, i % 2 === 0);
+    const versionBefore = scene.getLayersManifest().version;
+    expect(versionBefore).toBeGreaterThan(1);
+
+    const deps = await makeDeps(receiver);
+    const envelope = {
+      ...(await encryptEnvelope(deps.roomKey, "snapshot", {
+        manifest: receiver.getManifest(),
+        pages: [
+          {
+            id: "p1",
+            name: "Page 1",
+            elements: [],
+            layers: {
+              version: 1,
+              versionNonce: 1,
+              layers: [{ id: layer.id, name: "Teacher name", visible: true, locked: false, adminLocked: true, audience: "admins" }],
+            },
+          },
+        ],
+      })),
+      senderRole: "admin",
+    };
+
+    await handleInboundMessage(JSON.stringify(envelope), deps);
+
+    expect(scene.getLayersManifest().version).toBe(versionBefore);
+    expect(scene.getLayer(layer.id)?.adminLocked).toBe(true);
+    expect(scene.getLayer(layer.id)?.audience).toBe("admins");
+    expect(scene.getLayer(layer.id)?.name).toBe("Student name");
   });
 
   it("a layers-free (old-client) snapshot leaves local layers untouched", async () => {

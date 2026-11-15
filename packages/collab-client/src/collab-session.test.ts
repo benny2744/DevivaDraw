@@ -542,6 +542,95 @@ describe("CollabSession — end-to-end over an in-memory relay", () => {
     await waitUntil(() => studentStore.getSceneById(pageId)?.getElement(answer.id)?.isDeleted === false);
     await waitUntil(() => lateViewerStore.getSceneById(pageId)?.getElement(answer.id)?.isDeleted === false);
   });
+
+  it("publishes a layer lock on the next flush, and a student with a newer layer version still adopts it", async () => {
+    const relay = new FakeRoomRelay();
+    const adminStore = PageStore.fresh();
+    const studentStore = PageStore.fresh();
+    const admin = new CollabSession({
+      scene: adminStore.getActiveScene(),
+      pages: createPageStoreCollabAdapter(adminStore),
+      userName: "Admin",
+      userColor: "#111111",
+      createSocket: () => relay.createSocket("admin"),
+      createRoom: fakeCreateRoom,
+    });
+    const student = new CollabSession({
+      scene: studentStore.getActiveScene(),
+      pages: createPageStoreCollabAdapter(studentStore),
+      userName: "Student",
+      userColor: "#222222",
+      createSocket: () => relay.createSocket("editor"),
+      createRoom: fakeCreateRoom,
+    });
+    sessions.push(admin, student);
+
+    const key = await generateRoomKey();
+    await admin.joinSession("http://collab.example", `https://draw.example/room/room-lock?t=admin.mac#key=${key}`);
+    await student.joinSession("http://collab.example", `https://draw.example/room/room-lock?t=editor.mac#key=${key}`);
+    await waitUntil(() => admin.connectionStatus === "connected" && student.connectionStatus === "connected");
+
+    const adminScene = adminStore.getActiveScene();
+    const pageId = adminStore.getActivePageId();
+    const layerId = adminScene.getLayers()[0]!.id;
+    adminScene.renameLayer(layerId, "Board");
+    await waitUntil(() => studentStore.getSceneById(pageId)?.getLayers()[0]?.name === "Board");
+
+    const studentScene = studentStore.getSceneById(pageId)!;
+    for (let i = 0; i < 4; i++) studentScene.setLayerVisible(layerId, i % 2 === 0);
+    const studentVersion = studentScene.getLayersManifest().version;
+    expect(studentVersion).toBeGreaterThan(adminScene.getLayersManifest().version);
+
+    adminScene.setLayerAdminLocked(layerId, true);
+    await waitUntil(() => studentStore.getSceneById(pageId)?.getLayers()[0]?.adminLocked === true);
+    expect(studentStore.getSceneById(pageId)?.getLayersManifest().version).toBe(studentVersion);
+    expect(studentStore.getSceneById(pageId)?.getLayers()[0]?.name).toBe("Board");
+  });
+
+  it("tombstones a new student element drawn on an admin-locked layer for every peer", async () => {
+    const relay = new FakeRoomRelay();
+    const adminStore = PageStore.fresh();
+    const studentAStore = PageStore.fresh();
+    const studentBStore = PageStore.fresh();
+    const open = (store: PageStore, name: string, role: "admin" | "editor", color: string) => {
+      const session = new CollabSession({
+        scene: store.getActiveScene(),
+        pages: createPageStoreCollabAdapter(store),
+        userName: name,
+        userColor: color,
+        createSocket: () => relay.createSocket(role),
+        createRoom: fakeCreateRoom,
+      });
+      sessions.push(session);
+      return session;
+    };
+    const admin = open(adminStore, "Admin", "admin", "#111111");
+    const studentA = open(studentAStore, "StudentA", "editor", "#222222");
+    const studentB = open(studentBStore, "StudentB", "editor", "#333333");
+
+    const key = await generateRoomKey();
+    const url = (role: string) => `https://draw.example/room/room-revoke?t=${role}.mac#key=${key}`;
+    await admin.joinSession("http://collab.example", url("admin"));
+    await studentA.joinSession("http://collab.example", url("editor"));
+    await studentB.joinSession("http://collab.example", url("editor"));
+    await waitUntil(
+      () => admin.connectionStatus === "connected" && studentA.connectionStatus === "connected" && studentB.connectionStatus === "connected"
+    );
+
+    const adminScene = adminStore.getActiveScene();
+    const pageId = adminStore.getActivePageId();
+    const layerId = adminScene.getLayers()[0]!.id;
+    adminScene.setLayerAdminLocked(layerId, true);
+    await waitUntil(() => studentAStore.getSceneById(pageId)?.getLayers().some((layer) => layer.id === layerId && layer.adminLocked === true));
+    await waitUntil(() => studentBStore.getSceneById(pageId)?.getLayers().some((layer) => layer.id === layerId && layer.adminLocked === true));
+
+    const studentScene = studentAStore.getSceneById(pageId)!;
+    const stroke = studentScene.addElement(createRectangleElement({ x: 40, y: 40, width: 12, height: 12 }));
+
+    await waitUntil(() => adminScene.getElement(stroke.id)?.isDeleted === true);
+    await waitUntil(() => studentAStore.getSceneById(pageId)?.getElement(stroke.id)?.isDeleted === true);
+    await waitUntil(() => studentBStore.getSceneById(pageId)?.getElement(stroke.id)?.isDeleted === true);
+  });
 });
 
 /**

@@ -288,6 +288,36 @@ export class SceneLayersStore {
     return true;
   }
 
+  /**
+   * Copies `adminLocked` and `audience` from a remote admin manifest onto layers that already
+   * exist locally. Used when that manifest loses last-writer-wins, so a non-admin cannot keep
+   * a layer unlocked by having bumped their own layer version. Names, order, visibility, the
+   * ordinary lock, and the LWW version/nonce stay as they are — adopting those from a losing
+   * manifest would let the loser become the next winner. Returns whether any layer changed.
+   */
+  applyAdminLayerPolicy(manifest: LayersManifest): boolean {
+    const remoteById = new Map(manifest.layers.map((layer) => [layer.id, layer]));
+    let changed = false;
+    for (const layer of this.layers) {
+      const remote = remoteById.get(layer.id);
+      if (!remote) continue;
+      const nextLocked = remote.adminLocked === true;
+      const nextAudience = remote.audience === "admins" ? ("admins" as const) : undefined;
+      if (Boolean(layer.adminLocked) !== nextLocked) {
+        if (nextLocked) layer.adminLocked = true;
+        else delete layer.adminLocked;
+        changed = true;
+      }
+      if (layer.audience !== nextAudience) {
+        if (nextAudience === "admins") layer.audience = "admins";
+        else delete layer.audience;
+        changed = true;
+      }
+    }
+    if (changed) this.version += 1;
+    return changed;
+  }
+
   private bumpVersions(): void {
     this.version += 1;
     this.manifestVersion += 1;

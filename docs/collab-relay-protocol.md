@@ -46,8 +46,15 @@ Two types are emitted *by* the relay and never accepted from a connection: `peer
 
 `peerId` and `senderRole` are assigned by the relay, never client-supplied. Every broadcast frame is
 re-stamped with the sender's `peerId` and `senderRole` (`"admin"`, `"editor"`, or `"viewer"`,
-overwriting any peer-supplied values). Frames routed to admins only during private mode are stamped
-with `held: true` (and `held` is stripped when private mode is off).
+overwriting any peer-supplied values). Clients treat a frame with no `senderRole` as `admin`, so
+that relays which predate role stamping still work. A relay that admits untrusted peers must stamp
+the field on every broadcast frame. Forwarding a client frame without it would let that peer act
+as admin. The ModChat relay always stamps it.
+
+Frames routed to admins only during private mode are stamped with `held: true` (and `held` is
+stripped when private mode is off). Held strokes are omitted from the public snapshot, so a student
+who reloads while private mode is still on does not get their own held strokes back. That is
+expected: those strokes exist only on admin clients until the teacher ends private mode.
 
 Admin frames may also carry a plaintext `audience` (`"all"`, `"admins"`, or `"others"`, defaulting to
 `"all"`). Non-admin `audience` values are ignored and routed as `"all"`.
@@ -217,6 +224,21 @@ the link.
 The consequence is that a page served over HTTPS cannot open a `ws://` LAN socket (mixed content), so
 LAN peers join from the desktop app. This is stated in the hosting UI rather than left to be
 discovered as a silent failure.
+
+## Layer list on the snapshot
+
+Layer state is not an element delta. It rides inside a `snapshot`, as a per-page layers manifest
+(`version`, `versionNonce`, `layers`). An admin client publishes that snapshot on the next outbound
+flush (about 100 ms) whenever its layer list changes — a lock, an audience change, a rename, a
+reorder — and not only on the 30 s timer.
+
+Last-writer-wins still decides which manifest replaces the list. Two fields are admin policy and
+are applied even when the manifest loses: `adminLocked` and `audience`, copied onto layers with
+the same id. A non-admin cannot drop a lock by bumping their own layer version.
+
+A non-admin element delta that an admin refuses is not left in place. If the admin has no local
+copy (a new stroke on a locked layer), the admin tombstones it and sends that deletion, so the
+author and every other peer drop the stroke.
 
 ## See also
 

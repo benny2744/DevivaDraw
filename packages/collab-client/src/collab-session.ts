@@ -123,8 +123,11 @@ export class CollabSession {
   private unsubscribePages: (() => void) | null = null;
   private readonly pageSceneUnsubs = new Map<string, () => void>();
   private manifestDirty = false;
-  private layerAudienceDirty = false;
+  /** An admin changed the layer list (lock, audience, rename, reorder). The next flush publishes a snapshot instead of waiting for the 30s timer. */
+  private layerManifestDirty = false;
   private readonly knownLayerAudiences = new Map<string, Map<string, "admins" | undefined>>();
+  /** Last seen `Scene.getLayersVersion()` per page, so a layer-list edit is distinguishable from an element edit on the same notify. */
+  private readonly knownLayerVersions = new Map<string, number>();
   private readonly knownPublicSynced = new Set<string>();
   private readonly pendingHideTombstones = new Set<string>();
   private disposeIdleTicking: (() => void) | null = null;
@@ -231,8 +234,9 @@ export class CollabSession {
     for (const unsubscribe of this.pageSceneUnsubs.values()) unsubscribe();
     this.pageSceneUnsubs.clear();
     this.manifestDirty = false;
-    this.layerAudienceDirty = false;
+    this.layerManifestDirty = false;
     this.knownLayerAudiences.clear();
+    this.knownLayerVersions.clear();
     this.knownPublicSynced.clear();
     this.pendingHideTombstones.clear();
     this.disposeIdleTicking?.();
@@ -444,8 +448,18 @@ export class CollabSession {
 
   private handleRefusedElement(targetScene: Scene, refusedElement: AnyElement, pageId?: string): void {
     const local = targetScene.getElement(refusedElement.id);
-    if (!local) return;
-    if (remoteElementWins(local, refusedElement)) {
+    if (!local) {
+      // The admin never had this element (a new stroke on a locked layer). Tombstone it so the
+      // author and every other peer drop it, instead of leaving it on the screens that accepted
+      // the delta before the lock was known.
+      targetScene.applyRemoteElement({
+        ...refusedElement,
+        isDeleted: true,
+        version: refusedElement.version + 1,
+        versionNonce: randomVersionNonce(),
+        updated: Date.now(),
+      });
+    } else if (remoteElementWins(local, refusedElement)) {
       if (refusedElement.version === local.version) {
         targetScene.updateElement(local.id, {});
       } else {
@@ -457,7 +471,8 @@ export class CollabSession {
         });
       }
     }
-    const syncKey = pageId === undefined ? local.id : `${pageId}/${local.id}`;
+    const id = local?.id ?? refusedElement.id;
+    const syncKey = pageId === undefined ? id : `${pageId}/${id}`;
     this.syncedVersions.delete(syncKey);
     this.scheduleOutboundSync();
   }
@@ -465,13 +480,16 @@ export class CollabSession {
   private recordLayerAudiences(scene: Scene, pageId?: string): void {
     const scopeKey = pageId ?? "__single__";
     this.knownLayerAudiences.set(scopeKey, new Map(scene.getLayers().map((layer) => [layer.id, layer.audience])));
+    this.knownLayerVersions.set(scopeKey, scene.getLayersVersion());
   }
 
   private onSceneChanged(scene: Scene, pageId?: string): void {
     if (this.role === "admin") {
       const scopeKey = pageId ?? "__single__";
       const prevMap = this.knownLayerAudiences.get(scopeKey);
+      const prevVersion = this.knownLayerVersions.get(scopeKey);
       const nextLayers = scene.getLayers();
+      const nextVersion = scene.getLayersVersion();
       if (prevMap) {
         const newlyHidden = new Set<string>();
         const newlyRevealed = new Set<string>();
@@ -482,7 +500,7 @@ export class CollabSession {
         }
         this.recordLayerAudiences(scene, pageId);
         if (newlyHidden.size > 0 || newlyRevealed.size > 0) {
-          this.layerAudienceDirty = true;
+          this.layerManifestDirty = true;
           scene.batch(() => {
             for (const element of [...scene.elementsUnsorted()]) {
               if (element.isDeleted) continue;
@@ -498,6 +516,8 @@ export class CollabSession {
               }
             }
           });
+        } else if (prevVersion !== undefined && nextVersion !== prevVersion) {
+          this.layerManifestDirty = true;
         }
       } else {
         this.recordLayerAudiences(scene, pageId);
@@ -555,9 +575,9 @@ export class CollabSession {
         }
       }
       await Promise.all(promises);
-      if (this.manifestDirty || this.layerAudienceDirty) {
+      if (this.manifestDirty || this.layerManifestDirty) {
         this.manifestDirty = false;
-        this.layerAudienceDirty = false;
+        this.layerManifestDirty = false;
         await this.sendSnapshot();
       }
       return;
@@ -579,8 +599,8 @@ export class CollabSession {
     }
     promises.push(flushCommentDeltas({ scene: this.scene, isAdmin, roomKey: live.roomKey, send }, this.syncedComments));
     await Promise.all(promises);
-    if (this.layerAudienceDirty) {
-      this.layerAudienceDirty = false;
+    if (this.layerManifestDirty) {
+      this.layerManifestDirty = false;
       await this.sendSnapshot();
     }
   }

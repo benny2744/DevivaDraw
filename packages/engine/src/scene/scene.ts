@@ -486,6 +486,16 @@ export class Scene {
     return adopted;
   }
 
+  /**
+   * Applies an admin's layer lock and audience even when their manifest lost last-writer-wins.
+   * See `SceneLayersStore.applyAdminLayerPolicy`. Notifies only when a layer actually changed.
+   */
+  applyAdminLayerPolicy(manifest: LayersManifest): boolean {
+    const changed = this.layersStore.applyAdminLayerPolicy(manifest);
+    if (changed) this.notify();
+    return changed;
+  }
+
   // ---- Comments --------------------------------------------------------------------------------
   // Thin, notifying facades over `SceneCommentsStore` (which never notifies itself — the Scene owns
   // the change signal, same as for files and layers). Comment mutations are deliberately NOT part of

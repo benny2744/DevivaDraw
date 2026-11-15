@@ -49,8 +49,11 @@ export interface CollabPagesAdapter {
    * never outrank one that did).
    */
   getLayersManifest(pageId: string): LayersManifest | null;
-  /** LWW-applies a remote page's layers manifest (already shape-validated by `isPlausibleLayersManifest`) — the engine's wholesale-adoption rule decides the winner. Unknown page ids no-op. */
-  applyRemoteLayersManifest(pageId: string, manifest: LayersManifest): void;
+  /**
+   * LWW-applies a remote page's layers manifest (already shape-validated by `isPlausibleLayersManifest`).
+   * Returns whether the remote won. Unknown page ids return `false`.
+   */
+  applyRemoteLayersManifest(pageId: string, manifest: LayersManifest): boolean;
   /** Fires on page add/remove/rename/replace — NOT on element edits or on which page is locally active (active page is a local concern and never syncs). */
   subscribe(listener: () => void): () => void;
 }

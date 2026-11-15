@@ -32,7 +32,7 @@ function makePagesAdapter(initial: Array<{ id: string; name: string }>) {
       const layers = scenes.get(pageId)?.getLayersManifest() ?? null;
       return layers !== null && layers.version > 0 ? layers : null;
     },
-    applyRemoteLayersManifest: (pageId, layersManifest) => void scenes.get(pageId)?.applyRemoteLayersManifest(layersManifest),
+    applyRemoteLayersManifest: (pageId, layersManifest) => scenes.get(pageId)?.applyRemoteLayersManifest(layersManifest) ?? false,
     subscribe: () => () => {},
     tombstone: (id) => void tombstoned.add(id),
     manifest: () => manifest,

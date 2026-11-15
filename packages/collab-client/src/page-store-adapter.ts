@@ -20,15 +20,15 @@ export function createPageStoreCollabAdapter(pageStore: PageStore): CollabPagesA
       const layers = pageStore.getSceneById(pageId)?.getLayersManifest() ?? null;
       return layers !== null && layers.version > 0 ? layers : null;
     },
-    applyRemoteLayersManifest: (pageId, manifest) => void pageStore.getSceneById(pageId)?.applyRemoteLayersManifest(manifest),
+    applyRemoteLayersManifest: (pageId, manifest) => pageStore.getSceneById(pageId)?.applyRemoteLayersManifest(manifest) ?? false,
     // Filtered to *page-list* changes (the manifest key covers add/rename/remove/reorder and
     // the silent remote-page materialization): an active-page switch or camera park must not
     // read as "the document changed" and trigger a snapshot broadcast.
     subscribe: (listener) => {
       const manifestKey = () => {
         const manifest = pageStore.getManifest();
-        // Per-page layers counters ride the key so a layer op (or a remote adoption) dirties
-        // the manifest and reaches peers via the prompt snapshot, not the 30s timer.
+        // Layer-list edits notify the scene, not this store, so this key alone does not publish
+        // them. CollabSession watches getLayersVersion() and sends the prompt snapshot itself.
         const layersKey = manifest.pages.map((page) => pageStore.getSceneById(page.id)?.getLayersVersion() ?? 0).join(".");
         return `${manifest.version}:${manifest.versionNonce}:${layersKey}:${manifest.pages.map((page) => page.id + page.name).join(",")}`;
       };

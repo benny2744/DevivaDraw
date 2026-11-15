@@ -59,6 +59,12 @@ export interface InboundMessageDeps {
   onElementRefused?(scene: Scene, element: AnyElement, pageId?: string): void;
 }
 
+/**
+ * Absent `senderRole` is treated as admin so frames from relays that predate role stamping keep
+ * working. A relay that admits untrusted peers must stamp `senderRole` on every broadcast frame.
+ * The ModChat relay always does. Forwarding a client frame without that stamp would let the peer
+ * act as admin, including publishing layer locks and admin-only snapshots.
+ */
 function readSenderRole(value: unknown): CollabRole {
   if (value === undefined) return "admin";
   if (value === "admin" || value === "editor" || value === "viewer") return value;
@@ -168,7 +174,10 @@ async function applySnapshotPayload(payload: unknown, deps: InboundMessageDeps, 
       // a just-materialized remote page trades its constructor default for the real layer state —
       // the read-time orphan rule reunites any elements that arrived first).
       if (isPlausibleLayersManifest(entry.layers) && isLayerManifestAllowed(target, entry.layers, senderRole)) {
-        deps.pages.applyRemoteLayersManifest(entry.id, entry.layers);
+        const adopted = deps.pages.applyRemoteLayersManifest(entry.id, entry.layers);
+        // A student who edited their own layer list can outrank the teacher's manifest version.
+        // The lock and audience still apply: those two fields are admin policy, not document LWW.
+        if (!adopted && senderRole === "admin") target.applyAdminLayerPolicy(entry.layers);
       }
       if (deps.isAdmin && senderRole === "admin" && Array.isArray(entry.heldElementIds)) {
         for (const heldId of entry.heldElementIds) {
