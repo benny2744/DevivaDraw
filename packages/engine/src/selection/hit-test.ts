@@ -123,7 +123,7 @@ export interface HitTestOptions {
 }
 
 export function hitTestElement(element: AnyElement, point: Point, tolerance: number, options?: HitTestOptions): boolean {
-  if (element.isDeleted || element.locked) return false;
+  if (element.isDeleted || element.locked || element.adminLocked) return false;
   if (element.type === "text" && element.containerId !== null) return false; // bound text: see module doc
 
   const local = toLocalRelativePoint(element, point);

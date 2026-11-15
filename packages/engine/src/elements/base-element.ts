@@ -60,6 +60,8 @@ export interface BaseElement {
   boundElements: BoundElementRef[] | null;
   link: string | null;
   locked: boolean;
+  /** Admin-only lock: non-admins cannot unlock or edit this element. Omitted when false. */
+  adminLocked?: true;
   /** Fractional sort key controlling draw order; see `scene/fractional-index.ts`. */
   index: string;
   /**

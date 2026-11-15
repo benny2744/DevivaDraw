@@ -37,6 +37,7 @@ export function touch<T extends AnyElement>(element: T, changes: Partial<T> = {}
     versionNonce: randomVersionNonce(),
     updated: Date.now(),
   };
+  if (next.adminLocked !== true) delete next.adminLocked;
   return freezeElement(next);
 }
 

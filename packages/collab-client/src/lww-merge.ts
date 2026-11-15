@@ -13,6 +13,7 @@
  */
 import type { AnyElement, Scene } from "@benny2744/engine";
 import { lwwRecordWins } from "@benny2744/engine";
+import type { CollabRole } from "./collab-session";
 
 /**
  * Structural validation for an inbound remote element — the decrypted payload is still untrusted at
@@ -35,9 +36,31 @@ export function isPlausibleRemoteElement(value: unknown): value is AnyElement {
     Number.isFinite(el.versionNonce) &&
     typeof el.index === "string" &&
     (el.layerId === undefined || typeof el.layerId === "string") &&
+    (el.adminLocked === undefined || el.adminLocked === true) &&
     typeof el.isDeleted === "boolean" &&
     typeof el.updated === "number"
   );
+}
+
+/**
+ * Role gate for inbound element mutations: non-admins cannot modify an admin-locked element (or an
+ * element on an admin-locked layer, or move one onto an admin-locked layer), and cannot add or
+ * remove `adminLocked` itself.
+ */
+export function isElementMutationAllowed(
+  scene: Scene,
+  local: AnyElement | undefined,
+  remote: AnyElement,
+  senderRole: CollabRole = "admin",
+): boolean {
+  if (senderRole === "admin") return true;
+  if (Boolean(local?.adminLocked) !== Boolean(remote.adminLocked)) return false;
+  if (local?.adminLocked === true) return false;
+  const localLayer = local ? scene.resolveLayer(local) : undefined;
+  const remoteLayer = scene.resolveLayer(remote);
+  if (localLayer && (localLayer.adminLocked === true || localLayer.audience === "admins")) return false;
+  if (remoteLayer.adminLocked === true || remoteLayer.audience === "admins") return false;
+  return true;
 }
 
 /**
@@ -51,15 +74,16 @@ export function remoteElementWins(local: AnyElement | undefined, remote: AnyElem
 }
 
 /**
- * Validates, LWW-compares, and applies a single remote element delta to `scene` — the one call site an
- * inbound-message handler needs, keeping "decide" and "apply" atomic from the caller's perspective so
- * there's no window where a second concurrent inbound delta could see a stale comparison result.
- * Returns whether the delta was actually applied (a caller uses this to avoid rebroadcasting a
- * rejected/no-op/malformed delta back onto the wire).
+ * Validates, role-checks, LWW-compares, and applies a single remote element delta to `scene` — the
+ * one call site an inbound-message handler needs, keeping "decide" and "apply" atomic from the
+ * caller's perspective so there's no window where a second concurrent inbound delta could see a
+ * stale comparison result. Returns whether the delta was actually applied (a caller uses this to
+ * avoid rebroadcasting a rejected/no-op/malformed delta back onto the wire).
  */
-export function mergeRemoteElement(scene: Scene, remote: unknown): boolean {
+export function mergeRemoteElement(scene: Scene, remote: unknown, senderRole: CollabRole = "admin"): boolean {
   if (!isPlausibleRemoteElement(remote)) return false;
   const local = scene.getElement(remote.id);
+  if (!isElementMutationAllowed(scene, local, remote, senderRole)) return false;
   if (!remoteElementWins(local, remote)) return false;
   scene.applyRemoteElement(remote);
   return true;

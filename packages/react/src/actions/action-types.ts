@@ -68,6 +68,8 @@ export interface UiToggleState {
   setShortcutsDialogOpen(value: boolean): void;
   getShareDialogState(): ShareDialogState;
   setShareDialogState(state: ShareDialogState): void;
+  /** Whether this session is connected as a room admin (can manage admin locks and visibility). */
+  getCollabAdmin?(): boolean;
 }
 
 /**

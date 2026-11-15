@@ -27,12 +27,14 @@ import { PresenceBroadcaster } from "./presence-broadcaster";
 import { PresenceStore } from "./presence-state";
 import type { PresenceViewport } from "./presence-state";
 import { buildRoomUrl, buildRoomWebSocketUrl, parseRoomUrl, roleClaimedByToken } from "./room-url";
-import type { Scene } from "@benny2744/engine";
+import { randomVersionNonce } from "@benny2744/engine";
+import type { AnyElement, Scene } from "@benny2744/engine";
+import { remoteElementWins } from "./lww-merge";
 
 export type CollabConnectionStatus = "disconnected" | "connecting" | "connected";
 
 /** What this client may do in the room it is connected to. Reflects the token it holds; the relay is the authority (see `apps/collab-server`'s `room-connection-registry.ts`). */
-export type CollabRole = "editor" | "viewer";
+export type CollabRole = "admin" | "editor" | "viewer";
 
 export interface StartSessionOptions {
   /**
@@ -121,9 +123,14 @@ export class CollabSession {
   private unsubscribePages: (() => void) | null = null;
   private readonly pageSceneUnsubs = new Map<string, () => void>();
   private manifestDirty = false;
+  private layerAudienceDirty = false;
+  private readonly knownLayerAudiences = new Map<string, Map<string, "admins" | undefined>>();
+  private readonly knownPublicSynced = new Set<string>();
+  private readonly pendingHideTombstones = new Set<string>();
   private disposeIdleTicking: (() => void) | null = null;
   private snapshotTimer: ReturnType<typeof setInterval> | null = null;
   private followedPeerId: string | null = null;
+  private privateModeEnabled = false;
 
   constructor(options: CollabSessionOptions) {
     this.scene = options.scene;
@@ -224,6 +231,10 @@ export class CollabSession {
     for (const unsubscribe of this.pageSceneUnsubs.values()) unsubscribe();
     this.pageSceneUnsubs.clear();
     this.manifestDirty = false;
+    this.layerAudienceDirty = false;
+    this.knownLayerAudiences.clear();
+    this.knownPublicSynced.clear();
+    this.pendingHideTombstones.clear();
     this.disposeIdleTicking?.();
     this.disposeIdleTicking = null;
     if (this.outboundTimer !== null) clearTimeout(this.outboundTimer);
@@ -238,7 +249,68 @@ export class CollabSession {
     this.roomId = null;
     this.role = "editor";
     this.followedPeerId = null;
+    this.syncPrivateAddOnly();
     this.setStatus("disconnected");
+  }
+
+  get privateMode(): boolean {
+    return this.privateModeEnabled;
+  }
+
+  setPrivateMode(enabled: boolean): void {
+    const wasEnabled = this.privateModeEnabled;
+    this.privateModeEnabled = enabled;
+    this.syncPrivateAddOnly();
+    if (!enabled && (wasEnabled || this.hasAnyHeldElements()) && this.role === "admin") {
+      void this.releaseHeldElementsAndSync();
+    }
+  }
+
+  private allActiveScenes(): Scene[] {
+    if (!this.pages) return [this.scene];
+    const scenes: Scene[] = [];
+    for (const pageId of this.pages.listPageIds()) {
+      const scene = this.pages.getScene(pageId);
+      if (scene) scenes.push(scene);
+    }
+    return scenes;
+  }
+
+  private hasAnyHeldElements(): boolean {
+    return this.allActiveScenes().some((scene) => scene.hasHeldElements());
+  }
+
+  private syncPrivateAddOnly(): void {
+    const addOnly = !this.tornDown && this.privateModeEnabled && this.role !== "admin";
+    for (const scene of this.allActiveScenes()) {
+      scene.setPrivateAddOnly(addOnly);
+    }
+  }
+
+  private async releaseHeldElementsAndSync(): Promise<void> {
+    let anyReleased = false;
+    if (this.pages) {
+      for (const pageId of this.pages.listPageIds()) {
+        const scene = this.pages.getScene(pageId);
+        if (!scene) continue;
+        for (const id of scene.releaseHeldElements()) {
+          this.syncedVersions.delete(`${pageId}/${id}`);
+          anyReleased = true;
+        }
+      }
+    } else {
+      for (const id of this.scene.releaseHeldElements()) {
+        this.syncedVersions.delete(id);
+        anyReleased = true;
+      }
+    }
+    if (!anyReleased) return;
+    if (this.outboundTimer !== null) {
+      clearTimeout(this.outboundTimer);
+      this.outboundTimer = null;
+    }
+    await this.flushOutboundNow();
+    await this.sendSnapshot();
   }
 
   /** Publishes the local user's live cursor position (scene coordinates); `null` when the pointer leaves the canvas. Throttled internally — safe to call on every `pointermove`. */
@@ -330,14 +402,17 @@ export class CollabSession {
         this.scheduleOutboundSync();
       });
     } else {
-      this.unsubscribeScene = this.scene.subscribe(() => this.scheduleOutboundSync());
+      this.recordLayerAudiences(this.scene);
+      this.unsubscribeScene = this.scene.subscribe(() => this.onSceneChanged(this.scene));
     }
     this.disposeIdleTicking = this.presence.startIdleTicking(PRESENCE_IDLE_TICK_MS);
     this.snapshotTimer = setInterval(() => void this.sendSnapshot(), SNAPSHOT_INTERVAL_MS);
+    this.syncPrivateAddOnly();
   }
 
   private dispatchInbound(raw: string): Promise<void> {
     if (!this.roomKey) return Promise.resolve();
+    const isAdmin = this.role === "admin";
     return handleInboundMessage(raw, {
       // In a pages session, legacy un-tagged traffic lands on the current first page (not a scene
       // captured at connect time, which a page deletion could orphan).
@@ -345,14 +420,90 @@ export class CollabSession {
       pages: this.pages,
       presence: this.presence,
       roomKey: this.roomKey,
-      markSynced: (id, version, pageId) => this.syncedVersions.set(pageId === undefined ? id : `${pageId}/${id}`, version),
+      isAdmin,
+      markSynced: (id, version, pageId) => {
+        const key = pageId === undefined ? id : `${pageId}/${id}`;
+        this.syncedVersions.set(key, version);
+        const scene = pageId === undefined ? this.defaultScene() : (this.pages?.getScene(pageId) ?? this.defaultScene());
+        const element = scene.getElement(id);
+        if (element && !scene.isElementHeld(id) && scene.resolveLayer(element).audience !== "admins") {
+          this.knownPublicSynced.add(key);
+        }
+      },
       markCommentSynced: (id, version, pageId) => this.syncedComments.set(pageId === undefined ? id : `${pageId}/${id}`, version),
       onPeerLeft: (peerId) => this.presence.removePeer(peerId),
       // Republish, don't clear: the newcomer needs to see this client, and every peer already here is
       // still valid. Throttled inside the broadcaster, so a burst of joins costs one send.
       onPeerJoined: () => this.presenceBroadcaster.republish(),
       onSnapshotRequested: () => void this.sendSnapshot(),
+      onElementRefused: isAdmin
+        ? (targetScene, refusedElement, pageId) => this.handleRefusedElement(targetScene, refusedElement, pageId)
+        : undefined,
     });
+  }
+
+  private handleRefusedElement(targetScene: Scene, refusedElement: AnyElement, pageId?: string): void {
+    const local = targetScene.getElement(refusedElement.id);
+    if (!local) return;
+    if (remoteElementWins(local, refusedElement)) {
+      if (refusedElement.version === local.version) {
+        targetScene.updateElement(local.id, {});
+      } else {
+        targetScene.applyRemoteElement({
+          ...local,
+          version: refusedElement.version + 1,
+          versionNonce: randomVersionNonce(),
+          updated: Date.now(),
+        });
+      }
+    }
+    const syncKey = pageId === undefined ? local.id : `${pageId}/${local.id}`;
+    this.syncedVersions.delete(syncKey);
+    this.scheduleOutboundSync();
+  }
+
+  private recordLayerAudiences(scene: Scene, pageId?: string): void {
+    const scopeKey = pageId ?? "__single__";
+    this.knownLayerAudiences.set(scopeKey, new Map(scene.getLayers().map((layer) => [layer.id, layer.audience])));
+  }
+
+  private onSceneChanged(scene: Scene, pageId?: string): void {
+    if (this.role === "admin") {
+      const scopeKey = pageId ?? "__single__";
+      const prevMap = this.knownLayerAudiences.get(scopeKey);
+      const nextLayers = scene.getLayers();
+      if (prevMap) {
+        const newlyHidden = new Set<string>();
+        const newlyRevealed = new Set<string>();
+        for (const layer of nextLayers) {
+          const prev = prevMap.get(layer.id);
+          if (prev === undefined && layer.audience === "admins") newlyHidden.add(layer.id);
+          else if (prev === "admins" && layer.audience === undefined) newlyRevealed.add(layer.id);
+        }
+        this.recordLayerAudiences(scene, pageId);
+        if (newlyHidden.size > 0 || newlyRevealed.size > 0) {
+          this.layerAudienceDirty = true;
+          scene.batch(() => {
+            for (const element of [...scene.elementsUnsorted()]) {
+              if (element.isDeleted) continue;
+              const layerId = scene.resolveLayer(element).id;
+              if (newlyHidden.has(layerId)) {
+                const updated = scene.updateElement(element.id, {});
+                if (updated) {
+                  const syncKey = pageId === undefined ? element.id : `${pageId}/${element.id}`;
+                  this.pendingHideTombstones.add(syncKey);
+                }
+              } else if (newlyRevealed.has(layerId)) {
+                scene.updateElement(element.id, {});
+              }
+            }
+          });
+        }
+      } else {
+        this.recordLayerAudiences(scene, pageId);
+      }
+    }
+    this.scheduleOutboundSync();
   }
 
   private setStatus(status: CollabConnectionStatus): void {
@@ -365,31 +516,73 @@ export class CollabSession {
     if (this.outboundTimer !== null) return;
     this.outboundTimer = setTimeout(() => {
       this.outboundTimer = null;
-      const live = this.liveConnection();
-      if (!live) return;
-      const send = (data: string) => live.connection.send(data);
-      // A viewer's element deltas would be dropped by the relay anyway — this guard is politeness, not
-      // the boundary (see `apps/collab-server`'s `room-connection-registry.ts` for the real one). It
-      // spares the socket a stream of frames that can only be discarded. Comments are NOT guarded: a
-      // viewer commenting is the point of the role.
-      const mayEdit = this.role === "editor";
-      if (this.pages) {
-        for (const pageId of this.pages.listPageIds()) {
-          const scene = this.pages.getScene(pageId);
-          if (scene) {
-            if (mayEdit) void flushElementDeltas({ scene, pageId, roomKey: live.roomKey, send }, this.syncedVersions);
-            void flushCommentDeltas({ scene, pageId, roomKey: live.roomKey, send }, this.syncedComments);
-          }
-        }
-        if (this.manifestDirty) {
-          this.manifestDirty = false;
-          void this.sendSnapshot();
-        }
-        return;
-      }
-      if (mayEdit) void flushElementDeltas({ scene: this.scene, roomKey: live.roomKey, send }, this.syncedVersions);
-      void flushCommentDeltas({ scene: this.scene, roomKey: live.roomKey, send }, this.syncedComments);
+      void this.flushOutboundNow();
     }, OUTBOUND_SYNC_DEBOUNCE_MS);
+  }
+
+  private async flushOutboundNow(): Promise<void> {
+    const live = this.liveConnection();
+    if (!live || !live.connection.isOpen) return;
+    const send = (data: string) => live.connection.send(data);
+    // A viewer's element deltas would be dropped by the relay anyway — this guard is politeness, not
+    // the boundary (see `apps/collab-server`'s `room-connection-registry.ts` for the real one). It
+    // spares the socket a stream of frames that can only be discarded. Comments are NOT guarded: a
+    // viewer commenting is the point of the role.
+    const mayEdit = this.role !== "viewer";
+    const isAdmin = this.role === "admin";
+    const promises: Promise<void>[] = [];
+    if (this.pages) {
+      for (const pageId of this.pages.listPageIds()) {
+        const scene = this.pages.getScene(pageId);
+        if (scene) {
+          if (mayEdit) {
+            promises.push(
+              flushElementDeltas(
+                {
+                  scene,
+                  pageId,
+                  isAdmin,
+                  knownPublicSynced: this.knownPublicSynced,
+                  pendingHideTombstones: this.pendingHideTombstones,
+                  roomKey: live.roomKey,
+                  send,
+                },
+                this.syncedVersions,
+              ),
+            );
+          }
+          promises.push(flushCommentDeltas({ scene, pageId, isAdmin, roomKey: live.roomKey, send }, this.syncedComments));
+        }
+      }
+      await Promise.all(promises);
+      if (this.manifestDirty || this.layerAudienceDirty) {
+        this.manifestDirty = false;
+        this.layerAudienceDirty = false;
+        await this.sendSnapshot();
+      }
+      return;
+    }
+    if (mayEdit) {
+      promises.push(
+        flushElementDeltas(
+          {
+            scene: this.scene,
+            isAdmin,
+            knownPublicSynced: this.knownPublicSynced,
+            pendingHideTombstones: this.pendingHideTombstones,
+            roomKey: live.roomKey,
+            send,
+          },
+          this.syncedVersions,
+        ),
+      );
+    }
+    promises.push(flushCommentDeltas({ scene: this.scene, isAdmin, roomKey: live.roomKey, send }, this.syncedComments));
+    await Promise.all(promises);
+    if (this.layerAudienceDirty) {
+      this.layerAudienceDirty = false;
+      await this.sendSnapshot();
+    }
   }
 
   /** The scene legacy (un-tagged) inbound traffic applies to — the live first page in a pages session, the fixed scene otherwise. */
@@ -415,8 +608,12 @@ export class CollabSession {
     for (const pageId of currentIds) {
       if (this.pageSceneUnsubs.has(pageId)) continue;
       const scene = this.pages.getScene(pageId);
-      if (scene) this.pageSceneUnsubs.set(pageId, scene.subscribe(() => this.scheduleOutboundSync()));
+      if (scene) {
+        this.recordLayerAudiences(scene, pageId);
+        this.pageSceneUnsubs.set(pageId, scene.subscribe(() => this.onSceneChanged(scene, pageId)));
+      }
     }
+    this.syncPrivateAddOnly();
   }
 
   /** Which page the local user is viewing — rides with presence so peers keep foreign-page cursors off their canvas. */
@@ -428,15 +625,16 @@ export class CollabSession {
     // A snapshot is the whole document — the single most destructive thing a viewer could publish, and
     // the relay drops it. Not sending one also means a viewer never volunteers to answer another peer's
     // `snapshot-request`, leaving that to an editor who actually has authority over the document.
-    if (this.role !== "editor") return;
+    if (this.role === "viewer") return;
     const live = this.liveConnection();
     if (!live || !live.connection.isOpen) return;
     const send = (data: string) => live.connection.send(data);
+    const isAdmin = this.role === "admin";
     if (this.pages) {
-      await sendDocumentSnapshot({ roomKey: live.roomKey, send }, this.pages);
+      await sendDocumentSnapshot({ isAdmin, roomKey: live.roomKey, send }, this.pages);
       return;
     }
-    await sendFullSnapshot({ scene: this.scene, roomKey: live.roomKey, send });
+    await sendFullSnapshot({ scene: this.scene, isAdmin, roomKey: live.roomKey, send });
   }
 }
 

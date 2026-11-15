@@ -172,3 +172,61 @@ describe("mergeRemoteElement — table elements", () => {
     expect((stored as { cells: string[][] }).cells).toEqual([["a", "b"], ["c", "d"]]);
   });
 });
+
+describe("mergeRemoteElement — admin locks", () => {
+  it("refuses non-admin edits to an admin-locked element and prevents adding or clearing adminLocked", () => {
+    const scene = new Scene();
+    const base = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10 }));
+    const locked = scene.updateElement(base.id, { adminLocked: true })!;
+
+    // Non-admin tries to move the admin-locked element while keeping adminLocked: true.
+    expect(mergeRemoteElement(scene, { ...locked, version: locked.version + 1, x: 99 }, "editor")).toBe(false);
+    // Non-admin tries to strip adminLocked.
+    const unlockedCopy = { ...locked, version: locked.version + 1, x: 99 };
+    delete unlockedCopy.adminLocked;
+    expect(mergeRemoteElement(scene, unlockedCopy, "editor")).toBe(false);
+    expect(scene.getElement(base.id)).toEqual(locked);
+
+    // Non-admin cannot add adminLocked to an unlocked element or a brand-new element.
+    const free = scene.addElement(createRectangleElement({ x: 20, y: 20, width: 10, height: 10 }));
+    expect(mergeRemoteElement(scene, { ...free, version: free.version + 1, adminLocked: true }, "editor")).toBe(false);
+    expect(mergeRemoteElement(scene, rect({ adminLocked: true, version: 5 }), "editor")).toBe(false);
+
+    // Admin (or unstamping relay default) can modify and unlock.
+    expect(mergeRemoteElement(scene, { ...unlockedCopy, version: locked.version + 1 }, "admin")).toBe(true);
+    expect("adminLocked" in scene.getElement(base.id)!).toBe(false);
+  });
+
+  it("refuses non-admin edits to elements on or moving onto an admin-locked layer", () => {
+    const scene = new Scene();
+    const adminLayer = scene.addLayer("Template");
+    scene.setLayerAdminLocked(adminLayer.id, true);
+    scene.setActiveLayer(adminLayer.id);
+    const onAdminLayer = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10 }));
+
+    // Edit in place on admin-locked layer.
+    expect(mergeRemoteElement(scene, { ...onAdminLayer, version: onAdminLayer.version + 1, x: 50 }, "editor")).toBe(false);
+    // Attempt to move element off admin-locked layer onto default layer.
+    const movedOff = { ...onAdminLayer, version: onAdminLayer.version + 1 };
+    delete movedOff.layerId;
+    expect(mergeRemoteElement(scene, movedOff, "editor")).toBe(false);
+    // Attempt to create a new element on the admin-locked layer.
+    expect(mergeRemoteElement(scene, rect({ layerId: adminLayer.id, version: 5 }), "editor")).toBe(false);
+
+    // Admin succeeds.
+    expect(mergeRemoteElement(scene, { ...onAdminLayer, version: onAdminLayer.version + 1, x: 50 }, "admin")).toBe(true);
+    expect(scene.getElement(onAdminLayer.id)?.x).toBe(50);
+  });
+
+  it("refuses non-admin edits onto or within an admins-only layer", () => {
+    const scene = new Scene();
+    const secretLayer = scene.addLayer("Secret");
+    scene.setLayerAudience(secretLayer.id, "admins");
+    scene.setActiveLayer(secretLayer.id);
+    const secretEl = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10 }));
+
+    expect(mergeRemoteElement(scene, { ...secretEl, version: secretEl.version + 1, x: 77 }, "editor")).toBe(false);
+    expect(mergeRemoteElement(scene, rect({ layerId: secretLayer.id, version: 5 }), "editor")).toBe(false);
+    expect(mergeRemoteElement(scene, { ...secretEl, version: secretEl.version + 1, x: 77 }, "admin")).toBe(true);
+  });
+});

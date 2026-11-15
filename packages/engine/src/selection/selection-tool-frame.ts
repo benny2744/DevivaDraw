@@ -72,7 +72,7 @@ const MAX_POINTS_WITHOUT_FRAME = 2;
 export function buildSelectionOverlay(elements: readonly AnyElement[]): SelectionOverlay | null {
   const live = elements.filter((element) => !element.isDeleted);
   const only = live.length === 1 ? live[0]! : null;
-  const arrow = only?.type === "arrow" && !only.locked ? only : null;
+  const arrow = only?.type === "arrow" && !only.locked && !only.adminLocked ? only : null;
   if (arrow && arrow.points.length <= MAX_POINTS_WITHOUT_FRAME) return { kind: "linear", arrow };
 
   const frame = buildSelectionFrame(elements);

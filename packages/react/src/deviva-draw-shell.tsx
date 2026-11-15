@@ -93,7 +93,12 @@ import type { ImageInsertOutcome } from "./browser/image-insert-outcome";
 import type { DevivaDrawProps } from "./deviva-draw-app-types";
 
 export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(function DevivaDrawShell(props, ref) {
-  const { initialData, persistenceKey, onChange, className, style, initialViewOnly, shareApiBaseUrl, initialRoomUrl, autoFollow, fileOperations, onDocumentStateChange, lanHost, confirmDiscardChanges } = props;
+  const { initialData, persistenceKey, onChange, className, style, initialViewOnly, shareApiBaseUrl, initialRoomUrl, autoFollow, privateMode, fileOperations, onDocumentStateChange, lanHost, confirmDiscardChanges } = props;
+  const [handlePrivateMode, setHandlePrivateMode] = useState(false);
+  useEffect(() => {
+    if (privateMode !== undefined) setHandlePrivateMode(privateMode);
+  }, [privateMode]);
+  const effectivePrivateMode = privateMode ?? handlePrivateMode;
   const canvasHostRef = useRef<HTMLDivElement | null>(null);
 
   // The document's page list, seeded once: host-supplied `initialData` wraps into a single page
@@ -175,6 +180,7 @@ export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(fun
   // independence `remoteCursorsRef` exists for. The relay is the actual boundary; this only keeps the
   // UI honest instead of letting a viewer draw into a void.
   const collabViewer = useToggleState(false);
+  const collabAdmin = useToggleState(false);
   const presentationViewOnly = viewOnly.value || presentationActive.value || collabViewer.value;
   const commandPaletteOpen = useToggleState(false);
   const shortcutsDialogOpen = useToggleState(false);
@@ -266,6 +272,7 @@ export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(fun
       setShortcutsDialogOpen: shortcutsDialogOpen.set,
       getShareDialogState: shareDialog.get,
       setShareDialogState: shareDialog.set,
+      getCollabAdmin: collabAdmin.get,
     },
     shareApiBaseUrl,
     fileOperations,
@@ -315,7 +322,11 @@ export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(fun
     else if (wasViewOnly) runtime.actionRegistry.run("select-tool", runtime);
   }, [runtime, viewOnly.value]);
 
-  useImperativeHandle(ref, () => handle ?? NOOP_HANDLE, [handle]);
+  useImperativeHandle(
+    ref,
+    () => (handle ? { ...handle, privateMode: setHandlePrivateMode } : NOOP_HANDLE),
+    [handle],
+  );
   runtimeForContextMenuRef.current = runtime;
   useAdaptNextShapeStyle(runtime, mode);
 
@@ -426,7 +437,7 @@ export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(fun
   // the call sites that trigger one (the dialog, the auto-join a room URL performs) because only the
   // hook knows the instant at which this peer's own board is still its own — see `onBeforeJoin`.
   const snapshotBeforeJoin = useCallback(() => void getVersionScheduler()?.snapshotNow("milestone", "before-join"), [getVersionScheduler]);
-  const collab = useCollabSession({ scene: runtime?.scene ?? null, pageStore, apiBaseUrl: shareApiBaseUrl, onBeforeJoin: snapshotBeforeJoin });
+  const collab = useCollabSession({ scene: runtime?.scene ?? null, pageStore, apiBaseUrl: shareApiBaseUrl, onBeforeJoin: snapshotBeforeJoin, privateMode: effectivePrivateMode });
 
   /**
    * Version history. Built after `useCollabSession` because its restore guard reads that session's
@@ -532,9 +543,11 @@ export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(fun
 
   const collabRole = collab.role;
   const setCollabViewer = collabViewer.set;
+  const setCollabAdmin = collabAdmin.set;
   useEffect(() => {
     setCollabViewer(collabRole === "viewer");
-  }, [collabRole, setCollabViewer]);
+    setCollabAdmin(collabRole === "admin");
+  }, [collabRole, setCollabViewer, setCollabAdmin]);
 
   // Zen mode hides the *panel*-class chrome only — the side/edge surfaces that crowd the drawing
   // area (properties, pages, library, minimap, layers, hints, empty state). The toolbar, top bar and
@@ -719,7 +732,7 @@ export const DevivaDrawShell = forwardRef<DevivaDrawHandle, DevivaDrawProps>(fun
         <ContextMenu runtime={runtime} screenPoint={contextMenuTriggers.point} variant={contextMenuTriggers.variant} onClose={contextMenuTriggers.close} />
       )}
       {statsPanel.value && runtime && !presentationViewOnly && <StatsPanel runtime={runtime} cameraStore={cameraStore} />}
-      {layersPanel.value && runtime && !panelsHidden && !isNarrow && !presentationViewOnly && <LayersPanel runtime={runtime} />}
+      {layersPanel.value && runtime && !panelsHidden && !isNarrow && !presentationViewOnly && <LayersPanel runtime={runtime} isAdmin={collabAdmin.value} />}
       {/* `panelsHidden` covers both: an audience is not looking at review notes, and zen mode is a
           deliberate "hide the annotations too" working mode. Still rendered in view-only, though —
           reading a conversation is not editing the document (the popover's own `readOnly` handles that). */}

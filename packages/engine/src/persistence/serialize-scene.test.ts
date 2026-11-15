@@ -223,4 +223,22 @@ describe("serializeScene — export vs autosave soft-delete handling", () => {
       expect(text).toMatchObject({ fontWeight: "bold", fontStyle: "italic" });
     }
   });
+
+  it("round-trips heldElementIds when non-empty and omits them when empty or excludeHeld is set", () => {
+    const scene = new Scene();
+    const a = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10 }));
+    expect("heldElementIds" in serializeScene(scene)).toBe(false);
+
+    scene.markElementHeld(a.id);
+    const saved = serializeScene(scene);
+    expect(saved.heldElementIds).toEqual([a.id]);
+    expect("heldElementIds" in serializeScene(scene, { excludeHeld: true })).toBe(false);
+
+    const restored = deserializeScene(saved);
+    expect(restored.ok).toBe(true);
+    if (restored.ok) {
+      expect(restored.scene.isElementHeld(a.id)).toBe(true);
+      expect(restored.scene.getHeldElementIds()).toEqual([a.id]);
+    }
+  });
 });

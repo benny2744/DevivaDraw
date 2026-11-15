@@ -139,3 +139,75 @@ describe("handleInboundMessage — hostile/malformed input never throws", () => 
     expect(deps.scene.getElements()).toHaveLength(0);
   });
 });
+
+describe("handleInboundMessage — senderRole gating", () => {
+  it("calls onElementRefused when a non-admin tries to edit an admin-locked element, and ignores layer adminLocked changes from non-admin snapshots", async () => {
+    const onElementRefused = vi.fn();
+    const deps = { ...(await makeDeps()), onElementRefused };
+    const element = deps.scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10 }));
+    const locked = deps.scene.updateElement(element.id, { adminLocked: true })!;
+    const forged = { ...locked, version: locked.version + 1, x: 999 };
+    const envelope = { ...(await encryptEnvelope(deps.roomKey, "element-delta", { element: forged })), senderRole: "editor" };
+
+    await handleInboundMessage(JSON.stringify(envelope), deps);
+
+    expect(deps.scene.getElement(element.id)?.x).toBe(0);
+    expect(onElementRefused).toHaveBeenCalledWith(deps.scene, forged, undefined);
+  });
+
+  it("refuses non-admin snapshot layer changes that alter adminLocked", async () => {
+    const { PageStore } = await import("./page-store");
+    const { createPageStoreCollabAdapter } = await import("./page-store-adapter");
+    const store = PageStore.fresh();
+    const pageId = store.getActivePageId();
+    const scene = store.getActiveScene();
+    const pages = createPageStoreCollabAdapter(store);
+    const deps = { ...(await makeDeps()), scene, pages };
+
+    const layers = scene.getLayers();
+    const tamperedManifest = {
+      version: 99,
+      versionNonce: 1,
+      layers: [{ ...layers[0]!, adminLocked: true as const }],
+    };
+    const envelope = {
+      ...(await encryptEnvelope(deps.roomKey, "snapshot", {
+        manifest: pages.getManifest(),
+        pages: [{ id: pageId, name: "Page 1", elements: [], layers: tamperedManifest }],
+      })),
+      senderRole: "editor",
+    };
+
+    await handleInboundMessage(JSON.stringify(envelope), deps);
+    expect(scene.getLayers()[0]!.adminLocked).toBeUndefined();
+  });
+});
+
+describe("handleInboundMessage — held private-mode frames", () => {
+  it("records new elements from held frames and enforces add-only against existing non-held elements", async () => {
+    const onElementRefused = vi.fn();
+    const deps = { ...(await makeDeps()), isAdmin: true, onElementRefused };
+    const existing = deps.scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10 }));
+
+    // New element in a held frame -> accepted and marked held.
+    const source = new Scene();
+    const fresh = source.addElement(createRectangleElement({ x: 20, y: 20, width: 10, height: 10 }));
+    const heldNew = { ...(await encryptEnvelope(deps.roomKey, "element-delta", { element: fresh })), senderRole: "editor", held: true };
+    await handleInboundMessage(JSON.stringify(heldNew), deps);
+    expect(deps.scene.getElement(fresh.id)).toEqual(fresh);
+    expect(deps.scene.isElementHeld(fresh.id)).toBe(true);
+
+    // Follow-up edit to that held element -> allowed.
+    const freshEdited = source.updateElement(fresh.id, { x: 30 })!;
+    const heldEdit = { ...(await encryptEnvelope(deps.roomKey, "element-delta", { element: freshEdited })), senderRole: "editor", held: true };
+    await handleInboundMessage(JSON.stringify(heldEdit), deps);
+    expect(deps.scene.getElement(fresh.id)?.x).toBe(30);
+
+    // Held frame trying to modify pre-existing non-held element -> refused (add-only).
+    const illegalEdit = { ...existing, version: existing.version + 1, x: 999 };
+    const heldIllegal = { ...(await encryptEnvelope(deps.roomKey, "element-delta", { element: illegalEdit })), senderRole: "editor", held: true };
+    await handleInboundMessage(JSON.stringify(heldIllegal), deps);
+    expect(deps.scene.getElement(existing.id)?.x).toBe(0);
+    expect(onElementRefused).toHaveBeenCalledWith(deps.scene, illegalEdit, undefined);
+  });
+});

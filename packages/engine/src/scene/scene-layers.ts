@@ -25,6 +25,21 @@ export interface SceneLayer {
   name: string;
   visible: boolean;
   locked: boolean;
+  /** Admin-only lock: non-admins cannot unlock this layer or edit elements on it. Omitted when false. */
+  adminLocked?: true;
+  /** Layer visibility audience: `"admins"` omits this layer and its elements from non-admin snapshots and deltas. Omitted when visible to everyone. */
+  audience?: "admins";
+}
+
+function cloneLayer(layer: SceneLayer): SceneLayer {
+  return {
+    id: layer.id,
+    name: layer.name,
+    visible: layer.visible,
+    locked: layer.locked,
+    ...(layer.adminLocked === true ? { adminLocked: true as const } : {}),
+    ...(layer.audience === "admins" ? { audience: "admins" as const } : {}),
+  };
 }
 
 /** Upper bound a document/remote manifest may carry — a cap against hostile inputs, far above any real board. */
@@ -76,12 +91,12 @@ export class SceneLayersStore {
 
   /** Bottom→top copies — callers can't mutate store state through the return value. */
   getLayers(): SceneLayer[] {
-    return this.layers.map((layer) => ({ ...layer }));
+    return this.layers.map(cloneLayer);
   }
 
   getLayer(id: string): SceneLayer | undefined {
     const layer = this.layers.find((entry) => entry.id === id);
-    return layer ? { ...layer } : undefined;
+    return layer ? cloneLayer(layer) : undefined;
   }
 
   layerCount(): number {
@@ -156,6 +171,28 @@ export class SceneLayersStore {
     return true;
   }
 
+  setLayerAdminLocked(id: string, adminLocked: boolean): boolean {
+    const layer = this.layers.find((entry) => entry.id === id);
+    if (!layer || Boolean(layer.adminLocked) === adminLocked) return false;
+    if (adminLocked) layer.adminLocked = true;
+    else delete layer.adminLocked;
+    this.bumpVersions();
+    return true;
+  }
+
+  setLayerAudience(id: string, audience: "admins" | undefined): boolean {
+    const layer = this.layers.find((entry) => entry.id === id);
+    if (!layer || layer.audience === audience) return false;
+    if (audience === "admins") layer.audience = "admins";
+    else delete layer.audience;
+    this.bumpVersions();
+    return true;
+  }
+
+  hasAdminOnlyLayers(): boolean {
+    return this.layers.some((layer) => layer.audience === "admins");
+  }
+
   /** Moves the layer one step up (+1, toward the top) or down (-1). Returns whether anything moved. */
   moveLayer(id: string, direction: 1 | -1): boolean {
     const from = this.positions.get(id);
@@ -195,7 +232,7 @@ export class SceneLayersStore {
    */
   replaceAll(layers: readonly SceneLayer[], activeLayerId?: string): boolean {
     if (layers.length === 0 || layers.length > MAX_LAYERS) return false;
-    this.layers = layers.map((layer) => ({ ...layer }));
+    this.layers = layers.map(cloneLayer);
     this.rebuildPositions();
     this.defaultId = this.layers[0]!.id;
     this.activeId = activeLayerId !== undefined && this.positions.has(activeLayerId) ? activeLayerId : this.defaultId;
@@ -240,7 +277,7 @@ export class SceneLayersStore {
     }
 
     const previousActive = this.activeId;
-    this.layers = adopted.map((layer) => ({ ...layer }));
+    this.layers = adopted.map(cloneLayer);
     this.rebuildPositions();
     this.defaultId = this.layers[0]!.id;
     // The active layer is local working state — keep it when it survived the adoption.
@@ -261,7 +298,7 @@ export class SceneLayersStore {
   isTrivial(): boolean {
     if (this.layers.length !== 1) return false;
     const only = this.layers[0]!;
-    return only.name === DEFAULT_LAYER_NAME && only.visible && !only.locked;
+    return only.name === DEFAULT_LAYER_NAME && only.visible && !only.locked && !only.adminLocked && !only.audience;
   }
 
   private rebuildPositions(): void {

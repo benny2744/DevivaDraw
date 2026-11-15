@@ -117,6 +117,7 @@ function validateBaseFields(raw: Record<string, unknown>, index: number): string
   }
   if (!(raw.link === null || isString(raw.link))) return `${label}.link must be a string or null`;
   if (!isBoolean(raw.locked)) return `${label}.locked must be a boolean`;
+  if (raw.adminLocked !== undefined && raw.adminLocked !== true) return `${label}.adminLocked must be true when present`;
   if (!isString(raw.index)) return `${label}.index must be a string`;
   // Absent on every default-layer element and every pre-layers document — both must load.
   if (raw.layerId !== undefined && !isString(raw.layerId)) return `${label}.layerId must be a string when present`;
@@ -306,7 +307,7 @@ function validateAppState(raw: unknown): ValidationResult<SerializedAppState | u
 /** The envelope shape both validators require before looking at any entry: a plain object tagged with the document type, at the current (post-migration) schema version, with `elements`/`files` containers of the right kind. Shared so a future envelope change can't drift between the strict and lenient paths — both reconstruction sites below MUST carry every field this picks, or an addition silently drops on one path (the layers field's original design-review risk). */
 function validateEnvelope(
   raw: unknown,
-): ValidationResult<{ elements: unknown[]; files: Record<string, unknown>; appState: unknown; layers: unknown; activeLayerId: unknown; comments: unknown; commentMessages: unknown }> {
+): ValidationResult<{ elements: unknown[]; files: Record<string, unknown>; appState: unknown; layers: unknown; activeLayerId: unknown; comments: unknown; commentMessages: unknown; heldElementIds: unknown }> {
   if (!isPlainObject(raw)) return fail("scene document must be a JSON object");
   if (raw.type !== SCENE_DOCUMENT_TYPE) return fail(`scene document "type" must be "${SCENE_DOCUMENT_TYPE}"`);
   if (raw.schemaVersion !== CURRENT_SCHEMA_VERSION) {
@@ -317,7 +318,7 @@ function validateEnvelope(
     return fail(`scene document has ${raw.elements.length} elements — the ${DOCUMENT_CEILINGS.maxElements}-element ceiling protects against hostile documents`);
   }
   if (!isPlainObject(raw.files)) return fail('scene document "files" must be an object');
-  return ok({ elements: raw.elements, files: raw.files, appState: raw.appState, layers: raw.layers, activeLayerId: raw.activeLayerId, comments: raw.comments, commentMessages: raw.commentMessages });
+  return ok({ elements: raw.elements, files: raw.files, appState: raw.appState, layers: raw.layers, activeLayerId: raw.activeLayerId, comments: raw.comments, commentMessages: raw.commentMessages, heldElementIds: raw.heldElementIds });
 }
 
 /** Hostile-input ceiling for a persisted layer list — mirrors `scene-layers.ts`'s `MAX_LAYERS`; duplicated as a literal so this module keeps zero scene-implementation imports. */
@@ -348,15 +349,52 @@ function validateLayersList(raw: unknown): { layers: SerializedLayer[] | undefin
       errors.push(`layers[${index}] must have string id/name and boolean visible/locked`);
       continue;
     }
+    if (entry.adminLocked !== undefined && entry.adminLocked !== true) {
+      errors.push(`layers[${index}].adminLocked must be true when present`);
+      continue;
+    }
+    if (entry.audience !== undefined && entry.audience !== "admins") {
+      errors.push(`layers[${index}].audience must be "admins" when present`);
+      continue;
+    }
     if (seen.has(entry.id)) {
       errors.push(`layers[${index}] duplicates id "${entry.id}" (kept the first)`);
       continue;
     }
     seen.add(entry.id);
-    layers.push({ id: entry.id, name: entry.name, visible: entry.visible, locked: entry.locked });
+    layers.push({
+      id: entry.id,
+      name: entry.name,
+      visible: entry.visible,
+      locked: entry.locked,
+      ...(entry.adminLocked === true ? { adminLocked: true as const } : {}),
+      ...(entry.audience === "admins" ? { audience: "admins" as const } : {}),
+    });
   }
   // Every entry invalid ⇒ same degradation as an absent list: the scene's constructor default layer.
   return { layers: layers.length > 0 ? layers : undefined, errors };
+}
+
+function validateHeldElementIds(raw: unknown): { heldElementIds: string[] | undefined; errors: string[] } {
+  if (raw === undefined) return { heldElementIds: undefined, errors: [] };
+  if (!Array.isArray(raw)) return { heldElementIds: undefined, errors: ['scene document "heldElementIds" must be an array when present'] };
+  if (raw.length > DOCUMENT_CEILINGS.maxElements) {
+    return { heldElementIds: undefined, errors: ['scene document "heldElementIds" exceeds element ceiling'] };
+  }
+  const errors: string[] = [];
+  const seen = new Set<string>();
+  const ids: string[] = [];
+  for (const [index, entry] of raw.entries()) {
+    if (!isString(entry) || entry.length === 0) {
+      errors.push(`heldElementIds[${index}] must be a non-empty string`);
+      continue;
+    }
+    if (!seen.has(entry)) {
+      seen.add(entry);
+      ids.push(entry);
+    }
+  }
+  return { heldElementIds: ids.length > 0 ? ids : undefined, errors };
 }
 
 export function validateSceneDocument(raw: unknown): ValidationResult<SceneDocumentV1> {
@@ -397,6 +435,9 @@ export function validateSceneDocument(raw: unknown): ValidationResult<SceneDocum
   if (commentsResult.errors.length > 0) return fail(commentsResult.errors[0]!);
   if (commentsResult.threads) document.comments = commentsResult.threads;
   if (commentsResult.messages) document.commentMessages = commentsResult.messages;
+  const heldResult = validateHeldElementIds(envelope.value.heldElementIds);
+  if (heldResult.errors.length > 0) return fail(heldResult.errors[0]!);
+  if (heldResult.heldElementIds) document.heldElementIds = heldResult.heldElementIds;
   return ok(document);
 }
 
@@ -457,5 +498,8 @@ export function validateSceneDocumentLenient(raw: unknown): ValidationResult<Len
   droppedErrors.push(...commentsResult.errors);
   if (commentsResult.threads) document.comments = commentsResult.threads;
   if (commentsResult.messages) document.commentMessages = commentsResult.messages;
+  const heldResult = validateHeldElementIds(envelope.value.heldElementIds);
+  droppedErrors.push(...heldResult.errors);
+  if (heldResult.heldElementIds) document.heldElementIds = heldResult.heldElementIds;
   return ok({ document, droppedErrors });
 }

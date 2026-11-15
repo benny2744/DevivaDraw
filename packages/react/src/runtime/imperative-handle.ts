@@ -58,6 +58,8 @@ export interface DevivaDrawHandle {
    * so the canvas repaints and the image decode cache loads the new file.
    */
   addFiles(files: Record<string, LiveStoredFile>): void;
+  /** Enables or disables collaboration private mode on the live session (overridden when the `privateMode` prop is passed). */
+  privateMode(enabled: boolean): void;
   exportToPng(options?: ExportPngOptions): Promise<Blob>;
   exportToSvg(options?: ExportSvgOptions): string;
   /** Clears the canvas back to empty (batched as a single undo step) — the main menu's "Reset canvas" action calls the same path. */
@@ -145,6 +147,7 @@ export function buildImperativeHandle(deps: ImperativeHandleDeps): DevivaDrawHan
     addFiles: (files) => {
       for (const [fileId, file] of Object.entries(files)) scene.addFile(fileId, file);
     },
+    privateMode: () => {},
 
     exportToPng: (options = {}) =>
       exportToPng({

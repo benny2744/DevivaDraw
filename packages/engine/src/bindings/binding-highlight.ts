@@ -16,7 +16,7 @@ import { distanceToShapeOutline, isBindableTarget, isInsideShapeOutline, isNearO
 
 /** Whether `point` would bind to `element` — the exact condition `findBindableShapeNear` applies, minus the z-order search. */
 function wouldBind(element: AnyElement, point: Point, thresholdSceneUnits: number): boolean {
-  if (element.isDeleted || element.locked || !isBindableTarget(element)) return false;
+  if (element.isDeleted || element.locked || element.adminLocked || !isBindableTarget(element)) return false;
   if (!isNearOutlineBounds(element, point, thresholdSceneUnits)) return false; // cheap reject before the exact outline distance
   if (distanceToShapeOutline(element, point) <= thresholdSceneUnits) return true;
   return isInsideShapeOutline(element, point);

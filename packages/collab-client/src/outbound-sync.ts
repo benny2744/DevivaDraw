@@ -8,12 +8,19 @@
 import { encryptEnvelope } from "./message-codec";
 import type { CollabPagesAdapter } from "./pages-adapter";
 import type { PresencePayload } from "./presence-state";
+import { DEFAULT_LAYER_NAME } from "@benny2744/engine";
 import type { Scene } from "@benny2744/engine";
 
 export interface OutboundSyncDeps {
   scene: Scene;
   roomKey: CryptoKey;
   send(data: string): boolean;
+  /** Whether this client is an admin — enables audience tagging for held elements, admin-only layers, and split public/admin snapshots. */
+  isAdmin?: boolean;
+  /** Elements previously synced publicly; moving one onto an admin-only layer emits a tombstone to non-admins. */
+  knownPublicSynced?: Set<string>;
+  /** Elements queued for non-admin tombstones when a layer is switched to admins-only. */
+  pendingHideTombstones?: Set<string>;
   /** Which page `scene` is, in a multi-page session — tagged onto every delta so receivers route it; absent in single-scene sessions (the wire shape stays exactly what pre-pages peers expect). Also namespaces the `syncedVersions` keys, since the same map spans every page. */
   pageId?: string;
   /**
@@ -51,7 +58,29 @@ export async function flushElementDeltas(deps: OutboundSyncDeps, syncedVersions:
     if (!current || current.version !== versionAtScanTime) continue; // stale — superseded during the encrypt window
 
     syncedVersions.set(syncKey, versionAtScanTime);
-    deps.send(JSON.stringify(envelope));
+    const isAdminLayer = Boolean(deps.isAdmin && deps.scene.resolveLayer(current).audience === "admins");
+    const isHeld = Boolean(deps.isAdmin && deps.scene.isElementHeld(current.id));
+    const audience = isAdminLayer || isHeld ? "admins" : undefined;
+    deps.send(JSON.stringify(audience ? { ...envelope, audience } : envelope));
+
+    if (deps.isAdmin) {
+      const pendingTombstone = deps.pendingHideTombstones?.delete(syncKey) ?? false;
+      const wasPublic = deps.knownPublicSynced?.delete(syncKey) ?? false;
+      if (isAdminLayer && (pendingTombstone || wasPublic)) {
+        const tombstone = { ...current, isDeleted: true };
+        const tombstoneEnvelope = await encrypt(
+          deps.roomKey,
+          "element-delta",
+          deps.pageId === undefined ? { element: tombstone } : { element: tombstone, pageId: deps.pageId },
+        );
+        const latest = deps.scene.getElement(element.id);
+        if (latest && latest.version === versionAtScanTime) {
+          deps.send(JSON.stringify({ ...tombstoneEnvelope, audience: "others" }));
+        }
+      } else if (!isAdminLayer && !isHeld) {
+        deps.knownPublicSynced?.add(syncKey);
+      }
+    }
   }
 }
 
@@ -102,9 +131,27 @@ function commentsSnapshotFields(scene: Scene): { comments?: unknown[]; commentMe
 
 /** Sends every current element (including soft-deleted ones) as one `snapshot` message — the full-state recovery path a newly-joined or reconnecting peer's `snapshot-request` resolves against. */
 export async function sendFullSnapshot(deps: OutboundSyncDeps): Promise<void> {
-  const elements = [...deps.scene.elementsUnsorted()];
-  const envelope = await encryptEnvelope(deps.roomKey, "snapshot", { elements, ...commentsSnapshotFields(deps.scene) });
-  deps.send(JSON.stringify(envelope));
+  const allElements = [...deps.scene.elementsUnsorted()];
+  const hasHeld = Boolean(deps.isAdmin && deps.scene.hasHeldElements());
+  const hasAdminLayers = Boolean(deps.isAdmin && deps.scene.hasAdminOnlyLayers());
+  const needsSplit = hasHeld || hasAdminLayers;
+  const publicElements = needsSplit
+    ? allElements.filter((el) => !deps.scene.isElementHeld(el.id) && deps.scene.resolveLayer(el).audience !== "admins")
+    : allElements;
+  const publicEnvelope = await encryptEnvelope(deps.roomKey, "snapshot", {
+    elements: publicElements,
+    ...commentsSnapshotFields(deps.scene),
+  });
+  deps.send(JSON.stringify(publicEnvelope));
+
+  if (needsSplit) {
+    const adminEnvelope = await encryptEnvelope(deps.roomKey, "snapshot", {
+      elements: allElements,
+      ...(hasHeld ? { heldElementIds: deps.scene.getHeldElementIds() } : {}),
+      ...commentsSnapshotFields(deps.scene),
+    });
+    deps.send(JSON.stringify({ ...adminEnvelope, audience: "admins" }));
+  }
 }
 
 /**
@@ -114,25 +161,61 @@ export async function sendFullSnapshot(deps: OutboundSyncDeps): Promise<void> {
  */
 export async function sendDocumentSnapshot(deps: Omit<OutboundSyncDeps, "scene" | "pageId">, pages: CollabPagesAdapter): Promise<void> {
   const manifest = pages.getManifest();
-  const payload = {
-    manifest,
-    pages: manifest.pages.map((entry) => {
+  let hasAdminContent = false;
+  const publicPages = manifest.pages.map((entry) => {
+    const layers = pages.getLayersManifest(entry.id);
+    const scene = pages.getScene(entry.id);
+    const hasHeld = Boolean(deps.isAdmin && scene?.hasHeldElements());
+    const hasAdminLayers = Boolean(deps.isAdmin && scene?.hasAdminOnlyLayers());
+    const needsSplit = hasHeld || hasAdminLayers;
+    if (needsSplit) hasAdminContent = true;
+    const elements = scene
+      ? needsSplit
+        ? [...scene.elementsUnsorted()].filter((el) => !scene.isElementHeld(el.id) && scene.resolveLayer(el).audience !== "admins")
+        : [...scene.elementsUnsorted()]
+      : [];
+    let publicLayers = layers;
+    if (layers !== null && hasAdminLayers) {
+      const visibleLayers = layers.layers.filter((layer) => layer.audience !== "admins");
+      publicLayers = {
+        ...layers,
+        layers:
+          visibleLayers.length > 0
+            ? visibleLayers
+            : [{ id: layers.layers[0]!.id, name: DEFAULT_LAYER_NAME, visible: true, locked: false }],
+      };
+    }
+    return {
+      id: entry.id,
+      name: entry.name,
+      elements,
+      // Attached inside the per-page entry (never a new wire type) — pre-layers peers ignore the
+      // unknown key; `null` (never-mutated) pages send nothing so they can't outrank real state.
+      ...(publicLayers !== null ? { layers: publicLayers } : {}),
+      // Comments ride the same way, under the same "omit when empty" rule.
+      ...(scene ? commentsSnapshotFields(scene) : {}),
+    };
+  });
+  const publicEnvelope = await encryptEnvelope(deps.roomKey, "snapshot", { manifest, pages: publicPages });
+  deps.send(JSON.stringify(publicEnvelope));
+
+  if (deps.isAdmin && hasAdminContent) {
+    const adminPages = manifest.pages.map((entry) => {
       const layers = pages.getLayersManifest(entry.id);
       const scene = pages.getScene(entry.id);
+      const heldIds = scene?.getHeldElementIds() ?? [];
       return {
         id: entry.id,
         name: entry.name,
         elements: [...(scene?.elementsUnsorted() ?? [])],
-        // Attached inside the per-page entry (never a new wire type) — pre-layers peers ignore the
-        // unknown key; `null` (never-mutated) pages send nothing so they can't outrank real state.
         ...(layers !== null ? { layers } : {}),
-        // Comments ride the same way, under the same "omit when empty" rule.
+        ...(heldIds.length > 0 ? { heldElementIds: heldIds } : {}),
         ...(scene ? commentsSnapshotFields(scene) : {}),
       };
-    }),
-  };
-  const envelope = await encryptEnvelope(deps.roomKey, "snapshot", payload);
-  deps.send(JSON.stringify(envelope));
+    });
+    const adminEnvelope = await encryptEnvelope(deps.roomKey, "snapshot", { manifest, pages: adminPages });
+    deps.send(JSON.stringify({ ...adminEnvelope, audience: "admins" }));
+  }
 }
 
 /** Sends one presence update — uncompressed (see `message-codec.ts`'s `EnvelopeCodecOptions` doc: small, frequent, latency-sensitive). */

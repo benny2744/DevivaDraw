@@ -383,4 +383,24 @@ describe("Scene.toJSON / Scene.fromJSON", () => {
 
     expect(live.getElements()).toEqual(before);
   });
+
+  it("privateAddOnly locks pre-existing and remote elements while allowing newly added local elements", () => {
+    const scene = new Scene();
+    const existing = scene.addElement(createGenericElement({ x: 0, y: 0 }));
+    scene.setPrivateAddOnly(true);
+    expect(scene.effectiveLocked(existing)).toBe(true);
+    expect(scene.selectableElements()).toEqual([]);
+
+    const own = scene.addElement(createGenericElement({ x: 20, y: 20 }));
+    expect(scene.effectiveLocked(own)).toBe(false);
+    expect(scene.selectableElements().map((el) => el.id)).toEqual([own.id]);
+
+    const remoteTeacher = { ...createGenericElement({ x: 40, y: 40 }), id: "teacher-1", version: 1 };
+    scene.applyRemoteElement(remoteTeacher);
+    expect(scene.effectiveLocked(remoteTeacher)).toBe(true);
+
+    scene.setPrivateAddOnly(false);
+    expect(scene.effectiveLocked(existing)).toBe(false);
+    expect(scene.effectiveLocked(remoteTeacher)).toBe(false);
+  });
 });

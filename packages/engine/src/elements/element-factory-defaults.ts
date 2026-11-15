@@ -73,6 +73,7 @@ export function createElementBase(input: ElementCreationInput): Omit<BaseElement
     ...(input.layerId !== undefined ? { layerId: input.layerId } : {}),
     link: input.link ?? null,
     locked: input.locked ?? false,
+    ...(input.adminLocked === true ? { adminLocked: true as const } : {}),
     index: "",
     version: 0,
     versionNonce: 0,

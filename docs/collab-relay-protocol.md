@@ -44,8 +44,13 @@ Five types are routable. The relay knows nothing about them beyond the string:
 Two types are emitted *by* the relay and never accepted from a connection: `peer-joined` and
 `peer-left`, each `{type, peerId}`.
 
-`peerId` is assigned by the relay, never client-supplied. Every broadcast frame is re-stamped with the
-sender's `peerId` before it goes out.
+`peerId` and `senderRole` are assigned by the relay, never client-supplied. Every broadcast frame is
+re-stamped with the sender's `peerId` and `senderRole` (`"admin"`, `"editor"`, or `"viewer"`,
+overwriting any peer-supplied values). Frames routed to admins only during private mode are stamped
+with `held: true` (and `held` is stripped when private mode is off).
+
+Admin frames may also carry a plaintext `audience` (`"all"`, `"admins"`, or `"others"`, defaulting to
+`"all"`). Non-admin `audience` values are ignored and routed as `"all"`.
 
 ## The rules
 
@@ -85,14 +90,19 @@ be sending incremental deltas anyway.
 
 ### R4 — Broadcast except sender
 
-An accepted frame goes to every *other* connection in the room and never back to its sender. The
-client's own echo guard is a secondary defence; this is the primary one.
+An accepted frame goes to every *other* matching connection in the room and never back to its sender.
+By default (`audience: "all"` or omitted) every other connection matches; `audience: "admins"` matches
+only `admin` connections; `audience: "others"` matches only non-`admin` connections. The client's own
+echo guard is a secondary defence; this is the primary one.
 
 ### R5 — Snapshot cache, fast path
 
-The relay retains the most recent `snapshot` frame it has seen (already `peerId`-stamped). A
-`snapshot-request` is answered by **unicasting** that cached frame to the requester alone — no other
-connection sees the request.
+The relay retains two cached `snapshot` frames (already stamped): a **public** snapshot
+(`audience: "all"` or omitted) and an **admin** snapshot (`audience: "admins"`). A new public snapshot
+updates the public cache and clears any prior admin cache (so an admin no longer receives a stale
+split snapshot once everything is public). A `snapshot-request` from an `admin` is answered by
+**unicasting** the admin snapshot if present, otherwise the public snapshot; everyone else receives
+only the public snapshot. No other connection sees the request.
 
 The cache is in-memory. The Worker relay additionally persists it (to Cloudflare R2) through a
 hook outside the registry; the LAN relay does not persist at all, because the host's own document is
@@ -114,8 +124,10 @@ connection says about itself:
 
 | Role | May send |
 | --- | --- |
-| `editor` | all five types |
+| `admin` | all five types, plus `audience` routing |
+| `editor` | all five types (`audience` ignored) |
 | `viewer` | `comment-delta`, `presence`, `snapshot-request` |
+| `collaborator` (ModChat `R8`) | `snapshot-request` when off; `element-delta` + `snapshot-request` when on |
 
 A viewer's `element-delta` or `snapshot` — the two that change what the room's document says — is
 **dropped silently**, `R1`-style, and the connection stays open. An out-of-date or buggy viewer client

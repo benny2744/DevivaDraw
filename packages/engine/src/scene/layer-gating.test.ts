@@ -44,6 +44,37 @@ describe("layer gating — predicates", () => {
     expect(scene.effectiveLocked(plain)).toBe(false);
     expect(scene.selectableElements().map((element) => element.id)).toEqual([plain.id]);
   });
+
+  it("effectiveLocked and selectableElements honour layer.adminLocked and element.adminLocked", () => {
+    const scene = new Scene();
+    const adminLayer = scene.addLayer("Admin Locked");
+    scene.setActiveLayer(adminLayer.id);
+    const onAdminLayer = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 40, height: 40, backgroundColor: "#fff" }));
+    scene.setLayerAdminLocked(adminLayer.id, true);
+
+    expect(scene.getLayer(adminLayer.id)?.adminLocked).toBe(true);
+    expect(scene.effectiveLocked(onAdminLayer)).toBe(true);
+    expect(scene.selectableElements()).toEqual([]);
+
+    scene.setLayerAdminLocked(adminLayer.id, false);
+    expect("adminLocked" in scene.getLayer(adminLayer.id)!).toBe(false);
+    expect(scene.effectiveLocked(onAdminLayer)).toBe(false);
+    expect(scene.selectableElements().map((e) => e.id)).toEqual([onAdminLayer.id]);
+  });
+
+  it("setLayerAudience marks a layer admins-only and omits audience when reset", () => {
+    const scene = new Scene();
+    const layer = scene.addLayer("Teacher Key");
+    expect(scene.hasAdminOnlyLayers()).toBe(false);
+
+    scene.setLayerAudience(layer.id, "admins");
+    expect(scene.getLayer(layer.id)?.audience).toBe("admins");
+    expect(scene.hasAdminOnlyLayers()).toBe(true);
+
+    scene.setLayerAudience(layer.id, undefined);
+    expect("audience" in scene.getLayer(layer.id)!).toBe(false);
+    expect(scene.hasAdminOnlyLayers()).toBe(false);
+  });
 });
 
 describe("layer gating — interaction surfaces", () => {

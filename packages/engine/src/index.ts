@@ -453,7 +453,7 @@ export { computeFlipChanges } from "./selection/flip-selection";
 
 export { expandToGroupMembers, groupSelection, ungroupSelection } from "./selection/group-ungroup";
 
-export { lockSelection, unlockSelection } from "./selection/selection-lock";
+export { lockForEveryone, lockSelection, unlockForEveryone, unlockSelection } from "./selection/selection-lock";
 
 export { dropArrowBindingsMovingAlone } from "./selection/arrow-binding-drop";
 

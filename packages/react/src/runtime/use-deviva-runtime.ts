@@ -506,11 +506,11 @@ export function useDevivaRuntime(options: UseDevivaRuntimeOptions): UseDevivaRun
     // load-bearing for performance: a drag fires one notify per selected element per frame, and an
     // unconditional scan here would go quadratic in selection size on exactly the drag-all stress
     // path — so the scan runs only when a LAYER actually changed, an O(1) check otherwise.
-    let prunedAtLayersVersion = scene.getLayersVersion();
+    let prunedAtGatingVersion = scene.getGatingVersion();
     const unsubscribeSelectionPrune = scene.subscribe(() => {
-      const layersVersion = scene.getLayersVersion();
-      if (layersVersion === prunedAtLayersVersion) return;
-      prunedAtLayersVersion = layersVersion;
+      const gatingVersion = scene.getGatingVersion();
+      if (gatingVersion === prunedAtGatingVersion) return;
+      prunedAtGatingVersion = gatingVersion;
       const selected = builtRuntime.selection.getSelectedIds();
       if (selected.size === 0) return;
       const kept = [...selected].filter((id) => {

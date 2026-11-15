@@ -10,6 +10,7 @@ export const NOOP_HANDLE: DevivaDrawHandle = {
   getSceneElements: () => [],
   getFiles: () => ({}),
   addFiles: () => {},
+  privateMode: () => {},
   exportToPng: () => Promise.reject(new Error("deviva-draw: not mounted yet")),
   exportToSvg: () => "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"0\" height=\"0\"></svg>",
   resetScene: () => {},

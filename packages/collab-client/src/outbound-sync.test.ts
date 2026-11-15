@@ -107,6 +107,23 @@ describe("flushElementDeltas", () => {
     void a;
     void b;
   });
+
+  it("tags held elements with audience: admins when isAdmin is true", async () => {
+    const scene = new Scene();
+    const pub = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 1, height: 1 }));
+    const held = scene.addElement(createRectangleElement({ x: 5, y: 5, width: 1, height: 1 }));
+    scene.markElementHeld(held.id);
+    const roomKey = await freshRoomKey();
+    const send = vi.fn<(data: string) => boolean>(() => true);
+
+    await flushElementDeltas({ scene, roomKey, send, isAdmin: true }, new Map());
+
+    expect(send).toHaveBeenCalledTimes(2);
+    const envelopes = send.mock.calls.map((c) => JSON.parse(c[0] as string) as { audience?: string });
+    expect(envelopes.filter((e) => e.audience === "admins")).toHaveLength(1);
+    expect(envelopes.filter((e) => e.audience === undefined)).toHaveLength(1);
+    void pub;
+  });
 });
 
 describe("sendFullSnapshot", () => {
@@ -126,6 +143,67 @@ describe("sendFullSnapshot", () => {
     expect(decrypted.ok).toBe(true);
     const elements = (decrypted as { payload: { elements: Array<{ id: string }> } }).payload.elements;
     expect(elements.map((el) => el.id).sort()).toEqual([deleted.id, live.id].sort());
+  });
+
+  it("splits public and admin snapshots when isAdmin and held elements exist", async () => {
+    const scene = new Scene();
+    const pub = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 1, height: 1 }));
+    const held = scene.addElement(createRectangleElement({ x: 5, y: 5, width: 1, height: 1 }));
+    scene.markElementHeld(held.id);
+    const roomKey = await freshRoomKey();
+    const send = vi.fn<(data: string) => boolean>(() => true);
+
+    await sendFullSnapshot({ scene, roomKey, send, isAdmin: true });
+
+    expect(send).toHaveBeenCalledTimes(2);
+    const pubEnv = JSON.parse(send.mock.calls[0]![0] as string);
+    const adminEnv = JSON.parse(send.mock.calls[1]![0] as string);
+    expect(pubEnv.audience).toBeUndefined();
+    expect(adminEnv.audience).toBe("admins");
+
+    const pubDec = await decryptEnvelope(roomKey, pubEnv);
+    const adminDec = await decryptEnvelope(roomKey, adminEnv);
+    expect((pubDec as { payload: { elements: Array<{ id: string }>; heldElementIds?: string[] } }).payload.elements.map((e) => e.id)).toEqual([pub.id]);
+    expect((pubDec as { payload: { heldElementIds?: string[] } }).payload.heldElementIds).toBeUndefined();
+    expect((adminDec as { payload: { elements: Array<{ id: string }>; heldElementIds?: string[] } }).payload.elements.map((e) => e.id).sort()).toEqual([pub.id, held.id].sort());
+    expect((adminDec as { payload: { heldElementIds?: string[] } }).payload.heldElementIds).toEqual([held.id]);
+  });
+
+  it("sendDocumentSnapshot omits admins-only layers and their elements from the public snapshot", async () => {
+    const { PageStore } = await import("./page-store");
+    const { createPageStoreCollabAdapter } = await import("./page-store-adapter");
+    const { sendDocumentSnapshot } = await import("./outbound-sync");
+    const store = PageStore.fresh();
+    const pageId = store.getActivePageId();
+    const scene = store.getActiveScene();
+    const pub = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10 }));
+    const secretLayer = scene.addLayer("Answer Key");
+    scene.setLayerAudience(secretLayer.id, "admins");
+    scene.setActiveLayer(secretLayer.id);
+    const secret = scene.addElement(createRectangleElement({ x: 20, y: 20, width: 10, height: 10 }));
+
+    const roomKey = await freshRoomKey();
+    const send = vi.fn<(data: string) => boolean>(() => true);
+    await sendDocumentSnapshot({ isAdmin: true, roomKey, send }, createPageStoreCollabAdapter(store));
+
+    expect(send).toHaveBeenCalledTimes(2);
+    const pubEnv = JSON.parse(send.mock.calls[0]![0] as string);
+    const adminEnv = JSON.parse(send.mock.calls[1]![0] as string);
+    expect(pubEnv.audience).toBeUndefined();
+    expect(adminEnv.audience).toBe("admins");
+
+    const pubPayload = (await decryptEnvelope(roomKey, pubEnv)) as {
+      payload: { pages: Array<{ id: string; elements: Array<{ id: string }>; layers?: { layers: Array<{ id: string }> } }> };
+    };
+    expect(pubPayload.payload.pages[0]!.elements.map((e) => e.id)).toEqual([pub.id]);
+    expect(pubPayload.payload.pages[0]!.layers?.layers.map((l) => l.id)).not.toContain(secretLayer.id);
+
+    const adminPayload = (await decryptEnvelope(roomKey, adminEnv)) as {
+      payload: { pages: Array<{ id: string; elements: Array<{ id: string }>; layers?: { layers: Array<{ id: string }> } }> };
+    };
+    expect(adminPayload.payload.pages[0]!.elements.map((e) => e.id).sort()).toEqual([pub.id, secret.id].sort());
+    expect(adminPayload.payload.pages[0]!.layers?.layers.map((l) => l.id)).toContain(secretLayer.id);
+    void pageId;
   });
 });
 

@@ -265,4 +265,40 @@ describe("buildActionRegistry — end-to-end against a real Scene", () => {
 
     expect(scene.getElement(el.id)?.isDeleted).toBe(false);
   });
+
+  it("admin-lock actions are gated by getCollabAdmin, and unlock-all / toggle-lock skip admin-locked elements for non-admins", () => {
+    const scene = new Scene();
+    const normal = scene.addElement(createRectangleElement({ x: 0, y: 0, width: 10, height: 10, locked: true }));
+    const adminEl = scene.addElement(createRectangleElement({ x: 20, y: 0, width: 10, height: 10, locked: true, adminLocked: true }));
+    const registry = buildActionRegistry();
+
+    const nonAdmin = buildTestRuntime(scene);
+    nonAdmin.ui.getCollabAdmin = () => false;
+    expect(registry.isEnabled("lock-for-everyone", nonAdmin)).toBe(false);
+    expect(registry.isEnabled("unlock-for-everyone", nonAdmin)).toBe(false);
+
+    nonAdmin.selection.selectOnly([adminEl.id]);
+    expect(registry.isEnabled("toggle-lock", nonAdmin)).toBe(false);
+    registry.run("toggle-lock", nonAdmin);
+    expect(scene.getElement(adminEl.id)?.locked).toBe(true);
+    expect(scene.getElement(adminEl.id)?.adminLocked).toBe(true);
+
+    registry.run("unlock-all", nonAdmin);
+    expect(scene.getElement(normal.id)?.locked).toBe(false);
+    expect(scene.getElement(adminEl.id)?.locked).toBe(true);
+    expect(scene.getElement(adminEl.id)?.adminLocked).toBe(true);
+
+    const admin = buildTestRuntime(scene);
+    admin.ui.getCollabAdmin = () => true;
+    admin.selection.selectOnly([normal.id]);
+    expect(registry.isEnabled("lock-for-everyone", admin)).toBe(true);
+    registry.run("lock-for-everyone", admin);
+    expect(scene.getElement(normal.id)?.adminLocked).toBe(true);
+
+    admin.selection.selectOnly([]);
+    expect(registry.isEnabled("unlock-for-everyone", admin)).toBe(true);
+    registry.run("unlock-for-everyone", admin);
+    expect(scene.getElement(normal.id)?.adminLocked).toBeUndefined();
+    expect(scene.getElement(adminEl.id)?.adminLocked).toBeUndefined();
+  });
 });

@@ -24,6 +24,14 @@ export function isPlausibleLayersManifest(value: unknown): value is LayersManife
   return manifest.layers.every((entry) => {
     if (typeof entry !== "object" || entry === null) return false;
     const layer = entry as Record<string, unknown>;
-    return typeof layer.id === "string" && layer.id.length > 0 && typeof layer.name === "string" && typeof layer.visible === "boolean" && typeof layer.locked === "boolean";
+    return (
+      typeof layer.id === "string" &&
+      layer.id.length > 0 &&
+      typeof layer.name === "string" &&
+      typeof layer.visible === "boolean" &&
+      typeof layer.locked === "boolean" &&
+      (layer.adminLocked === undefined || layer.adminLocked === true) &&
+      (layer.audience === undefined || layer.audience === "admins")
+    );
   });
 }

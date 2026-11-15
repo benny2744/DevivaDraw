@@ -78,7 +78,7 @@ export function elementsInMarquee(elements: readonly AnyElement[], marquee: Scen
   if (marquee.width === 0 && marquee.height === 0) return [];
 
   return elements.filter((element) => {
-    if (element.isDeleted || element.locked) return false;
+    if (element.isDeleted || element.locked || element.adminLocked) return false;
     if (element.type === "text" && element.containerId !== null) return false;
     const bbox = rotatedBboxOf(element);
     return mode === "contain" ? rectContains(marquee, bbox) : rectsIntersect(marquee, bbox);

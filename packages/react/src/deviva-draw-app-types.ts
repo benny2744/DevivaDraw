@@ -37,6 +37,11 @@ export interface DevivaDrawProps {
    * Omit for the manual Follow button.
    */
   autoFollow?: "sole-peer" | "locked";
+  /**
+   * Private mode for a collaborative board: non-admins can only add new elements (pre-existing
+   * content acts admin-locked), and on admins turning it off releases held student work to everyone.
+   */
+  privateMode?: boolean;
   /** Host-supplied file operations for scene open/save — how a shell with a real filesystem (the desktop app) provides native dialogs, path identity, and save-in-place. Omit for the browser's picker/download behavior, which is unchanged when this prop is absent. See `FileOperationsProvider`. */
   fileOperations?: FileOperationsProvider;
   /** Fired synchronously on every document identity/dirty transition (`{path, name, dirty}`) — the desktop shell's title bar, macOS documentEdited dot, recents, and unsaved-close guard all hang off this. Dirty is content-only: pan/zoom and page switching never set it. */

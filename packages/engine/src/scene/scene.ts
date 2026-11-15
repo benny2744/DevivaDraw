@@ -65,6 +65,12 @@ export class Scene {
   private readonly layersStore = new SceneLayersStore();
   /** Comment threads and messages — records parallel to elements, never elements; see `comments/comments-store.ts`'s module doc. Composed unit, same as files and layers. */
   private readonly commentsStore = new SceneCommentsStore();
+  /** Elements created during private mode and held for admins only. Saved with admin documents; never in public snapshots. */
+  private readonly heldElementIds = new Set<string>();
+  /** Non-admin private-mode gating: existing/remote elements stay locked while newly added local elements are editable. */
+  private privateAddOnly = false;
+  private readonly privateOwnIds = new Set<string>();
+  private privateGateVersion = 0;
   private readonly listeners = new Set<SceneListener>();
   /** Domain-specific post-mutation middleware — see `registerUpdateHook`. Empty by default: `Scene` itself knows nothing about bindings, bound text, or any other cross-element relationship. */
   private readonly updateHooks = new Set<SceneUpdateHook>();
@@ -137,6 +143,7 @@ export class Scene {
     const stampLayer = element.layerId === undefined && activeId !== this.layersStore.getDefaultLayerId();
     const stored = touch(element, stampLayer ? { index, layerId: activeId } : { index });
     this.elements.set(stored.id, stored);
+    if (this.privateAddOnly) this.privateOwnIds.add(stored.id);
     this.notify();
     return stored;
   }
@@ -314,9 +321,72 @@ export class Scene {
     return !this.layersStore.resolve(element.layerId).visible;
   }
 
-  /** Element-level `locked` OR its layer's lock — layer-locked elements must behave exactly like individually-locked ones on every interaction surface. */
-  effectiveLocked(element: Pick<AnyElement, "layerId" | "locked">): boolean {
-    return element.locked || this.layersStore.resolve(element.layerId).locked;
+  /** Element-level `locked`, `adminLocked`, its layer's lock / admin lock, or private-mode add-only gating on non-admin scenes. */
+  effectiveLocked(element: Pick<AnyElement, "id" | "layerId" | "locked" | "adminLocked">): boolean {
+    const layer = this.layersStore.resolve(element.layerId);
+    return (
+      element.locked ||
+      element.adminLocked === true ||
+      layer.locked ||
+      layer.adminLocked === true ||
+      (this.privateAddOnly && !this.privateOwnIds.has(element.id))
+    );
+  }
+
+  /** Monotonic gating counter covering layer changes and private-mode add-only toggles. */
+  getGatingVersion(): number {
+    return this.layersStore.getVersion() + this.privateGateVersion;
+  }
+
+  setPrivateAddOnly(enabled: boolean): void {
+    if (this.privateAddOnly === enabled) return;
+    this.privateAddOnly = enabled;
+    if (!enabled) this.privateOwnIds.clear();
+    this.privateGateVersion += 1;
+    this.notify();
+  }
+
+  isPrivateAddOnly(): boolean {
+    return this.privateAddOnly;
+  }
+
+  isPrivateLocked(element: Pick<AnyElement, "id">): boolean {
+    return this.privateAddOnly && !this.privateOwnIds.has(element.id);
+  }
+
+  isElementHeld(id: string): boolean {
+    return this.heldElementIds.has(id);
+  }
+
+  getHeldElementIds(): string[] {
+    return [...this.heldElementIds];
+  }
+
+  hasHeldElements(): boolean {
+    return this.heldElementIds.size > 0;
+  }
+
+  markElementHeld(id: string): boolean {
+    if (this.heldElementIds.has(id)) return false;
+    this.heldElementIds.add(id);
+    this.notify();
+    return true;
+  }
+
+  releaseHeldElements(): string[] {
+    if (this.heldElementIds.size === 0) return [];
+    const released = [...this.heldElementIds];
+    this.heldElementIds.clear();
+    this.notify();
+    return released;
+  }
+
+  replaceHeldElementIds(ids: readonly string[]): void {
+    this.heldElementIds.clear();
+    for (const id of ids) {
+      if (typeof id === "string" && id.length > 0) this.heldElementIds.add(id);
+    }
+    this.notify();
   }
 
   /**
@@ -350,6 +420,18 @@ export class Scene {
 
   setLayerLocked(id: string, locked: boolean): void {
     if (this.layersStore.setLayerLocked(id, locked)) this.notify();
+  }
+
+  setLayerAdminLocked(id: string, adminLocked: boolean): void {
+    if (this.layersStore.setLayerAdminLocked(id, adminLocked)) this.notify();
+  }
+
+  setLayerAudience(id: string, audience: "admins" | undefined): void {
+    if (this.layersStore.setLayerAudience(id, audience)) this.notify();
+  }
+
+  hasAdminOnlyLayers(): boolean {
+    return this.layersStore.hasAdminOnlyLayers();
   }
 
   /** One step toward the top (+1) or bottom (-1). */

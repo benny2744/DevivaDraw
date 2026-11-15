@@ -20,7 +20,7 @@ const ELEMENT_ACTION_GROUPS: readonly (readonly string[])[] = [
   ["duplicate", "delete"],
   ["bring-to-front", "bring-forward", "send-backward", "send-to-back"],
   ["flip-horizontal", "flip-vertical"],
-  ["group", "ungroup", "toggle-lock"],
+  ["group", "ungroup", "toggle-lock", "lock-for-everyone"],
   ["add-to-library"],
 ];
 
@@ -31,9 +31,11 @@ const ELEMENT_ACTION_GROUPS: readonly (readonly string[])[] = [
  */
 const CANVAS_ACTION_GROUPS: readonly (readonly string[])[] = [
   ["paste"],
-  ["copy-as-image", "copy-as-svg", "select-all", "unlock-all"],
+  ["copy-as-image", "copy-as-svg", "select-all", "unlock-all", "unlock-for-everyone"],
   ["toggle-grid", "toggle-object-snap", "toggle-zen-mode", "toggle-view-only", "toggle-stats"],
 ];
+
+const ADMIN_ONLY_ACTION_IDS = new Set(["lock-for-everyone", "unlock-for-everyone"]);
 
 /**
  * Live state readers for the toggle rows, so the canvas menu can draw the same trailing ✓ the main
@@ -61,7 +63,10 @@ export interface ContextMenuProps {
 
 export function ContextMenu(props: ContextMenuProps) {
   const { runtime, screenPoint, variant, onClose } = props;
-  const groups = variant === "canvas" ? CANVAS_ACTION_GROUPS : ELEMENT_ACTION_GROUPS;
+  const isAdmin = Boolean(runtime.ui.getCollabAdmin?.());
+  const groups = (variant === "canvas" ? CANVAS_ACTION_GROUPS : ELEMENT_ACTION_GROUPS)
+    .map((group) => group.filter((id) => isAdmin || !ADMIN_ONLY_ACTION_IDS.has(id)))
+    .filter((group) => group.length > 0);
   const { t } = useTranslation();
   const menuRef = useRef<HTMLDivElement | null>(null);
   const isMac = detectIsMac(typeof navigator !== "undefined" ? navigator.platform : undefined);

@@ -3,7 +3,17 @@
  * via `@benny2744/engine`'s `selection/align-distribute.ts` and apply them as one batched history
  * step, matching every other multi-element mutation in this codebase.
  */
-import { computeAlignChanges, computeDistributeChanges, computeFlipChanges, groupSelection, lockSelection, unlockSelection, ungroupSelection } from "@benny2744/engine";
+import {
+  computeAlignChanges,
+  computeDistributeChanges,
+  computeFlipChanges,
+  groupSelection,
+  lockForEveryone,
+  lockSelection,
+  unlockForEveryone,
+  unlockSelection,
+  ungroupSelection,
+} from "@benny2744/engine";
 import type { AlignEdge, DistributeAxis, FlipAxis } from "@benny2744/engine";
 import type { Action, ActionRuntime } from "./action-types";
 
@@ -117,9 +127,24 @@ export function buildArrangeActions(): Action[] {
       labelKey: "action.lock",
       icon: "lock",
       shortcut: "meta+shift+l",
-      isEnabled: (runtime) => runtime.selection.size > 0,
+      isEnabled: (runtime) => {
+        const isAdmin = Boolean(runtime.ui.getCollabAdmin?.());
+        return [...runtime.selection.getSelectedIds()].some((id) => {
+          const element = runtime.scene.getElement(id);
+          if (!element || element.isDeleted) return false;
+          if (!isAdmin && (element.adminLocked || runtime.scene.resolveLayer(element).adminLocked || runtime.scene.isPrivateLocked(element))) return false;
+          return true;
+        });
+      },
       run: (runtime) => {
-        const ids = [...runtime.selection.getSelectedIds()];
+        const isAdmin = Boolean(runtime.ui.getCollabAdmin?.());
+        const ids = [...runtime.selection.getSelectedIds()].filter((id) => {
+          const element = runtime.scene.getElement(id);
+          if (!element || element.isDeleted) return false;
+          if (!isAdmin && (element.adminLocked || runtime.scene.resolveLayer(element).adminLocked || runtime.scene.isPrivateLocked(element))) return false;
+          return true;
+        });
+        if (ids.length === 0) return;
         const anyUnlocked = ids.some((id) => runtime.scene.getElement(id)?.locked === false);
         runtime.history.beginBatch();
         (anyUnlocked ? lockSelection : unlockSelection)(runtime.scene, ids);
@@ -129,18 +154,78 @@ export function buildArrangeActions(): Action[] {
     {
       // Locked elements ignore clicks by design, so they can't be selected and unlocked one by one —
       // this canvas-level escape hatch frees every locked element at once and selects them, making
-      // the result visible (and immediately re-lockable if the release was a mistake).
+      // the result visible (and immediately re-lockable if the release was a mistake). Non-admins
+      // cannot unlock admin-locked elements.
       id: "unlock-all",
       labelKey: "action.unlockAll",
       icon: "lock",
-      isEnabled: (runtime) => runtime.scene.getElements().some((element) => !element.isDeleted && element.locked),
+      isEnabled: (runtime) => {
+        const isAdmin = Boolean(runtime.ui.getCollabAdmin?.());
+        return runtime.scene.getElements().some((element) => {
+          if (element.isDeleted || !element.locked) return false;
+          if (!isAdmin && (element.adminLocked || runtime.scene.resolveLayer(element).adminLocked || runtime.scene.isPrivateLocked(element))) return false;
+          return true;
+        });
+      },
       run: (runtime) => {
+        const isAdmin = Boolean(runtime.ui.getCollabAdmin?.());
         const ids = runtime.scene
           .getElements()
-          .filter((element) => !element.isDeleted && element.locked)
+          .filter((element) => {
+            if (element.isDeleted || !element.locked) return false;
+            if (!isAdmin && (element.adminLocked || runtime.scene.resolveLayer(element).adminLocked || runtime.scene.isPrivateLocked(element))) return false;
+            return true;
+          })
           .map((element) => element.id);
+        if (ids.length === 0) return;
         runtime.history.beginBatch();
         unlockSelection(runtime.scene, ids);
+        runtime.history.endBatch(runtime.scene.getElements());
+        runtime.selection.selectOnly(ids);
+      },
+    },
+    {
+      id: "lock-for-everyone",
+      labelKey: "action.lockForEveryone",
+      icon: "admin-lock",
+      isEnabled: (runtime) =>
+        Boolean(runtime.ui.getCollabAdmin?.()) &&
+        [...runtime.selection.getSelectedIds()].some((id) => {
+          const element = runtime.scene.getElement(id);
+          return Boolean(element && !element.isDeleted && !element.adminLocked);
+        }),
+      run: (runtime) => {
+        if (!runtime.ui.getCollabAdmin?.()) return;
+        const ids = [...runtime.selection.getSelectedIds()];
+        if (ids.length === 0) return;
+        runtime.history.beginBatch();
+        lockForEveryone(runtime.scene, ids);
+        runtime.history.endBatch(runtime.scene.getElements());
+      },
+    },
+    {
+      id: "unlock-for-everyone",
+      labelKey: "action.unlockForEveryone",
+      icon: "unlock",
+      isEnabled: (runtime) =>
+        Boolean(runtime.ui.getCollabAdmin?.()) &&
+        runtime.scene.getElements().some((element) => !element.isDeleted && element.adminLocked === true),
+      run: (runtime) => {
+        if (!runtime.ui.getCollabAdmin?.()) return;
+        const selectedAdminIds = [...runtime.selection.getSelectedIds()].filter((id) => {
+          const element = runtime.scene.getElement(id);
+          return Boolean(element && !element.isDeleted && element.adminLocked === true);
+        });
+        const ids =
+          selectedAdminIds.length > 0
+            ? selectedAdminIds
+            : runtime.scene
+                .getElements()
+                .filter((element) => !element.isDeleted && element.adminLocked === true)
+                .map((element) => element.id);
+        if (ids.length === 0) return;
+        runtime.history.beginBatch();
+        unlockForEveryone(runtime.scene, ids);
         runtime.history.endBatch(runtime.scene.getElements());
         runtime.selection.selectOnly(ids);
       },

@@ -135,7 +135,9 @@ export function buildRoomWebSocketUrl(apiBaseUrl: string, roomId: string, token?
  * Anything unrecognised — no token, an unknown prefix, a bare MAC — reads as `editor`, which is what
  * every room link created before roles existed is.
  */
-export function roleClaimedByToken(token: string | null | undefined): "editor" | "viewer" {
-  return token?.startsWith("viewer.") ? "viewer" : "editor";
+export function roleClaimedByToken(token: string | null | undefined): "admin" | "editor" | "viewer" {
+  if (token?.startsWith("viewer.")) return "viewer";
+  if (token?.startsWith("admin.")) return "admin";
+  return "editor";
 }
 

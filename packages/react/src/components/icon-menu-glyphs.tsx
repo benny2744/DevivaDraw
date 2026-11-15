@@ -76,6 +76,21 @@ export const MENU_GLYPHS: Record<string, ReactNode> = {
       <path d="M7 9 V6.5 A3 3 0 0 1 12.6 5.2" />
     </>
   ),
+  // Shield-lock glyph for admin-only locks.
+  "admin-lock": (
+    <>
+      <path d="M10 3 L16 5.5 V9.5 C16 13.5 13.4 16 10 17.2 C6.6 16 4 13.5 4 9.5 V5.5 Z" strokeLinejoin="round" />
+      <rect x="7.5" y="9.5" width="5" height="4" rx="0.8" />
+      <path d="M8.5 9.5 V8 A1.5 1.5 0 0 1 11.5 8 V9.5" />
+    </>
+  ),
+  "admins-only": (
+    <>
+      <path d="M10 3 L16 5.5 V9.5 C16 13.5 13.4 16 10 17.2 C6.6 16 4 13.5 4 9.5 V5.5 Z" strokeLinejoin="round" />
+      <circle cx="10" cy="10" r="2.1" />
+      <path d="M6.8 13.2 L13.2 6.8" strokeLinecap="round" />
+    </>
+  ),
   // A gear: eight stubby teeth around a ring — the preferences flyout's parent row.
   settings: (
     <>

@@ -32,6 +32,8 @@ export interface SerializeSceneOptions {
    * paths must never set this — those are the full-fidelity document formats.
    */
   excludeHidden?: boolean;
+  /** Drops private-mode held element ids from the serialized metadata (e.g. public snapshots). */
+  excludeHeld?: boolean;
   /**
    * Leaves these files' bytes out of `files`, keeping the elements' `fileId` references intact — for
    * a host that persists the payloads separately (see `file-store.ts` for why: base64 image bytes are
@@ -54,7 +56,7 @@ export interface SerializeSceneOptions {
  * since-deleted image never bloats the output.
  */
 export function serializeScene(scene: Scene, options: SerializeSceneOptions = {}): SceneDocumentV1 {
-  const { includeDeleted = false, appState, excludeHidden = false, excludeFileIds } = options;
+  const { includeDeleted = false, appState, excludeHidden = false, excludeHeld = false, excludeFileIds } = options;
   const elements = scene.getElements().filter((element) => (includeDeleted || !element.isDeleted) && !(excludeHidden && scene.isElementHidden(element)));
 
   const referencedFileIds = new Set<string>();
@@ -87,6 +89,9 @@ export function serializeScene(scene: Scene, options: SerializeSceneOptions = {}
   if (scene.hasComments()) {
     document.comments = scene.getAllCommentThreads();
     document.commentMessages = scene.getAllCommentMessages();
+  }
+  if (scene.hasHeldElements() && !excludeHidden && !excludeHeld) {
+    document.heldElementIds = scene.getHeldElementIds();
   }
   return document;
 }
@@ -211,6 +216,7 @@ function buildSceneFromDocument(document: SceneDocumentV1): Scene {
   }
   for (const [fileId, file] of Object.entries(document.files)) scene.restoreFile(fileId, file);
   for (const element of document.elements) scene.restoreElement(element);
+  if (document.heldElementIds !== undefined) scene.replaceHeldElementIds(document.heldElementIds);
   if (document.appState?.background !== undefined) scene.setBackground(document.appState.background);
   repairDanglingReferences(scene);
   return scene;

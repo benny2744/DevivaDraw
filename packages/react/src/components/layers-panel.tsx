@@ -21,10 +21,11 @@ import type { DevivaRuntime } from "../runtime/runtime-types";
 
 export interface LayersPanelProps {
   runtime: DevivaRuntime;
+  isAdmin?: boolean;
 }
 
 export function LayersPanel(props: LayersPanelProps) {
-  const { runtime } = props;
+  const { runtime, isAdmin = false } = props;
   const scene = runtime.scene;
   const { t } = useTranslation();
   const [renamingId, setRenamingId] = useState<string | null>(null);
@@ -89,16 +90,57 @@ export function LayersPanel(props: LayersPanelProps) {
             >
               <Icon name={layer.visible ? "eye" : "eye-off"} size={12} />
             </button>
-            <button
-              type="button"
-              data-testid={`layer-locked-${layer.id}`}
-              aria-label={t(layer.locked ? "layers.unlock" : "layers.lock")}
-              aria-pressed={layer.locked}
-              style={{ ...buttonStyle(false), padding: "2px 4px", opacity: layer.locked ? 1 : 0.5 }}
-              onClick={() => scene.setLayerLocked(layer.id, !layer.locked)}
-            >
-              <Icon name={layer.locked ? "lock" : "unlock"} size={12} />
-            </button>
+            {!isAdmin && layer.adminLocked ? (
+              <span
+                data-testid={`layer-admin-locked-badge-${layer.id}`}
+                aria-label={t("layers.adminLockedHint")}
+                title={t("layers.adminLockedHint")}
+                style={{ display: "inline-flex", alignItems: "center", padding: "2px 4px", opacity: 0.7 }}
+              >
+                <Icon name="admin-lock" size={12} />
+              </span>
+            ) : (
+              <button
+                type="button"
+                data-testid={`layer-locked-${layer.id}`}
+                aria-label={t(layer.locked ? "layers.unlock" : "layers.lock")}
+                aria-pressed={layer.locked}
+                style={{ ...buttonStyle(false), padding: "2px 4px", opacity: layer.locked ? 1 : 0.5 }}
+                onClick={() => scene.setLayerLocked(layer.id, !layer.locked)}
+              >
+                <Icon name={layer.locked ? "lock" : "unlock"} size={12} />
+              </button>
+            )}
+            {isAdmin && (
+              <>
+                <button
+                  type="button"
+                  data-testid={`layer-admin-locked-${layer.id}`}
+                  aria-label={t(layer.adminLocked ? "layers.adminUnlock" : "layers.adminLock")}
+                  title={t(layer.adminLocked ? "layers.adminUnlock" : "layers.adminLock")}
+                  aria-pressed={Boolean(layer.adminLocked)}
+                  style={{ ...buttonStyle(false), padding: "2px 4px", opacity: layer.adminLocked ? 1 : 0.45 }}
+                  onClick={() => scene.setLayerAdminLocked(layer.id, !layer.adminLocked)}
+                >
+                  <Icon name="admin-lock" size={12} />
+                </button>
+                <button
+                  type="button"
+                  data-testid={`layer-audience-${layer.id}`}
+                  aria-label={t(layer.audience === "admins" ? "layers.makePublic" : "layers.makeAdminsOnly")}
+                  title={t(layer.audience === "admins" ? "layers.makePublic" : "layers.makeAdminsOnly")}
+                  aria-pressed={layer.audience === "admins"}
+                  style={{
+                    ...buttonStyle(layer.audience === "admins"),
+                    padding: "2px 4px",
+                    opacity: layer.audience === "admins" ? 1 : 0.45,
+                  }}
+                  onClick={() => scene.setLayerAudience(layer.id, layer.audience === "admins" ? undefined : "admins")}
+                >
+                  <Icon name="admins-only" size={12} />
+                </button>
+              </>
+            )}
             {renamingId === layer.id ? (
               <input
                 data-testid={`layer-rename-${layer.id}`}
@@ -159,7 +201,7 @@ export function LayersPanel(props: LayersPanelProps) {
             >
               <Icon name="layer-down" size={11} />
             </button>
-            {layers.length > 1 && (
+            {layers.length > 1 && (isAdmin || !layer.adminLocked) && (
               <button type="button" data-testid={`layer-delete-${layer.id}`} aria-label={t("layers.delete")} style={{ ...buttonStyle(false), padding: "2px 4px" }} onClick={() => deleteLayer(layer.id)}>
                 <Icon name="close" size={11} />
               </button>

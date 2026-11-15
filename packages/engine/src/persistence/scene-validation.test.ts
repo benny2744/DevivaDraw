@@ -271,4 +271,27 @@ describe("validateSceneDocument — load-path hardening", () => {
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.error).toMatch(/dataURL/);
   });
+
+  it("accepts adminLocked: true on elements and layers, and rejects non-true adminLocked", () => {
+    const okEl = { ...stored(createRectangleElement({ x: 0, y: 0 })), adminLocked: true };
+    const doc = {
+      ...minimalDocument([okEl]),
+      layers: [{ id: "l1", name: "Layer 1", visible: true, locked: false, adminLocked: true }],
+    };
+    const valid = validateSceneDocument(doc);
+    expect(valid.ok).toBe(true);
+    if (valid.ok) {
+      expect(valid.value.elements[0]!.adminLocked).toBe(true);
+      expect(valid.value.layers?.[0]!.adminLocked).toBe(true);
+    }
+
+    const badEl = { ...stored(createRectangleElement({ x: 0, y: 0 })), adminLocked: false };
+    expect(validateSceneDocument(minimalDocument([badEl])).ok).toBe(false);
+
+    const badLayerDoc = {
+      ...minimalDocument([]),
+      layers: [{ id: "l1", name: "Layer 1", visible: true, locked: false, adminLocked: false }],
+    };
+    expect(validateSceneDocument(badLayerDoc).ok).toBe(false);
+  });
 });

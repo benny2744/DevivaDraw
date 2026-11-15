@@ -42,6 +42,8 @@ export interface UseCollabSessionOptions {
    * later" — is exactly what a callback expresses.
    */
   onBeforeJoin?(): void;
+  /** Live private-mode state controlled by the embedding host. */
+  privateMode?: boolean;
 }
 
 /** Machine-checkable failure reason (mirrors `DecryptSceneErrorReason`'s "code, not prose" contract) so the dialog component picks an i18n'd message rather than displaying free text. `null` means no error is currently active. */
@@ -111,10 +113,11 @@ export interface UseCollabSessionResult {
   dismissEnded(): void;
   /** The local user's active page id in a multi-page host, `null` otherwise. Exposed so the peer list can tell which peers are on this page and therefore followable. */
   localPageId: string | null;
+  setPrivateMode(enabled: boolean): void;
 }
 
 export function useCollabSession(options: UseCollabSessionOptions): UseCollabSessionResult {
-  const { scene, pageStore, apiBaseUrl, onBeforeJoin } = options;
+  const { scene, pageStore, apiBaseUrl, onBeforeJoin, privateMode } = options;
   const sessionRef = useRef<CollabSession | null>(null);
   // The session lives as long as its anchor: the stable page store when present (a page switch swaps
   // `scene` but must not drop a live session), the scene itself otherwise.
@@ -348,7 +351,15 @@ export function useCollabSession(options: UseCollabSessionOptions): UseCollabSes
 
   const dismissEnded = useCallback(() => setEndedReason(null), []);
 
-  return { status, joining, isJoining, roomUrl, viewerUrl, role, peers, error, endedReason, dismissEnded, startSession, hostSession, joinSession, leaveSession, updateCursor, sendReaction, setHandRaised, setLocalViewport, follow, followedPeerId, followedViewport, localPageId };
+  const setPrivateMode = useCallback((enabled: boolean) => {
+    sessionRef.current?.setPrivateMode(enabled);
+  }, []);
+
+  useEffect(() => {
+    if (privateMode !== undefined) sessionRef.current?.setPrivateMode(privateMode);
+  }, [privateMode, sessionAnchor]);
+
+  return { status, joining, isJoining, roomUrl, viewerUrl, role, peers, error, endedReason, dismissEnded, startSession, hostSession, joinSession, leaveSession, updateCursor, sendReaction, setHandRaised, setLocalViewport, follow, followedPeerId, followedViewport, localPageId, setPrivateMode };
 }
 
 /**

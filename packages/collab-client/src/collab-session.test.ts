@@ -16,35 +16,61 @@ import type { WebSocketLike } from "./connection-manager";
  * harness only needs to be faithful enough to prove `CollabSession` itself behaves correctly against it.
  */
 class FakeRoomRelay {
-  private readonly members: Array<{ peerId: string; socket: FakeSocket }> = [];
-  private storedSnapshot: string | null = null;
+  private readonly members: Array<{ peerId: string; socket: FakeSocket; role?: "admin" | "editor" | "viewer" }> = [];
+  private storedPublicSnapshot: string | null = null;
+  private storedAdminSnapshot: string | null = null;
   private nextPeerId = 1;
+  private privateMode = false;
   /** Every socket ever created, in creation order — lets a test reach in and simulate a server-side drop on a specific peer's connection (`ConnectionManager` itself has no such hook; only the transport does). */
   readonly sockets: FakeSocket[] = [];
 
-  createSocket(): FakeSocket {
+  setPrivateMode(enabled: boolean): void {
+    this.privateMode = enabled;
+  }
+
+  createSocket(role?: "admin" | "editor" | "viewer"): FakeSocket {
     const peerId = `peer-${this.nextPeerId++}`;
-    const socket = new FakeSocket((raw) => this.handleMessage(peerId, socket, raw));
-    this.members.push({ peerId, socket });
+    const socket = new FakeSocket((raw) => this.handleMessage(peerId, socket, role, raw));
+    this.members.push({ peerId, socket, role });
     this.sockets.push(socket);
     queueMicrotask(() => socket.open());
     return socket;
   }
 
-  private handleMessage(senderId: string, senderSocket: FakeSocket, raw: string): void {
-    const message = JSON.parse(raw) as { type: string };
+  private handleMessage(senderId: string, senderSocket: FakeSocket, senderRole: "admin" | "editor" | "viewer" | undefined, raw: string): void {
+    const message = JSON.parse(raw) as { type: string; audience?: "all" | "admins" | "others" };
     if (message.type === "snapshot-request") {
-      if (this.storedSnapshot) senderSocket.deliver(this.storedSnapshot);
+      const requester = this.members.find((m) => m.peerId === senderId);
+      const cached = requester?.role === "admin" ? (this.storedAdminSnapshot ?? this.storedPublicSnapshot) : this.storedPublicSnapshot;
+      if (cached) senderSocket.deliver(cached);
       else this.broadcastExceptSender(senderId, raw);
       return;
     }
-    if (message.type === "snapshot") this.storedSnapshot = JSON.stringify({ ...message, peerId: senderId });
-    this.broadcastExceptSender(senderId, JSON.stringify({ ...message, peerId: senderId }));
+    const isHeld = this.privateMode && senderRole === "editor" && message.type === "element-delta";
+    const audience = isHeld ? "admins" : (senderRole === "admin" && message.audience ? message.audience : "all");
+    const stamped = JSON.stringify({
+      ...message,
+      audience: undefined,
+      peerId: senderId,
+      ...(senderRole ? { senderRole } : {}),
+      ...(isHeld ? { held: true } : {}),
+    });
+    if (message.type === "snapshot") {
+      if (audience === "admins") this.storedAdminSnapshot = stamped;
+      else if (audience === "all") {
+        this.storedPublicSnapshot = stamped;
+        this.storedAdminSnapshot = null;
+      }
+    }
+    this.broadcastExceptSender(senderId, stamped, audience);
   }
 
-  private broadcastExceptSender(senderId: string, raw: string): void {
+  private broadcastExceptSender(senderId: string, raw: string, audience: "all" | "admins" | "others" = "all"): void {
     for (const member of this.members) {
-      if (member.peerId !== senderId) member.socket.deliver(raw);
+      if (member.peerId === senderId) continue;
+      if (audience === "admins" && member.role !== "admin") continue;
+      if (audience === "others" && member.role === "admin") continue;
+      member.socket.deliver(raw);
     }
   }
 
@@ -141,12 +167,12 @@ function makePagedSession(relay: FakeRoomRelay, store: PageStore, name: string):
   return session;
 }
 
-function makeSession(relay: FakeRoomRelay, scene: Scene, name: string): CollabSession {
+function makeSession(relay: FakeRoomRelay, scene: Scene, name: string, role?: "admin" | "editor" | "viewer"): CollabSession {
   const session = new CollabSession({
     scene,
     userName: name,
     userColor: "#123456",
-    createSocket: () => relay.createSocket(),
+    createSocket: () => relay.createSocket(role),
     createRoom: fakeCreateRoom,
     // Fast, deterministic-ish reconnect timing for tests that need to observe a reconnect — production
     // relies on `ConnectionManager`'s own (much larger) defaults.
@@ -349,6 +375,172 @@ describe("CollabSession — end-to-end over an in-memory relay", () => {
     await session.joinSession("http://collab.example", `https://draw.example/room/room-legacy#key=${await generateRoomKey()}`);
     await waitUntil(() => session.connectionStatus === "connected");
     expect(session.currentRole).toBe("editor");
+  });
+
+  it("an admin link joins as an admin and syncs element deltas", async () => {
+    const relay = new FakeRoomRelay();
+    const adminScene = new Scene();
+    const peerScene = new Scene();
+    const admin = makeSession(relay, adminScene, "Admin");
+    const peer = makeSession(relay, peerScene, "Peer");
+    const key = await generateRoomKey();
+
+    await admin.joinSession("http://collab.example", `https://draw.example/room/room-admin?t=admin.mac#key=${key}`);
+    await peer.joinSession("http://collab.example", `https://draw.example/room/room-admin?t=editor.mac#key=${key}`);
+    await waitUntil(() => admin.connectionStatus === "connected" && peer.connectionStatus === "connected");
+    expect(admin.currentRole).toBe("admin");
+
+    const element = adminScene.addElement(createRectangleElement({ x: 3, y: 4, width: 5, height: 6 }));
+    await waitUntil(() => peerScene.getElement(element.id) !== undefined);
+    expect(peerScene.getElement(element.id)).toEqual(element);
+  });
+
+  it("admin refuses a non-admin edit to an admin-locked element and snaps the non-admin back", async () => {
+    const relay = new FakeRoomRelay();
+    const adminScene = new Scene();
+    const studentScene = new Scene();
+    const admin = makeSession(relay, adminScene, "Admin", "admin");
+    const student = makeSession(relay, studentScene, "Student", "editor");
+    const key = await generateRoomKey();
+
+    await admin.joinSession("http://collab.example", `https://draw.example/room/room-lock?t=admin.mac#key=${key}`);
+    await student.joinSession("http://collab.example", `https://draw.example/room/room-lock?t=editor.mac#key=${key}`);
+    await waitUntil(() => admin.connectionStatus === "connected" && student.connectionStatus === "connected");
+
+    const rect = adminScene.addElement(createRectangleElement({ x: 10, y: 20, width: 30, height: 40, adminLocked: true }));
+    await waitUntil(() => studentScene.getElement(rect.id)?.adminLocked === true);
+
+    // Simulate a modified student client tampering with the admin-locked element locally.
+    studentScene.updateElement(rect.id, { x: 999, adminLocked: undefined });
+    await waitUntil(() => studentScene.getElement(rect.id)?.x === 10);
+
+    expect(adminScene.getElement(rect.id)?.x).toBe(10);
+    expect(adminScene.getElement(rect.id)?.adminLocked).toBe(true);
+    expect(studentScene.getElement(rect.id)?.adminLocked).toBe(true);
+  });
+
+  it("private mode hides new student work from peers until private mode ends and locks pre-existing elements on students", async () => {
+    const relay = new FakeRoomRelay();
+    const adminScene = new Scene();
+    const studentAScene = new Scene();
+    const studentBScene = new Scene();
+    const admin = makeSession(relay, adminScene, "Admin", "admin");
+    const studentA = makeSession(relay, studentAScene, "StudentA", "editor");
+    const studentB = makeSession(relay, studentBScene, "StudentB", "editor");
+    const key = await generateRoomKey();
+
+    await admin.joinSession("http://collab.example", `https://draw.example/room/room-priv?t=admin.mac#key=${key}`);
+    await studentA.joinSession("http://collab.example", `https://draw.example/room/room-priv?t=editor.mac#key=${key}`);
+    await studentB.joinSession("http://collab.example", `https://draw.example/room/room-priv?t=editor.mac#key=${key}`);
+    await waitUntil(() => admin.connectionStatus === "connected" && studentA.connectionStatus === "connected" && studentB.connectionStatus === "connected");
+
+    const shared = adminScene.addElement(createRectangleElement({ x: 0, y: 0, width: 20, height: 20 }));
+    await waitUntil(() => studentAScene.getElement(shared.id) !== undefined && studentBScene.getElement(shared.id) !== undefined);
+
+    relay.setPrivateMode(true);
+    admin.setPrivateMode(true);
+    studentA.setPrivateMode(true);
+    studentB.setPrivateMode(true);
+
+    // Pre-existing element acts locked on students.
+    expect(studentAScene.effectiveLocked(studentAScene.getElement(shared.id)!)).toBe(true);
+
+    // StudentA draws a new element; admin receives it as held, StudentB does not see it.
+    const heldByA = studentAScene.addElement(createRectangleElement({ x: 50, y: 50, width: 15, height: 15 }));
+    expect(studentAScene.effectiveLocked(heldByA)).toBe(false);
+    await waitUntil(() => adminScene.getElement(heldByA.id) !== undefined);
+    expect(adminScene.isElementHeld(heldByA.id)).toBe(true);
+    await sleep(150);
+    expect(studentBScene.getElement(heldByA.id)).toBeUndefined();
+
+    // Ending private mode releases held work to StudentB and clears heldElementIds.
+    relay.setPrivateMode(false);
+    studentA.setPrivateMode(false);
+    studentB.setPrivateMode(false);
+    admin.setPrivateMode(false);
+
+    await waitUntil(() => studentBScene.getElement(heldByA.id) !== undefined);
+    expect(adminScene.hasHeldElements()).toBe(false);
+    expect(studentAScene.effectiveLocked(studentAScene.getElement(shared.id)!)).toBe(false);
+  });
+
+  it("hiding a layer sends tombstones to non-admins and revealing bumps versions so everyone sees it again", async () => {
+    const relay = new FakeRoomRelay();
+    const adminStore = PageStore.fresh();
+    const studentStore = PageStore.fresh();
+    const admin = new CollabSession({
+      scene: adminStore.getActiveScene(),
+      pages: createPageStoreCollabAdapter(adminStore),
+      userName: "Admin",
+      userColor: "#111111",
+      createSocket: () => relay.createSocket("admin"),
+      createRoom: fakeCreateRoom,
+    });
+    const student = new CollabSession({
+      scene: studentStore.getActiveScene(),
+      pages: createPageStoreCollabAdapter(studentStore),
+      userName: "Student",
+      userColor: "#222222",
+      createSocket: () => relay.createSocket("editor"),
+      createRoom: fakeCreateRoom,
+    });
+    sessions.push(admin, student);
+
+    const key = await generateRoomKey();
+    await admin.joinSession("http://collab.example", `https://draw.example/room/room-layers?t=admin.mac#key=${key}`);
+    await student.joinSession("http://collab.example", `https://draw.example/room/room-layers?t=editor.mac#key=${key}`);
+    await waitUntil(() => admin.connectionStatus === "connected" && student.connectionStatus === "connected");
+
+    const adminScene = adminStore.getActiveScene();
+    const pageId = adminStore.getActivePageId();
+    const secretLayer = adminScene.addLayer("Answer Key");
+    adminScene.setActiveLayer(secretLayer.id);
+    const answer = adminScene.addElement(createRectangleElement({ x: 10, y: 10, width: 20, height: 20 }));
+
+    // Force a snapshot so student learns the layer list too, and receives the element while layer is public.
+    await waitUntil(() => studentStore.getSceneById(pageId)?.getElement(answer.id)?.isDeleted === false);
+
+    // Admin hides the layer -> students receive a tombstone, admin keeps the real element at the bumped version.
+    adminScene.setLayerAudience(secretLayer.id, "admins");
+    await waitUntil(() => studentStore.getSceneById(pageId)?.getElement(answer.id)?.isDeleted === true);
+    expect(adminScene.getElement(answer.id)?.isDeleted).toBe(false);
+
+    // Late-joining viewer gets only the public snapshot (no answer, no secretLayer).
+    const lateViewerStore = PageStore.fresh();
+    const lateViewer = new CollabSession({
+      scene: lateViewerStore.getActiveScene(),
+      pages: createPageStoreCollabAdapter(lateViewerStore),
+      userName: "Viewer",
+      userColor: "#333333",
+      createSocket: () => relay.createSocket("viewer"),
+      createRoom: fakeCreateRoom,
+    });
+    sessions.push(lateViewer);
+    await lateViewer.joinSession("http://collab.example", `https://draw.example/room/room-layers?t=viewer.mac#key=${key}`);
+    await waitUntil(() => lateViewerStore.getSceneById(pageId) !== null);
+    await sleep(100);
+    expect(lateViewerStore.getSceneById(pageId)?.getElement(answer.id)).toBeUndefined();
+    expect(lateViewerStore.getSceneById(pageId)?.getLayers().some((l) => l.id === secretLayer.id)).toBe(false);
+
+    // Late-joining second admin gets the admin snapshot (both secretLayer and answer).
+    const lateAdminStore = PageStore.fresh();
+    const lateAdmin = new CollabSession({
+      scene: lateAdminStore.getActiveScene(),
+      pages: createPageStoreCollabAdapter(lateAdminStore),
+      userName: "Admin2",
+      userColor: "#444444",
+      createSocket: () => relay.createSocket("admin"),
+      createRoom: fakeCreateRoom,
+    });
+    sessions.push(lateAdmin);
+    await lateAdmin.joinSession("http://collab.example", `https://draw.example/room/room-layers?t=admin.mac#key=${key}`);
+    await waitUntil(() => lateAdminStore.getSceneById(pageId)?.getElement(answer.id)?.isDeleted === false);
+    expect(lateAdminStore.getSceneById(pageId)?.getLayers().some((l) => l.id === secretLayer.id && l.audience === "admins")).toBe(true);
+
+    // Admin reveals the layer -> version bumps again and beats the tombstone on student and viewer.
+    adminScene.setLayerAudience(secretLayer.id, undefined);
+    await waitUntil(() => studentStore.getSceneById(pageId)?.getElement(answer.id)?.isDeleted === false);
+    await waitUntil(() => lateViewerStore.getSceneById(pageId)?.getElement(answer.id)?.isDeleted === false);
   });
 });
 

@@ -22,3 +22,21 @@ export function lockSelection(scene: Scene, ids: readonly string[]): void {
 export function unlockSelection(scene: Scene, ids: readonly string[]): void {
   setLocked(scene, ids, false);
 }
+
+function setAdminLocked(scene: Scene, ids: readonly string[], adminLocked: boolean): void {
+  for (const id of ids) {
+    const element = scene.getElement(id);
+    if (!element || element.isDeleted) continue;
+    if (Boolean(element.adminLocked) !== adminLocked) {
+      scene.updateElement(id, adminLocked ? { adminLocked: true } : { adminLocked: undefined });
+    }
+  }
+}
+
+export function lockForEveryone(scene: Scene, ids: readonly string[]): void {
+  setAdminLocked(scene, ids, true);
+}
+
+export function unlockForEveryone(scene: Scene, ids: readonly string[]): void {
+  setAdminLocked(scene, ids, false);
+}

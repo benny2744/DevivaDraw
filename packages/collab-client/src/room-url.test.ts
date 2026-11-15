@@ -78,13 +78,15 @@ describe("role tokens in a room URL", () => {
   });
 
   it("reads the role a token claims, defaulting to editor for anything it does not recognise", () => {
+    expect(roleClaimedByToken("admin.mac")).toBe("admin");
     expect(roleClaimedByToken("viewer.mac")).toBe("viewer");
     expect(roleClaimedByToken("editor.mac")).toBe("editor");
     expect(roleClaimedByToken(null)).toBe("editor");
     expect(roleClaimedByToken(undefined)).toBe("editor");
     expect(roleClaimedByToken("nonsense")).toBe("editor");
-    // Not a prefix match on a longer word: "viewerish." must not read as viewer.
+    // Not a prefix match on a longer word: "viewerish." / "adminish." must not read as viewer/admin.
     expect(roleClaimedByToken("viewerish.mac")).toBe("editor");
+    expect(roleClaimedByToken("adminish.mac")).toBe("editor");
   });
 });
 

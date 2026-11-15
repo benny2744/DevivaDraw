@@ -49,6 +49,8 @@ export interface SerializedLayer {
   name: string;
   visible: boolean;
   locked: boolean;
+  adminLocked?: true;
+  audience?: "admins";
 }
 
 export interface SceneDocumentV1 {
@@ -82,6 +84,8 @@ export interface SceneDocumentV1 {
   comments?: CommentThread[];
   /** Comment messages, flat and keyed to their thread by `threadId` — per-message records so two concurrent replies both survive a merge (see `comments/comment-types.ts`). Written under the same non-empty rule as `comments`. */
   commentMessages?: CommentMessage[];
+  /** Element ids held during private mode (admin metadata only; omitted when empty and never in public snapshots). */
+  heldElementIds?: string[];
 }
 
 /**
