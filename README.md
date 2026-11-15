@@ -1,6 +1,6 @@
 # Deviva Draw
 
-This is a fork of [nhtera/DevivaDraw](https://github.com/nhtera/DevivaDraw), kept so ModChat can carry changes that are not upstream yet. The MIT license and the original copyright stay in place. `main` tracks upstream. `modchat` is the branch ModChat installs, published as `@benny2744/engine`, `@benny2744/react`, and `@benny2744/collab-client`. `@deviva-draw/mcp` and the apps are not published from this fork.
+This is a standalone copy of [nhtera/DevivaDraw](https://github.com/nhtera/DevivaDraw), kept so ModChat can carry changes that are not upstream yet. The MIT license and the original copyright stay in place. `main` can be updated from that repository. `modchat` is the branch ModChat installs, published as `@benny2744/engine`, `@benny2744/react`, and `@benny2744/collab-client`. `@deviva-draw/mcp` and the apps are not published from this copy.
 
 After merging `upstream/main` into `modchat`, run `node scripts/apply-fork-names.mjs`, then the typecheck, lint, and test gate. Bump the `-modchat.N` versions, publish the three packages, and point ModChat at the new versions.
 
