@@ -663,3 +663,130 @@ describe("a peer joining somebody else's room", () => {
     expect(joinerStore.getActivePageId()).toBe(hostPageId);
   });
 });
+
+/**
+ * Classchat shared-mode repro: the teacher (admin) draws, two students (collaborator tokens =
+ * client `editor` role, relay-stamped `editor`) join, and one student moves a teacher-created
+ * element. Every peer must see the move. This is the reported production symptom stated as a test:
+ * the mover's own board updates, the others do not.
+ */
+describe("a collaborator moving an admin's element", () => {
+  it("propagates the move to the admin and the other collaborator", async () => {
+    const relay = new FakeRoomRelay();
+    const key = await generateRoomKey();
+    const teacherStore = PageStore.fresh();
+    const aStore = PageStore.fresh();
+    const bStore = PageStore.fresh();
+    const mk = (store: PageStore, role: "admin" | "editor", name: string): CollabSession => {
+      const s = new CollabSession({
+        scene: store.getActiveScene(),
+        pages: createPageStoreCollabAdapter(store),
+        userName: name,
+        userColor: "#123456",
+        createSocket: () => relay.createSocket(role),
+        createRoom: fakeCreateRoom,
+      });
+      sessions.push(s);
+      return s;
+    };
+    const teacher = mk(teacherStore, "admin", "Teacher");
+    const studentA = mk(aStore, "editor", "Student A");
+    const studentB = mk(bStore, "editor", "Student B");
+    await teacher.joinSession("http://relay.test", `https://draw.test/room/cbrepro?t=admin.mac#key=${key}`);
+    await waitUntil(() => teacher.connectionStatus === "connected");
+
+    const aPre = new Set(aStore.getPages().map((p) => p.id));
+    const aActive0 = aStore.getActivePageId();
+    const bPre = new Set(bStore.getPages().map((p) => p.id));
+    const bActive0 = bStore.getActivePageId();
+    await studentA.joinSession("http://relay.test", `https://draw.test/room/cbrepro?t=editor.mac#key=${key}`);
+    await studentB.joinSession("http://relay.test", `https://draw.test/room/cbrepro?t=editor.mac#key=${key}`);
+    await Promise.all([
+      adoptRoomPages(aStore, { preJoinPageIds: aPre, preJoinActiveId: aActive0, timeoutMs: 2_000 }),
+      adoptRoomPages(bStore, { preJoinPageIds: bPre, preJoinActiveId: bActive0, timeoutMs: 2_000 }),
+    ]);
+
+    // The teacher draws a shape.
+    const teacherScene = teacherStore.getActiveScene();
+    const pageId = teacherStore.getActivePageId();
+    const shape = teacherScene.addElement(createRectangleElement({ x: 10, y: 10, width: 40, height: 40 }));
+    await waitUntil(() => aStore.getSceneById(pageId)?.getElement(shape.id) !== undefined && bStore.getSceneById(pageId)?.getElement(shape.id) !== undefined);
+
+    // Student A moves it (the selection-move gesture commits via scene.updateElement).
+    const aScene = aStore.getSceneById(pageId)!;
+    aScene.updateElement(shape.id, { x: 500, y: 600 });
+
+    // The teacher and student B must see the new position.
+    await waitUntil(() => teacherScene.getElement(shape.id)!.x === 500 && teacherScene.getElement(shape.id)!.y === 600, 3_000);
+    await waitUntil(() => {
+      const el = bStore.getSceneById(pageId)?.getElement(shape.id);
+      return el !== undefined && el.x === 500 && el.y === 600;
+    }, 3_000);
+  });
+});
+
+/**
+ * The classchat ghost-move, end to end: a student's copy goes stale (the relay's cached snapshot
+ * predates the teacher's edits, exactly the reconnect-after-30s-window shape of the production
+ * report), they move the shape, and their delta then strictly loses LWW on the teacher's client.
+ * Without the admin's stale-delta flood-back the mover holds a ghost forever — nothing else
+ * republishes the authoritative frame. The version floor asserts the snap-back came from the
+ * correction flood, not an accidental snapshot delivery.
+ */
+describe("admin stale-delta flood-back", () => {
+  it("snaps a ghost-mover back to the authoritative position", async () => {
+    const relay = new FakeRoomRelay();
+    const key = await generateRoomKey();
+    const teacherScene = new Scene();
+    const teacher = new CollabSession({
+      scene: teacherScene,
+      userName: "Teacher",
+      userColor: "#111111",
+      createSocket: () => relay.createSocket("admin"),
+      createRoom: fakeCreateRoom,
+    });
+    sessions.push(teacher);
+    await teacher.joinSession("http://relay.test", `https://draw.test/room/ghost?t=admin.mac#key=${key}`);
+    await waitUntil(() => teacher.connectionStatus === "connected");
+
+    // The teacher draws; an incidental snapshot-request seeds the RELAY'S CACHE at this state —
+    // what a rejoiner will be served, stale or not (classchat's 30-second snapshot cadence is what
+    // opens the real-world window this models).
+    const rect = teacherScene.addElement(createRectangleElement({ x: 10, y: 10, width: 40, height: 40 }));
+    const seeder = relay.createSocket("viewer");
+    await waitUntil(() => seeder.readyState === 1);
+    seeder.send(JSON.stringify({ type: "snapshot-request" }));
+    await sleep(100); // teacher answers, relay caches the snapshot (@v1, x=10)
+    const frameAtV1 = { ...teacherScene.getElement(rect.id)! };
+
+    // The teacher keeps working — the room advances to @v3 x=999 with the student not yet present.
+    teacherScene.updateElement(rect.id, { x: 400 });
+    teacherScene.updateElement(rect.id, { x: 999 });
+    await waitUntil(() => teacherScene.getElement(rect.id)!.version >= 3);
+    await sleep(300); // let the teacher's debounced flushes drain
+    const versionBeforeGhostMove = teacherScene.getElement(rect.id)!.version;
+
+    // The remount analog: a FRESH session on the student's stale copy (what WhiteboardViewer's
+    // key={roomUrl} remount produces — page store kept, collab session rebuilt). It is served the
+    // stale cached snapshot, then "moves" the shape locally — the frame that starts the ghost.
+    const studentScene = new Scene();
+    studentScene.applyRemoteElement(frameAtV1);
+    const student = new CollabSession({
+      scene: studentScene,
+      userName: "Ghost",
+      userColor: "#222222",
+      createSocket: () => relay.createSocket("editor"),
+      createRoom: fakeCreateRoom,
+    });
+    sessions.push(student);
+    await student.joinSession("http://relay.test", `https://draw.test/room/ghost?t=editor.mac#key=${key}`);
+    await waitUntil(() => student.connectionStatus === "connected" && studentScene.getElement(rect.id)?.x === 10);
+    studentScene.updateElement(rect.id, { x: 500 });
+
+    // Pre-fix this timed out at x=500 forever: the teacher's client dropped the losing frame with
+    // no reply. Post-fix the stale-delta correction floods x=999 at a version past both frames.
+    await waitUntil(() => studentScene.getElement(rect.id)!.x === 999, 3_000);
+    expect(teacherScene.getElement(rect.id)!.x).toBe(999);
+    expect(teacherScene.getElement(rect.id)!.version).toBeGreaterThan(versionBeforeGhostMove); // correction, not luck
+  });
+});

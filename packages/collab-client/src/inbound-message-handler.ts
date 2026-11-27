@@ -57,6 +57,13 @@ export interface InboundMessageDeps {
   isAdmin?: boolean;
   /** Fires when an inbound element delta was refused due to sender role (e.g. non-admin edit to an admin-locked element). */
   onElementRefused?(scene: Scene, element: AnyElement, pageId?: string): void;
+  /**
+   * Fires on the admin client when a non-admin's incremental element-delta loses LWW against a
+   * strictly newer local copy (not an identical echo, not a snapshot merge). The host's answer is
+   * to bump the local version so the authoritative state floods back to the stale sender — this is
+   * what turns a silent ghost edit into a snap-back.
+   */
+  onStaleDelta?(scene: Scene, element: AnyElement, pageId?: string): void;
 }
 
 /**
@@ -94,6 +101,7 @@ function mergeOneElement(
   senderRole: CollabRole,
   pageId?: string,
   isHeld = false,
+  fromDelta = false,
 ): void {
   if (!isPlausibleRemoteElement(rawElement)) return;
   const local = target.getElement(rawElement.id);
@@ -105,12 +113,28 @@ function mergeOneElement(
     deps.onElementRefused?.(target, rawElement, pageId);
     return;
   }
-  if (!remoteElementWins(local, rawElement)) return;
+  if (!remoteElementWins(local, rawElement)) {
+    // A stale frame from a non-admin loses LWW and was historically dropped silently — the mover
+    // kept a ghost edit nobody else ever saw (the classchat "it only moved for me" report). On the
+    // admin client, a strict loss (this client's copy is newer, and this is an incremental delta
+    // rather than a bulk snapshot merge) is a correction trigger: `onStaleDelta` bumps the local
+    // version so the authoritative state floods back and the ghost snaps back. Identical echoes
+    // (same version AND versionNonce) are already-applied frames, never conflicts, and a snapshot
+    // bulk-merge is a reconciliation, not a claim of authority — both must not bump.
+    if (fromDelta && deps.isAdmin && senderRole !== "admin" && local !== undefined && !staleDeltaIsEcho(local, rawElement)) {
+      deps.onStaleDelta?.(target, rawElement, pageId);
+    }
+    return;
+  }
   if (isHeld && deps.isAdmin && local === undefined) {
     target.markElementHeld(rawElement.id);
   }
   target.applyRemoteElement(rawElement);
   deps.markSynced(rawElement.id, rawElement.version, pageId);
+}
+
+function staleDeltaIsEcho(local: { version: number; versionNonce: number }, remote: { version: number; versionNonce: number }): boolean {
+  return local.version === remote.version && local.versionNonce === remote.versionNonce;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -128,7 +152,7 @@ async function applyElementPayload(payload: unknown, deps: InboundMessageDeps, s
   const target = resolveTargetScene(payload.pageId, deps);
   if (!target) return; // a delta racing the deletion of its page must not resurrect it
   const pageId = typeof payload.pageId === "string" ? payload.pageId : undefined;
-  mergeOneElement(target, payload.element, deps, senderRole, pageId, isHeld);
+  mergeOneElement(target, payload.element, deps, senderRole, pageId, isHeld, true);
 }
 
 /** One `comment-delta` frame: exactly one of `thread`/`message`, routed to its page the same way an element delta is. */

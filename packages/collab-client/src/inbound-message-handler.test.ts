@@ -211,3 +211,85 @@ describe("handleInboundMessage — held private-mode frames", () => {
     expect(onElementRefused).toHaveBeenCalledWith(deps.scene, illegalEdit, undefined);
   });
 });
+
+/**
+ * The ghost-move guard: a non-admin's stale element-delta that strictly loses LWW on the ADMIN
+ * client must fire `onStaleDelta` (the host floods its newer copy back). Silent drops are what
+ * let a classchat student's moved shape stay visible only on their own board. Echoes (same
+ * version AND nonce), admin senders, snapshot bulk merges, and non-admin receivers must never
+ * trigger it — those are reconciliations, not conflicts to arbitrate.
+ */
+describe("handleInboundMessage — element-delta stale correction", () => {
+  async function makeAdminDeps() {
+    return { ...(await makeDeps()), isAdmin: true, onStaleDelta: vi.fn(), onElementRefused: vi.fn() };
+  }
+  async function editorDelta(deps: Awaited<ReturnType<typeof makeAdminDeps>>, element: unknown) {
+    const envelope = await encryptEnvelope(deps.roomKey, "element-delta", { element });
+    return JSON.stringify({ ...envelope, senderRole: "editor", peerId: "p1" });
+  }
+
+  it("fires onStaleDelta when an editor's older delta loses to the admin's newer copy", async () => {
+    const deps = await makeAdminDeps();
+    const added = deps.scene.addElement(createRectangleElement({ x: 0, y: 0, width: 1, height: 1 }));
+    deps.scene.updateElement(added.id, { x: 1 }); // admin copy is now ahead
+    const current = deps.scene.getElement(added.id)!;
+    const stale = { ...current, version: current.version - 1, x: 777 };
+
+    await handleInboundMessage(await editorDelta(deps, stale), deps);
+
+    expect(deps.onStaleDelta).toHaveBeenCalledTimes(1);
+    expect(deps.onStaleDelta.mock.calls[0]?.[1]?.id).toBe(added.id);
+    expect(deps.scene.getElement(added.id)).toEqual(current); // the stale frame was not applied
+    expect(deps.markSynced).not.toHaveBeenCalled();
+  });
+
+  it("never fires for an identical echo (same version and versionNonce)", async () => {
+    const deps = await makeAdminDeps();
+    const added = deps.scene.addElement(createRectangleElement({ x: 0, y: 0, width: 1, height: 1 }));
+    const current = deps.scene.getElement(added.id)!;
+
+    await handleInboundMessage(await editorDelta(deps, current), deps);
+
+    expect(deps.onStaleDelta).not.toHaveBeenCalled();
+  });
+
+  it("never fires for admin senders (no admin-to-admin ping-pong)", async () => {
+    const deps = await makeAdminDeps();
+    const added = deps.scene.addElement(createRectangleElement({ x: 0, y: 0, width: 1, height: 1 }));
+    deps.scene.updateElement(added.id, { x: 1 });
+    const current = deps.scene.getElement(added.id)!;
+    const stale = { ...current, version: current.version - 1, x: 777 };
+    const envelope = await encryptEnvelope(deps.roomKey, "element-delta", { element: stale });
+
+    await handleInboundMessage(JSON.stringify({ ...envelope, senderRole: "admin", peerId: "p2" }), deps);
+
+    expect(deps.onStaleDelta).not.toHaveBeenCalled();
+  });
+
+  it("never fires during snapshot bulk merges", async () => {
+    const deps = await makeAdminDeps();
+    const added = deps.scene.addElement(createRectangleElement({ x: 0, y: 0, width: 1, height: 1 }));
+    deps.scene.updateElement(added.id, { x: 1 });
+    const current = deps.scene.getElement(added.id)!;
+    const stale = { ...current, version: current.version - 1, x: 777 };
+    const envelope = await encryptEnvelope(deps.roomKey, "snapshot", { elements: [stale] });
+
+    await handleInboundMessage(JSON.stringify({ ...envelope, senderRole: "editor", peerId: "p1" }), deps);
+
+    expect(deps.onStaleDelta).not.toHaveBeenCalled();
+    expect(deps.scene.getElement(added.id)).toEqual(current);
+  });
+
+  it("never fires on non-admin receivers (only the admin client arbitrates)", async () => {
+    const deps = { ...(await makeDeps()), onStaleDelta: vi.fn() }; // isAdmin absent
+    const added = deps.scene.addElement(createRectangleElement({ x: 0, y: 0, width: 1, height: 1 }));
+    deps.scene.updateElement(added.id, { x: 1 });
+    const current = deps.scene.getElement(added.id)!;
+    const stale = { ...current, version: current.version - 1, x: 777 };
+    const envelope = await encryptEnvelope(deps.roomKey, "element-delta", { element: stale });
+
+    await handleInboundMessage(JSON.stringify({ ...envelope, senderRole: "editor", peerId: "p1" }), deps);
+
+    expect(deps.onStaleDelta).not.toHaveBeenCalled();
+  });
+});

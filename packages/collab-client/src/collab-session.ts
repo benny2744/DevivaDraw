@@ -443,7 +443,30 @@ export class CollabSession {
       onElementRefused: isAdmin
         ? (targetScene, refusedElement, pageId) => this.handleRefusedElement(targetScene, refusedElement, pageId)
         : undefined,
+      onStaleDelta: isAdmin
+        ? (targetScene, staleElement, pageId) => this.handleStaleDelta(targetScene, staleElement, pageId)
+        : undefined,
     });
+  }
+
+  /**
+   * The authoritative answer to a non-admin's stale delta: re-publish THIS client's copy of the
+   * element at a version past both frames, so the flood-back converges the stale sender instead of
+   * leaving it holding a ghost edit (the classchat "it only moved for me" report). Admin-only and
+   * non-admin-sender-only (see `inbound-message-handler.ts`) — two admins can never ping-pong this.
+   */
+  private handleStaleDelta(targetScene: Scene, staleElement: AnyElement, pageId?: string): void {
+    const local = targetScene.getElement(staleElement.id);
+    if (!local) return; // the newer copy this beat has since left the scene — nothing to flood
+    targetScene.applyRemoteElement({
+      ...local,
+      version: Math.max(local.version, staleElement.version) + 1,
+      versionNonce: randomVersionNonce(),
+      updated: Date.now(),
+    });
+    const syncKey = pageId === undefined ? local.id : `${pageId}/${local.id}`;
+    this.syncedVersions.delete(syncKey);
+    this.scheduleOutboundSync();
   }
 
   private handleRefusedElement(targetScene: Scene, refusedElement: AnyElement, pageId?: string): void {

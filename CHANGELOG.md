@@ -8,6 +8,18 @@ All notable changes to Deviva Draw are documented here. The format follows
 
 ### Fixed
 
+- **The pen and highlighter stay armed after a stroke.** Both freehand tools shared the shape
+  tools' commit handler, which hands control back to the select tool ("draw then adjust"). On a
+  stylus that made every stroke disarm the pen, forcing a re-tap between strokes — writing became
+  one-stroke-per-click. A committed stroke is still selected (the style panel keeps working);
+  only the tool switch is dropped. Shapes and text keep the auto-revert unchanged.
+- **A stale edit from a non-admin snaps back instead of haunting the mover.** An incoming
+  element-delta that strictly loses the LWW comparison on the admin client was dropped silently:
+  the sender kept a ghost edit nobody else would ever see (reported from classchat shared mode:
+  "it only moves for me"). The admin client now re-publishes its authoritative copy at a version
+  past both frames, so every peer — the mover included — converges. Identical echoes, admin
+  senders, and snapshot bulk merges never trigger the correction, so the flood cannot loop.
+
 - **An admin layer lock reaches other peers on the next sync, not up to 30 seconds later.** Any
   layer-list change (lock, audience, rename, reorder) now publishes a snapshot on the same flush
   as an element edit. A peer whose own layer version is newer still adopts the admin's lock and

@@ -154,6 +154,14 @@ export function buildTools(
   let handleCreated: (elementId: string, options?: { select?: boolean }) => void = () => {};
   const onShapeCreated = (elementId: string) => handleCreated(elementId, { select: true });
   const onTextPlaced = (elementId: string) => handleCreated(elementId, { select: false });
+  // Pen and highlighter are continuous writing tools: a committed stroke must NOT revert to the
+  // select tool (unlike shapes) — the next gesture is the next stroke, not an adjustment. This
+  // shipped as a production defect: sharing `shapeToolDeps.onCreated` disarmed the pen after every
+  // stroke, forcing a re-tap of the tool between each one. The new stroke is still selected so the
+  // style panel reflects it; only the tool switch is dropped. Deferred assignment for the same
+  // reason as `handleCreated`.
+  let handleStrokeCreated: (elementId: string) => void = () => {};
+  const onStrokeCreated = (elementId: string) => handleStrokeCreated(elementId);
   // A placed sticky note opens its label editor immediately — a note exists to hold words, so the
   // extra double-click every other shape requires would just be friction here. Deferred assignment
   // for the same reason as `handleCreated`: the edit session doesn't exist yet at tool-construction
@@ -189,10 +197,10 @@ export function buildTools(
     getBindingEnabled: () => getEditorPreferences().arrowBinding,
     getMidpointSnapEnabled: () => getEditorPreferences().snapMidpoints,
   });
-  const freedrawTool = new FreedrawTool({ ...shapeToolDeps, getConstantWidth: () => getEditorPreferences().constantWidthPen });
+  const freedrawTool = new FreedrawTool({ ...shapeToolDeps, onCreated: onStrokeCreated, getConstantWidth: () => getEditorPreferences().constantWidthPen });
   // The highlighter is the freehand tool in "marker" mode — same gesture/style handling, but every
   // stroke it commits is a translucent multiply-blended highlighter (see `FreedrawElement.highlighter`).
-  const highlighterTool = new FreedrawTool({ ...shapeToolDeps, highlighter: true });
+  const highlighterTool = new FreedrawTool({ ...shapeToolDeps, onCreated: onStrokeCreated, highlighter: true });
   // The eraser deletes rather than creates, so it takes no style/onCreated — just the scene, history
   // (one drag = one undo step), and zoom (for a zoom-independent pointer hit tolerance).
   const eraserTool = new EraserTool({ scene, history: historyStack, getZoom: () => getCamera().zoom });
@@ -312,6 +320,11 @@ export function buildTools(
     if (getToolLocked()) return;
     if (options?.select !== false) selectionState.selectOnly([elementId]);
     toolStateMachine.setTool(SELECT_TOOL_NAME);
+  };
+  handleStrokeCreated = (elementId: string) => {
+    // Keep the pen/highlighter armed (see `onStrokeCreated`); still track the newest stroke in the
+    // selection so its style shows in the panel, same selection contract the shapes get.
+    selectionState.selectOnly([elementId]);
   };
   handleTableCreated = (elementId: string) => {
     handleCreated(elementId, { select: true });
